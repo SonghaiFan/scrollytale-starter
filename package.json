@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "arquero": "^8.0.3",
@@ -16,7 +19,7 @@
     "scrollama": "^3.2.0"
   },
   "devDependencies": {
-    "vite": "^7.1.4"
+    "vite": "^7.1.4",
+    "vitepress": "^1.6.4"
   }
 }
-

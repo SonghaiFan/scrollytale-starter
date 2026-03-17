@@ -22,6 +22,13 @@ npm install
 npm run dev
 ```
 
+## Run The Docs
+
+```bash
+npm install
+npm run docs:dev
+```
+
 ## Start Here
 
 - Project overview: [docs/index.md](docs/index.md)
@@ -43,12 +50,10 @@ npm run dev
 
 ## GitHub Pages
 
-This repo now includes a lightweight docs site in `docs/`.
+This repo now includes a VitePress docs site in `docs/`.
 
 To publish it with GitHub Pages:
 
 1. Open repository settings on GitHub
 2. Go to `Pages`
-3. Set source to `Deploy from a branch`
-4. Choose branch `main`
-5. Choose folder `/docs`
+3. Set source to `GitHub Actions`

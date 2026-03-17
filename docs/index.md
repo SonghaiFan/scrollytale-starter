@@ -1,19 +1,34 @@
-# Scrollytale Starter
+---
+layout: home
+
+hero:
+  name: "Scrollytale Starter"
+  text: "Markdown-driven D3 scrollytelling"
+  tagline: "A standalone starter project for turning story specs and CSV files into scroll-driven webpages."
+  actions:
+    - theme: brand
+      text: Start Here
+      link: /authoring-workflow
+    - theme: alt
+      text: View on GitHub
+      link: https://github.com/SonghaiFan/scrollytale-starter
+
+features:
+  - title: Standalone by default
+    details: Clone the repo, edit `story.md`, add a CSV in `public/data`, and render a working scrollytelling page.
+  - title: AI-friendly authoring
+    details: The project is structured so humans and AI agents can both understand the authoring rules and make small, safe changes.
+  - title: Clear split of concerns
+    details: The starter is the runtime. A separate `scrollytale` skill can help generate `story.md`, but the starter remains usable on its own.
+---
+
+## What It Is
 
 `scrollytale-starter` is a standalone project for building scroll-driven data stories with:
 
 - one Markdown story file: `story.md`
 - one or more CSV files in `public/data/`
 - a small runtime that turns the story spec into a webpage
-
-The core idea is simple:
-
-1. write or generate `story.md`
-2. point sections at real CSV fields
-3. run the starter
-4. get a scrollytelling webpage
-
-This repo is designed for both humans and AI agents.
 
 ## If You Are New
 
@@ -76,12 +91,8 @@ But the starter must remain usable on its own. Someone should be able to clone t
 
 ## GitHub Pages
 
-This `docs/` folder is intended to work as lightweight project documentation on GitHub and GitHub Pages.
+This docs site is configured for VitePress and GitHub Pages via GitHub Actions.
 
-If you enable GitHub Pages for this repository, set the source to:
+After enabling Pages in the repository settings, choose:
 
-- `Deploy from a branch`
-- branch: `main`
-- folder: `/docs`
-
-Then this page becomes the main landing page for the project docs.
+- Source: `GitHub Actions`
