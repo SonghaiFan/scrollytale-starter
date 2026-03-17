@@ -15,7 +15,7 @@
 
 .steps {
   display: grid;
-  gap: 2rem;
+  gap: var(--scrollytale-step-gap, 2rem);
   padding-bottom: 10em;
 }
 
@@ -66,8 +66,8 @@
 
 .sticky-figure {
   position: sticky;
-  top: 1rem;
-  min-height: 72vh;
+  top: var(--scrollytale-figure-top, 1rem);
+  min-height: var(--scrollytale-figure-height, 72vh);
   width: 100%;
   transform: translate3d(0, 0, 0);
   z-index: 0;
@@ -81,10 +81,56 @@
   min-height: 100%;
 }
 
+.section-scrolly-overlay {
+  display: grid;
+  align-items: start;
+}
+
+.section-scrolly-overlay > * {
+  grid-area: 1 / 1;
+}
+
+.section-scrolly-overlay .section-copy {
+  position: relative;
+  z-index: 1;
+  width: min(45ch, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 0;
+  pointer-events: none;
+}
+
+.section-scrolly-overlay .section-copy > * {
+  pointer-events: auto;
+}
+
+.section-scrolly-overlay .sticky-figure {
+  min-height: var(--scrollytale-figure-height, 78vh);
+}
+
+.section-scrolly-overlay .steps {
+  gap: calc(var(--scrollytale-step-gap, 2rem) * 0.7);
+}
+
+.section-scrolly-overlay .step {
+  max-width: 42ch;
+}
+
+.section-scrolly-overlay .step:first-child {
+  margin-top: 6rem;
+}
+
+.section-scrolly-overlay .step:last-child {
+  margin-bottom: 12rem;
+}
+
 @media (min-width: 900px) {
   .section-scrolly-left {
     flex-direction: row;
     align-items: start;
+  }
+
+  .section-scrolly-overlay {
+    display: grid;
   }
 
   .section-scrolly-right {
@@ -104,6 +150,18 @@
 @media (max-width: 899px) {
   .section-scrolly {
     display: grid;
+  }
+
+  .section-scrolly-overlay > * {
+    grid-area: auto;
+  }
+
+  .section-scrolly-overlay .section-copy {
+    width: 100%;
+  }
+
+  .section-scrolly-overlay .sticky-figure {
+    min-height: 360px;
   }
 
   .sticky-figure {

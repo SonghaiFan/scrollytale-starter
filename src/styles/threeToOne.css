@@ -1,0 +1,237 @@
+/*
+ * A fidelity layer adapted from demo_three-to-one-main/src/css/three-to-one.css.
+ * It intentionally overrides the generic starter styles for the default preset.
+ */
+
+.app-shell {
+  width: 100%;
+  margin: 0;
+  padding: 0 0 8rem;
+}
+
+.app-header {
+  z-index: 60;
+}
+
+.app-header h1 {
+  display: none;
+}
+
+.story-root {
+  gap: 4rem;
+}
+
+.section-full-width {
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+.section-scrolly {
+  width: min(1600px, calc(100vw - 1rem));
+  margin-inline: auto;
+}
+
+.section-copy h2 {
+  font-size: clamp(3.6rem, 8vw, 5.8rem);
+  letter-spacing: -0.05em;
+}
+
+.section-hero {
+  width: 100vw;
+  min-height: 100vh;
+  margin-top: 0;
+  margin-left: calc(50% - 50vw);
+  margin-bottom: 6rem;
+  padding: 4rem 1rem 6rem;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.5)),
+    linear-gradient(transparent 65%, var(--page-bg)),
+    url(https://picsum.photos/id/1040/1600/1200?grayscale);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.section-hero .section-copy {
+  max-width: 88ch;
+  margin: 0 auto;
+}
+
+.section-hero .eyebrow {
+  display: inline-block;
+  margin: 0 auto 1.25rem;
+  padding: 0.15rem 0.55rem;
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.section-hero .section-copy h2 {
+  margin: 0 auto 1rem;
+  max-width: 12ch;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: clamp(4rem, 9vw, 7rem);
+}
+
+.section-hero .dek,
+.section-hero .summary,
+.section-hero .body-copy p,
+.section-hero .body-copy li {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.section-hero .body-copy {
+  max-width: 62ch;
+  margin: 0 auto;
+}
+
+.section-hero .body-copy p,
+.section-hero .body-copy li {
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+}
+
+.section-hero .figure-card {
+  max-width: 78ch;
+  margin: 2rem auto 0;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.section-hero .figure-card p {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.scroll-downs {
+  position: relative;
+  margin: 5rem auto 0;
+  width: 35px;
+  height: 55px;
+}
+
+.mousey {
+  width: 10px;
+  padding: 10px 15px;
+  height: 45px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 25px;
+  opacity: 0.85;
+  box-sizing: content-box;
+}
+
+.scroller {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  background-color: rgba(255, 255, 255, 0.92);
+  animation-name: scroll;
+  animation-duration: 2.5s;
+  animation-timing-function: cubic-bezier(0.15, 0.41, 0.69, 0.94);
+  animation-iteration-count: infinite;
+}
+
+@keyframes scroll {
+  0% {
+    opacity: 0;
+  }
+
+  10% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(15px);
+    opacity: 0;
+  }
+}
+
+.section-scrolly {
+  padding: 1rem;
+}
+
+.section-scrolly .section-copy {
+  padding: 0 1rem;
+}
+
+.section-scrolly-left .section-copy,
+.section-scrolly-right .section-copy {
+  flex: 0 1 45ch;
+  max-width: 45ch;
+}
+
+.section-scrolly-left .section-figure,
+.section-scrolly-right .section-figure {
+  flex: 1 1 0;
+}
+
+.step {
+  background-color: var(--surface);
+  opacity: 0.1;
+}
+
+.step.is-active {
+  opacity: 1;
+}
+
+.bottom-nav {
+  background: transparent;
+}
+
+.bottom-nav-inner {
+  background: var(--chrome-bg);
+}
+
+.bottom-nav-links {
+  gap: 0.1rem;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+}
+
+.bottom-nav-link,
+.bottom-nav-button {
+  opacity: 0.6;
+}
+
+.bottom-nav-link {
+  min-width: 1.65rem;
+  padding: 0.2rem 0.35rem;
+  border: 0;
+  font-size: 1em;
+}
+
+.bottom-nav-link.is-active {
+  border: 0;
+  opacity: 1;
+  color: var(--text);
+}
+
+.bottom-nav-button {
+  padding-inline: 0.5rem;
+}
+
+@media (max-width: 899px) {
+  .section-hero {
+    padding-top: 5rem;
+  }
+
+  .section-hero .section-copy h2 {
+    font-size: clamp(3.3rem, 14vw, 5.2rem);
+  }
+
+  .section-copy h2 {
+    font-size: clamp(2.8rem, 12vw, 4.6rem);
+  }
+
+  .bottom-nav-button {
+    font-size: 0.8rem;
+  }
+
+  .theme-switch {
+    margin-right: 6px;
+    transform: scale(0.92);
+    transform-origin: top right;
+  }
+}

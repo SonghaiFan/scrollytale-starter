@@ -1,7 +1,9 @@
 function renderStep(markdown, step, index) {
+  const content = typeof step === "string" ? step : step?.body ?? "";
+
   return `
     <div class="step${index === 0 ? " is-active" : ""}" data-step-index="${index}">
-      ${markdown.render(step)}
+      ${markdown.render(content)}
     </div>
   `;
 }

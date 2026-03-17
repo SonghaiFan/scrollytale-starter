@@ -88,7 +88,7 @@ This repo is not:
 ## Current v0 Scope
 
 - `structure`: `linear`
-- `layout`: `hero`, `scrolly-left`, `scrolly-right`, `full-width`
+- `layout`: `chapter`, `hero`, `scrolly-left`, `scrolly-overlay`, `scrolly-right`, `full-width`
 - `vis.type`: `html`, `bar`, `line`, `unit`
 
 The broader academic design space is documented in [design-space.md](design-space.md). The starter already accepts some of that metadata in `story.md`, even when the runtime support is still partial.

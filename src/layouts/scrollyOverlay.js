@@ -12,9 +12,9 @@ function renderBody(markdown, body) {
   return body ? `<div class="body-copy">${markdown.render(body)}</div>` : "";
 }
 
-export function renderScrollyLeft({ section, markdown }) {
+export function renderScrollyOverlay({ section, markdown }) {
   const element = document.createElement("section");
-  element.className = "section-shell section-scrolly section-scrolly-left";
+  element.className = "section-shell section-scrolly section-scrolly-overlay";
   element.id = section.id;
 
   element.innerHTML = `

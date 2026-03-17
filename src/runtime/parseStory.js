@@ -141,7 +141,10 @@ function extractBodyDirectives(body, baseConfig = {}) {
       }
 
       if (type === "step" && content) {
-        steps.push(content);
+        steps.push({
+          ...parseDirectiveAttributes(attrSource),
+          body: content,
+        });
       }
 
       if (type === "annotation" && content) {
@@ -181,6 +184,7 @@ function parseLegacySection(section) {
       title: section.title,
       config: {},
       body: section.raw.trim(),
+      raw: section.raw.trim(),
     };
   }
 
@@ -188,6 +192,9 @@ function parseLegacySection(section) {
     title: section.title,
     config: parseYamlBlock(blockMatch[1]),
     body: blockMatch[2].trim(),
+    raw: [`## ${section.title}`, "", "```yaml", blockMatch[1], "```", "", blockMatch[2].trim()]
+      .filter(Boolean)
+      .join("\n"),
   };
 }
 
@@ -208,7 +215,7 @@ function splitFrontmatterSections(body) {
     const end = index + 1 < matches.length ? matches[index + 1].index : source.length;
     const rawBody = source.slice(start, end).trim();
 
-    return { config, rawBody };
+    return { config, rawConfig: match[1].trim(), rawBody };
   });
 }
 
@@ -249,6 +256,7 @@ function parseFrontmatterSection(section, index) {
     title,
     config,
     body: heading.body,
+    raw: ["---", section.rawConfig, "---", "", section.rawBody.trim()].filter(Boolean).join("\n"),
   };
 }
 

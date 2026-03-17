@@ -186,11 +186,12 @@ At suburb level, the spread becomes much wider.
 
 | Preset / Pattern | 状态 | 说明 |
 | --- | --- | --- |
+| `chapter` | `supported` | 默认的 Markdown-first narrative section |
 | `hero` | `supported` | 近似 editorial opening |
 | `scrolly-left` | `supported` | sticky figure + text steps |
 | `scrolly-right` | `supported` | sticky figure + text steps |
 | `full-width` | `supported` | 普通 flow section |
-| `scrolly-overlay` | <span class="status-pill developing">Still developing</span> | 为了完整覆盖 `three-to-one` 和 `Nick_2` 仍然需要 |
+| `scrolly-overlay` | `supported` | 已作为 text-over-vis scrolly section 的一等 layout 存在 |
 | `axis`、`binding`、`container`、`overlap` metadata | `metadata` | 已保存在 normalized story object 中 |
 
 ### Transition

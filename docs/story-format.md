@@ -35,6 +35,7 @@ custom_style: ./src/styles/custom.css
 - `title`
 - `data`
 - `custom_style`
+- optional `chrome`
 
 ### `data`
 
@@ -57,6 +58,22 @@ data:
 
 Both work.
 
+### `chrome`
+
+Page-level chrome stays intentionally small and intuitive.
+
+Example:
+
+```yaml
+chrome:
+  bottom_nav: true
+```
+
+Current supported chrome:
+
+- `bottom_nav`
+- `theme_toggle`
+
 ## Recommended Section Format
 
 Each section starts with a short frontmatter block:
@@ -74,6 +91,10 @@ series: region
 ```
 
 Then you write the body in plain Markdown.
+
+For a normal narrative section, you can often omit `layout` entirely.
+
+If a section has no special layout, the starter now treats it as a `chapter`.
 
 ## Example
 
@@ -135,10 +156,49 @@ If `headline` is omitted, the runtime uses the first Markdown heading in the sec
 
 ## Recommended Layout Values
 
+- `chapter`
 - `hero`
 - `scrolly-left`
+- `scrolly-overlay`
 - `scrolly-right`
 - `full-width`
+
+### `chapter`
+
+`chapter` is the most natural narrative layout.
+
+It is designed for:
+
+- ordinary text sections
+- Markdown-first writing
+- optional embedded figures
+- images directly inside the text flow
+
+That means a simple section can look like:
+
+````md
+---
+id: context
+---
+
+## Why the gap feels larger now
+
+This is just a normal chapter-like section written in Markdown.
+````
+
+You can also insert images directly in the chapter body with normal Markdown:
+
+````md
+---
+id: shoreline
+---
+
+## A chapter can carry inline media
+
+The paragraph flow stays natural, and the image sits inside the story rather than in a separate visualization slot.
+
+![Calm shoreline](https://picsum.photos/1200/480?grayscale)
+````
 
 ## Recommended Chart Values
 
@@ -158,6 +218,29 @@ Inner Melbourne sets the upper boundary for the comparison.
 ```
 
 Each step can contain normal Markdown.
+
+`::step` can also carry a small amount of chart state.
+
+For example, `line` and `bar` currently support `focus`:
+
+```md
+::step{focus="all"}
+All series stay visible together.
+::
+
+::step{focus="Inner"}
+Focus the Inner series or bar.
+::
+
+::step{focus="Outer,Middle"}
+Focus multiple series or categories together.
+::
+```
+
+This is closer to how the case studies work:
+
+- step text explains the narrative
+- step attributes describe the visual state change
 
 ## Optional `::vis`
 

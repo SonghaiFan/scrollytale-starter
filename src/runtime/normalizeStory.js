@@ -15,8 +15,10 @@ import {
 } from "./designSpace.js";
 
 const SUPPORTED_LAYOUTS = new Set([
+  "chapter",
   "hero",
   "scrolly-left",
+  "scrolly-overlay",
   "scrolly-right",
   "full-width",
 ]);
@@ -90,6 +92,22 @@ function normalizeDataSources(frontmatter, warnings) {
   return [];
 }
 
+function normalizeChrome(frontmatter) {
+  const chrome = frontmatter.chrome ?? {};
+
+  if (chrome === true) {
+    return {
+      bottomNav: true,
+      themeToggle: true,
+    };
+  }
+
+  return {
+    bottomNav: Boolean(chrome.bottom_nav ?? chrome.bottomNav),
+    themeToggle: Boolean(chrome.theme_toggle ?? chrome.themeToggle),
+  };
+}
+
 function normalizeStructure(rawStructure, warnings) {
   if (rawStructure == null) {
     return {
@@ -137,16 +155,16 @@ function normalizeStructure(rawStructure, warnings) {
 
 function normalizeLayoutMetadata(rawLayout, warnings, title) {
   const layoutConfig = typeof rawLayout === "string" ? { preset: rawLayout } : rawLayout ?? {};
-  const requestedLayout = layoutConfig.preset ?? "full-width";
+  const requestedLayout = layoutConfig.preset ?? "chapter";
   const defaults = getLayoutPresetMetadata(requestedLayout) ?? {};
 
   if (!SUPPORTED_LAYOUTS.has(requestedLayout)) {
     warnings.push(
-      `Section "${title}" requested unsupported layout "${requestedLayout}". Falling back to "full-width".`
+      `Section "${title}" requested unsupported layout "${requestedLayout}". Falling back to "chapter".`
     );
   }
 
-  const preset = SUPPORTED_LAYOUTS.has(requestedLayout) ? requestedLayout : "full-width";
+  const preset = SUPPORTED_LAYOUTS.has(requestedLayout) ? requestedLayout : "chapter";
   const axis = layoutConfig.axis ?? defaults.axis ?? "vertical";
   const binding = layoutConfig.binding ?? defaults.binding ?? "fixed-to-text";
   const container = layoutConfig.container ?? defaults.container ?? "text-container";
@@ -227,13 +245,52 @@ function normalizeActionTrigger(value, warnings, title, hasSteps) {
   return trigger;
 }
 
+function normalizeStepEntry(entry) {
+  if (typeof entry === "string") {
+    return {
+      body: entry,
+    };
+  }
+
+  if (!entry || typeof entry !== "object") {
+    return null;
+  }
+
+  const body =
+    typeof entry.body === "string"
+      ? entry.body
+      : typeof entry.text === "string"
+        ? entry.text
+        : "";
+
+  if (!body.trim()) {
+    return null;
+  }
+
+  const normalized = {
+    body,
+  };
+
+  Object.entries(entry).forEach(([key, value]) => {
+    if (key === "body" || key === "text" || value == null || value === "") {
+      return;
+    }
+
+    normalized[key] = value;
+  });
+
+  return normalized;
+}
+
 function normalizeSection(section, index, warnings) {
   const config = section.config ?? {};
   const layoutMeta = normalizeLayoutMetadata(config.layout, warnings, section.title);
   const requestedVis = config.vis?.type ?? "html";
   const id = config.id ?? (slugify(section.title) || `section-${index + 1}`);
   const summary = config.copy?.summary ?? "";
-  const steps = Array.isArray(config.copy?.steps) ? config.copy.steps : [];
+  const steps = Array.isArray(config.copy?.steps)
+    ? config.copy.steps.map(normalizeStepEntry).filter(Boolean)
+    : [];
   const hasSteps = steps.length > 0;
   const scene = normalizeScene(config.scene, warnings, section.title);
   const trigger = normalizeActionTrigger(config.action?.trigger, warnings, section.title, hasSteps);
@@ -254,6 +311,7 @@ function normalizeSection(section, index, warnings) {
     id,
     title: section.title,
     body: section.body,
+    raw: section.raw ?? "",
     headline: config.headline ?? section.title,
     dek: config.dek ?? "",
     layout: layoutMeta.preset,
@@ -305,6 +363,7 @@ export function normalizeStory(parsed) {
       sources: normalizeDataSources(frontmatter, warnings),
     },
     customStyle: frontmatter.custom_style ?? "./src/styles/custom.css",
+    chrome: normalizeChrome(frontmatter),
     designSpace: {
       structure: structureMeta,
     },

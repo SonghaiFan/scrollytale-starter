@@ -8,6 +8,10 @@ function getDimensions(container) {
   };
 }
 
+function getActiveIndex(payload) {
+  return typeof payload === "number" ? payload : Number(payload?.index) || 0;
+}
+
 export function renderUnitChart({ container, section, data }) {
   const colorField = section.vis.fields.color;
   container.innerHTML = "";
@@ -57,7 +61,8 @@ export function renderUnitChart({ container, section, data }) {
   window.addEventListener("resize", () => draw(currentIndex));
 
   return {
-    update(index) {
+    update(payload) {
+      const index = getActiveIndex(payload);
       currentIndex = index;
       draw(index);
     },

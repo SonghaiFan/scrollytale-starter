@@ -11,6 +11,45 @@
   --border: rgba(0, 0, 0, 0.8);
   --accent: #302ae6;
   --shadow: none;
+  --chrome-bg: rgba(255, 255, 255, 0.82);
+  --chrome-bg-subtle: rgba(255, 255, 255, 0.56);
+  --chrome-border: rgba(0, 0, 0, 0.08);
+  --chrome-active-bg: rgba(0, 0, 0, 0.92);
+  --chrome-active-text: #ffffff;
+  --chrome-hover-bg: rgba(0, 0, 0, 0.08);
+  --panel-bg: rgba(251, 251, 249, 0.96);
+  --panel-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+  --panel-divider: rgba(0, 0, 0, 0.07);
+  --source-bg: rgba(255, 255, 255, 0.78);
+  --source-border: rgba(0, 0, 0, 0.08);
+  --source-text: #202124;
+  --source-key: #1d7f58;
+  --source-value: #5f3dc4;
+  --source-html: #c05621;
+}
+
+[data-theme="dark"] {
+  --page-bg: #000000;
+  --surface: rgba(0, 0, 0, 0.2);
+  --surface-strong: rgba(0, 0, 0, 0.82);
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.86);
+  --border: rgba(255, 255, 255, 0.8);
+  --chrome-bg: rgba(16, 16, 16, 0.86);
+  --chrome-bg-subtle: rgba(20, 20, 20, 0.68);
+  --chrome-border: rgba(255, 255, 255, 0.12);
+  --chrome-active-bg: rgba(255, 255, 255, 0.94);
+  --chrome-active-text: #000000;
+  --chrome-hover-bg: rgba(255, 255, 255, 0.1);
+  --panel-bg: rgba(14, 14, 14, 0.96);
+  --panel-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
+  --panel-divider: rgba(255, 255, 255, 0.1);
+  --source-bg: rgba(20, 20, 20, 0.88);
+  --source-border: rgba(255, 255, 255, 0.1);
+  --source-text: #f3f4f6;
+  --source-key: #73d4ab;
+  --source-value: #c0a4ff;
+  --source-html: #ffba7a;
 }
 
 * {
@@ -28,6 +67,9 @@ body {
   color: var(--text);
   background-color: var(--page-bg);
   text-align: center;
+  transition:
+    color 0.35s ease,
+    background-color 0.35s ease;
 }
 
 img,

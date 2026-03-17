@@ -28,11 +28,23 @@ export const DESIGN_SPACE = {
         container: "text-container",
         overlap: "text-over-vis",
       },
+      chapter: {
+        axis: "vertical",
+        binding: "fixed-to-text",
+        container: "text-container",
+        overlap: null,
+      },
       "scrolly-left": {
         axis: "vertical",
         binding: "float-to-text",
         container: "vis-container",
         overlap: null,
+      },
+      "scrolly-overlay": {
+        axis: "vertical",
+        binding: "float-to-text",
+        container: "vis-container",
+        overlap: "text-over-vis",
       },
       "scrolly-right": {
         axis: "vertical",
@@ -100,11 +112,12 @@ export const STARTER_SUPPORT = {
     merge: "metadata",
   },
   layout: {
+    chapter: "supported",
     hero: "supported",
     "scrolly-left": "supported",
+    "scrolly-overlay": "supported",
     "scrolly-right": "supported",
     "full-width": "supported",
-    "scrolly-overlay": "planned",
   },
   transition: {
     focus: "supported",

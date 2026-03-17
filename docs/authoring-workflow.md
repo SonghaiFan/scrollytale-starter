@@ -45,6 +45,7 @@ npm run dev
 Then open the local Vite URL, usually:
 
 - `http://localhost:5173`
+- `http://localhost:5173/authoring` for the authoring UI
 
 ## 5. Validate Before Sharing
 

@@ -9,6 +9,39 @@ function getDimensions(container) {
   };
 }
 
+function getActiveIndex(payload) {
+  return typeof payload === "number" ? payload : Number(payload?.index) || 0;
+}
+
+function resolveFocusKeys(step, groupedKeys, fallbackIndex, totalSteps) {
+  const focusValue = step?.focus;
+  if (typeof focusValue !== "string" || !focusValue.trim()) {
+    const chunkSize = Math.max(1, Math.ceil(groupedKeys.length / Math.max(totalSteps, 1)));
+    const highlightStart = fallbackIndex * chunkSize;
+    return groupedKeys.slice(highlightStart, highlightStart + chunkSize);
+  }
+
+  const tokens = focusValue
+    .split(",")
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  if (!tokens.length) {
+    return [];
+  }
+
+  if (tokens.some((token) => /^(all|\*)$/i.test(token))) {
+    return groupedKeys;
+  }
+
+  return tokens
+    .map((token) => {
+      const lowered = token.toLowerCase();
+      return groupedKeys.find((key) => String(key).toLowerCase() === lowered);
+    })
+    .filter(Boolean);
+}
+
 export function renderBarChart({ container, section, data }) {
   const { x, y } = section.vis.fields;
   container.innerHTML = "";
@@ -33,14 +66,21 @@ export function renderBarChart({ container, section, data }) {
   const gx = g.append("g");
   const gy = g.append("g");
   let currentIndex = 0;
+  let currentStep = null;
 
-  function draw(activeIndex = 0) {
+  function draw(activeIndex = 0, activeStep = null) {
     const { width, height, margin } = getDimensions(container);
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
-    const chunkSize = Math.max(1, Math.ceil(grouped.length / Math.max(section.copy.steps.length, 1)));
-    const highlightStart = activeIndex * chunkSize;
-    const highlightEnd = highlightStart + chunkSize;
+    const groupedKeys = grouped.map((d) => d.key);
+    const activeKeys = resolveFocusKeys(
+      activeStep,
+      groupedKeys,
+      activeIndex,
+      section.copy.steps.length
+    );
+    const activeKeySet = new Set(activeKeys);
+    const transition = svg.transition().duration(450);
 
     svg.attr("viewBox", `0 0 ${width} ${height}`);
     g.attr("transform", `translate(${margin.left},${margin.top})`);
@@ -72,19 +112,25 @@ export function renderBarChart({ container, section, data }) {
       .attr("y", (d) => yScale(d.value))
       .attr("width", xScale.bandwidth())
       .attr("height", (d) => innerHeight - yScale(d.value))
-      .attr("fill", (d, index) =>
-        index >= highlightStart && index < highlightEnd ? "#0f766e" : "#94a3b8"
+      .attr("rx", 10)
+      .transition(transition)
+      .attr("fill", (d) =>
+        activeKeySet.size === 0 || activeKeySet.has(d.key) ? "#0f766e" : "#94a3b8"
       )
-      .attr("rx", 10);
+      .attr("opacity", (d) =>
+        activeKeySet.size === 0 || activeKeySet.has(d.key) ? 1 : 0.24
+      );
   }
 
   draw(0);
-  window.addEventListener("resize", () => draw(currentIndex));
+  window.addEventListener("resize", () => draw(currentIndex, currentStep));
 
   return {
-    update(index) {
+    update(payload) {
+      const index = getActiveIndex(payload);
       currentIndex = index;
-      draw(index);
+      currentStep = typeof payload === "number" ? null : payload?.step ?? null;
+      draw(index, currentStep);
     },
   };
 }

@@ -35,6 +35,7 @@ custom_style: ./src/styles/custom.css
 - `title`
 - `data`
 - `custom_style`
+- 可选的 `chrome`
 
 ### `data`
 
@@ -57,6 +58,22 @@ data:
 
 两种都可以。
 
+### `chrome`
+
+页面级 chrome 目前保持得很小，也尽量直觉。
+
+例如：
+
+```yaml
+chrome:
+  bottom_nav: true
+```
+
+当前支持的 chrome：
+
+- `bottom_nav`
+- `theme_toggle`
+
 ## 推荐的 Section 格式
 
 每个 section 用一个简短 frontmatter 开始：
@@ -74,6 +91,10 @@ series: region
 ```
 
 之后正文就用普通 Markdown 来写。
+
+对于普通叙事段落，你通常可以连 `layout` 都不写。
+
+如果一个 section 没有特殊 layout，starter 现在会默认把它当成 `chapter`。
 
 ## 示例
 
@@ -135,10 +156,49 @@ The inner region remains the top line throughout the series.
 
 ## 推荐的 Layout 值
 
+- `chapter`
 - `hero`
 - `scrolly-left`
+- `scrolly-overlay`
 - `scrolly-right`
 - `full-width`
+
+### `chapter`
+
+`chapter` 是最自然的 narrative layout。
+
+它适合：
+
+- 普通文本段落
+- Markdown-first 的书写方式
+- 可选的嵌入 figure
+- 直接插入到正文里的图片
+
+也就是说，一个简单 section 可以写成：
+
+````md
+---
+id: context
+---
+
+## Why the gap feels larger now
+
+This is just a normal chapter-like section written in Markdown.
+````
+
+你也可以直接在 chapter 正文里用普通 Markdown 插入图片：
+
+````md
+---
+id: shoreline
+---
+
+## A chapter can carry inline media
+
+The paragraph flow stays natural, and the image sits inside the story rather than in a separate visualization slot.
+
+![Calm shoreline](https://picsum.photos/1200/480?grayscale)
+````
 
 ## 推荐的 Chart 值
 
@@ -158,6 +218,29 @@ Inner Melbourne sets the upper boundary for the comparison.
 ```
 
 每个 step 里都可以继续写普通 Markdown。
+
+`::step` 也可以带少量图表状态。
+
+例如现在 `line` 和 `bar` 都支持 `focus`：
+
+```md
+::step{focus="all"}
+让所有 series 一起保持可见。
+::
+
+::step{focus="Inner"}
+聚焦到 Inner 这一条线或这一组柱子。
+::
+
+::step{focus="Outer,Middle"}
+同时聚焦多个 series 或类别。
+::
+```
+
+这会更接近 case study 的方式：
+
+- step 文案负责叙事
+- step 属性负责描述图表状态变化
 
 ## 可选的 `::vis`
 

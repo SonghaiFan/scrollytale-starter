@@ -186,11 +186,12 @@ This page distinguishes three levels:
 
 | Preset / Pattern | Status | Notes |
 | --- | --- | --- |
+| `chapter` | `supported` | Default Markdown-first narrative section |
 | `hero` | `supported` | Approximates an editorial opening |
 | `scrolly-left` | `supported` | Sticky figure + text steps |
 | `scrolly-right` | `supported` | Sticky figure + text steps |
 | `full-width` | `supported` | Flow section without sticky scrolly |
-| `scrolly-overlay` | <span class="status-pill developing">Still developing</span> | Needed to fully cover `three-to-one` and `Nick_2` |
+| `scrolly-overlay` | `supported` | First-class overlay layout for text-over-vis scrolly sections |
 | `axis`, `binding`, `container`, `overlap` metadata | `metadata` | Stored in normalized story objects |
 
 ### Transition

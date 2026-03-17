@@ -7,6 +7,12 @@ This repo is meant to work in two ways:
 - as a standalone project that anyone can clone and edit manually
 - as the runtime/template layer used by an AI authoring skill
 
+The app is now starting a gradual move toward a Vue-driven document experience:
+
+- Vue owns the outer app shell and story boot flow
+- the current D3 layouts and scroll runtime still render the page
+- this keeps the starter stable while opening a path toward inspector and authoring UI
+
 ## What It Does
 
 - reads `story.md`
@@ -21,6 +27,11 @@ This repo is meant to work in two ways:
 npm install
 npm run dev
 ```
+
+Use the app in two modes:
+
+- presenting: `http://localhost:5173/`
+- authoring: `http://localhost:5173/authoring`
 
 ## Run The Docs
 
@@ -41,6 +52,7 @@ npm run docs:dev
 - update `story.md`
 - place CSV files in `public/data`
 - adjust styles in `src/styles/custom.css`
+- extend Vue app-shell logic in `src/app/` as the authoring experience grows
 
 ## v0 Scope
 

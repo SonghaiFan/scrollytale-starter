@@ -13,6 +13,12 @@ The overall system has two layers:
 
 The starter is the runtime.
 
+It is now also the beginning of a document app shell:
+
+- Vue owns the outer application lifecycle
+- the existing D3 runtime still handles layouts and scroll behavior
+- future authoring UI can grow in `src/app/` without forcing a full rewrite
+
 It is responsible for:
 
 - parsing `story.md`
@@ -81,6 +87,11 @@ Runtime changes usually happen in:
 - `src/runtime/`
 - `src/layouts/`
 - `src/visualizations/`
+
+Document-app and authoring-shell changes usually happen in:
+
+- `src/app/`
+- `src/main.js`
 
 ## Advice for AI Agents
 

@@ -88,7 +88,7 @@ features:
 ## 当前 v0 范围
 
 - `structure`：`linear`
-- `layout`：`hero`、`scrolly-left`、`scrolly-right`、`full-width`
+- `layout`：`chapter`、`hero`、`scrolly-left`、`scrolly-overlay`、`scrolly-right`、`full-width`
 - `vis.type`：`html`、`bar`、`line`、`unit`
 
 更完整的学术 design space 请看 [design-space.md](design-space.md)。即使 runtime 还没有全部实现，starter 已经可以在 `story.md` 中携带其中一部分 metadata。
