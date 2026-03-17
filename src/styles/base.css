@@ -1,12 +1,16 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&family=Roboto+Mono:wght@500&display=swap");
+
 :root {
-  --page-bg: #f8fafc;
-  --surface: rgba(255, 255, 255, 0.82);
-  --surface-strong: #ffffff;
-  --text: #0f172a;
-  --muted: #475569;
-  --border: rgba(148, 163, 184, 0.3);
-  --accent: #0f766e;
-  --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --primary: #302ae6;
+  --secondary: #03b976;
+  --page-bg: #ffffff;
+  --surface: rgba(255, 255, 255, 0.2);
+  --surface-strong: rgba(255, 255, 255, 0.82);
+  --text: #000000;
+  --muted: rgba(0, 0, 0, 0.82);
+  --border: rgba(0, 0, 0, 0.8);
+  --accent: #302ae6;
+  --shadow: none;
 }
 
 * {
@@ -18,13 +22,12 @@ html {
 }
 
 body {
-  margin: 0;
+  margin: 0 auto;
   min-width: 320px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Raleway", sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(15, 118, 110, 0.1), transparent 32%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  background-color: var(--page-bg);
+  text-align: center;
 }
 
 img,
@@ -38,9 +41,19 @@ li {
   line-height: 1.6;
 }
 
+a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .eyebrow {
   margin: 0 0 0.75rem;
-  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -51,15 +64,20 @@ li {
 .summary,
 .body-copy,
 .step p,
+.step li,
 .figure-card p {
   color: var(--muted);
+}
+
+.body-copy p,
+.body-copy li {
+  max-width: 75ch;
 }
 
 .error-block {
   overflow: auto;
   padding: 1rem;
-  border-radius: 1rem;
-  background: #0f172a;
-  color: #e2e8f0;
+  border-radius: 4px;
+  background: #111827;
+  color: #f8fafc;
 }
-

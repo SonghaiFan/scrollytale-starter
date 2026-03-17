@@ -28,10 +28,11 @@ Use simple filenames and keep them stable once referenced in `story.md`.
 You will usually change:
 
 - story title
-- data source ids and paths
+- data names and paths
+- section frontmatter
 - section order
 - section copy
-- chart field mappings
+- chart fields such as `chart`, `data`, `x`, and `y`
 - section layout choices
 
 ## 4. Run the Project
@@ -77,10 +78,11 @@ Good default section count:
 If you are making a new story, start in this order:
 
 1. update the top frontmatter in [`story.md`](https://github.com/SonghaiFan/scrollytale-starter/blob/main/story.md)
-2. replace section copy
-3. update `vis.data.source`
-4. update `vis.fields`
-5. optionally refine `src/styles/custom.css`
+2. define or revise section frontmatter blocks
+3. replace section copy and headings
+4. update `chart`, `data`, `x`, `y`, `series`, or `color`
+5. update `::step` blocks for scrolly sections
+6. optionally refine `src/styles/custom.css`
 
 ## What Not to Change by Default
 

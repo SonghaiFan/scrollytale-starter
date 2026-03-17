@@ -4,15 +4,27 @@ This document proposes a next-step authoring syntax for `scrollytale-starter`.
 
 It is inspired by Slidev's Markdown-first authoring style, but it remains focused on scroll-driven narrative webpages instead of slides.
 
+## Status
+
+The first implementation phase is now supported in the starter runtime:
+
+- section frontmatter blocks separated by `---`
+- inline HTML in section bodies
+- `::vis`
+- `::step`
+- short chart fields such as `chart`, `data`, `x`, and `y`
+
+The rest of this page still works as design rationale and future direction.
+
 ## Why Propose a New Syntax
 
 The current `story.md` format works, but it is still too configuration-heavy.
 
-Today the authoring experience is mostly:
+Today the recommended authoring experience is closer to:
 
-- a section heading
-- a large YAML block
-- a little Markdown body
+- a short section setup block
+- plain Markdown as the main body
+- optional `::step` blocks when scrolly pacing is needed
 
 That means:
 

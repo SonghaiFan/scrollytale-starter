@@ -1,31 +1,31 @@
 .app-shell {
-  width: min(1200px, calc(100vw - 2rem));
+  width: min(1320px, calc(100vw - 2rem));
   margin: 0 auto;
-  padding: 2rem 0 6rem;
+  padding: 0 0 6rem;
 }
 
 .app-header {
-  padding: 2rem 0 1rem;
+  padding: 1rem 0 0;
 }
 
 .app-header h1 {
-  margin: 0;
-  font-size: clamp(2.4rem, 5vw, 4.8rem);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  margin: 0 auto;
+  max-width: 75ch;
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .story-root {
   display: grid;
-  gap: 2rem;
+  gap: 3rem;
 }
 
 .section-shell {
-  border: 1px solid var(--border);
-  border-radius: 1.75rem;
-  background: var(--surface);
-  backdrop-filter: blur(10px);
-  box-shadow: var(--shadow);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .section-copy,
@@ -34,29 +34,30 @@
 }
 
 .section-copy {
-  padding: 1.5rem;
+  padding: 0;
 }
 
 .section-copy h2 {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.75rem, 3vw, 3rem);
-  line-height: 1.04;
+  margin: 0 0 1rem;
+  font-size: clamp(2.2rem, 4vw, 4.6rem);
+  line-height: 1.02;
+  font-weight: 600;
 }
 
 .section-hero,
 .section-full-width {
   display: grid;
   gap: 1rem;
-  padding: 1rem;
+  padding: 0;
 }
 
 .section-figure {
-  min-height: 360px;
-  padding: 1rem;
+  min-height: 420px;
+  padding: 0;
 }
 
 .section-figure-wide {
-  min-height: 420px;
+  min-height: 480px;
 }
 
 .figure-card {
@@ -64,15 +65,16 @@
   align-content: start;
   gap: 0.75rem;
   min-height: 100%;
-  padding: 1.25rem;
-  border: 1px dashed var(--border);
-  border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.7);
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface-strong);
+  backdrop-filter: blur(2px);
 }
 
 .figure-kicker {
   margin: 0;
-  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-family: "Roboto Mono", ui-monospace, monospace;
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -81,14 +83,53 @@
 .chart-svg {
   width: 100%;
   height: 100%;
-  min-height: 340px;
+  min-height: 420px;
+}
+
+.section-hero {
+  min-height: 720px;
+  margin-top: 0;
+  margin-bottom: 6rem;
+  padding: 2rem 1rem 6rem;
+  background-image:
+    linear-gradient(transparent, var(--page-bg)),
+    url(https://picsum.photos/1400/720?grayscale);
+  background-repeat: no-repeat;
+  background-size: cover;
+  align-items: end;
+}
+
+.section-hero .section-copy {
+  max-width: 75ch;
+  margin: 0 auto;
+}
+
+.section-hero .section-copy h2 {
+  margin-top: 2rem;
+  color: var(--accent);
+}
+
+.section-hero .section-figure {
+  display: none;
+}
+
+.section-full-width {
+  min-height: 640px;
+  margin: 3rem auto;
+  max-width: 75ch;
+}
+
+.section-full-width .section-copy {
+  text-align: left;
+}
+
+.section-full-width .section-figure {
+  margin-top: 1rem;
 }
 
 @media (min-width: 900px) {
-  .section-hero,
   .section-full-width {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     align-items: stretch;
   }
 }
-
