@@ -1,0 +1,14 @@
+id,year,region,value
+1,2019,Inner,92
+2,2020,Inner,97
+3,2021,Inner,104
+4,2022,Inner,109
+5,2019,Middle,72
+6,2020,Middle,78
+7,2021,Middle,85
+8,2022,Middle,91
+9,2019,Outer,58
+10,2020,Outer,63
+11,2021,Outer,69
+12,2022,Outer,74
+

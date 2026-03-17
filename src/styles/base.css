@@ -1,0 +1,65 @@
+:root {
+  --page-bg: #f8fafc;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --border: rgba(148, 163, 184, 0.3);
+  --accent: #0f766e;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.1), transparent 32%),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+p,
+li {
+  line-height: 1.6;
+}
+
+.eyebrow {
+  margin: 0 0 0.75rem;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.dek,
+.summary,
+.body-copy,
+.step p,
+.figure-card p {
+  color: var(--muted);
+}
+
+.error-block {
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+

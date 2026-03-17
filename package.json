@@ -1,0 +1,22 @@
+{
+  "name": "scrollytale-starter",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "arquero": "^8.0.3",
+    "d3": "^7.9.0",
+    "js-yaml": "^4.1.0",
+    "markdown-it": "^14.1.0",
+    "scrollama": "^3.2.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.4"
+  }
+}
+
