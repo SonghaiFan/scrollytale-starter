@@ -76,7 +76,7 @@ Good default section count:
 
 If you are making a new story, start in this order:
 
-1. update the top frontmatter in [`story.md`](../story.md)
+1. update the top frontmatter in [`story.md`](https://github.com/SonghaiFan/scrollytale-starter/blob/main/story.md)
 2. replace section copy
 3. update `vis.data.source`
 4. update `vis.fields`
