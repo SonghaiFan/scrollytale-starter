@@ -1,9 +1,14 @@
-function renderStep(markdown, step, index) {
+import { renderMarkerSpanForVisType } from "../app/navMarkers.js";
+
+function renderStep(markdown, step, index, visType) {
   const content = typeof step === "string" ? step : step?.body ?? "";
 
   return `
     <div class="step${index === 0 ? " is-active" : ""}" data-step-index="${index}">
-      ${markdown.render(content)}
+      <div class="step-inner">
+        ${renderMarkerSpanForVisType(visType, "step-marker")}
+        <div class="step-content">${markdown.render(content)}</div>
+      </div>
     </div>
   `;
 }
@@ -19,12 +24,12 @@ export function renderScrollyRight({ section, markdown }) {
 
   element.innerHTML = `
     <div class="section-copy scrolly-copy">
-      <p class="eyebrow">${section.scene}</p>
+      <p class="eyebrow eyebrow-marker">${renderMarkerSpanForVisType(section.vis.type, "eyebrow-ui-marker")}</p>
       <h2>${section.headline}</h2>
       ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
       ${renderBody(markdown, section.body)}
       <div class="steps">
-        ${section.copy.steps.map((step, index) => renderStep(markdown, step, index)).join("")}
+        ${section.copy.steps.map((step, index) => renderStep(markdown, step, index, section.vis.type)).join("")}
       </div>
     </div>
     <div class="section-figure sticky-figure"></div>

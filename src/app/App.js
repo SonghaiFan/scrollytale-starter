@@ -196,7 +196,14 @@ export const App = defineComponent({
         return renderLoading();
       }
 
-      return h("div", { class: `vue-app-shell${isAuthoring.value ? " is-authoring-mode" : ""}` }, [
+      return h(
+        "div",
+        {
+          class: `vue-app-shell${isAuthoring.value ? " is-authoring-mode" : ""}${
+            state.value.debug ? " is-debug-mode" : ""
+          }`,
+        },
+        [
         h(StoryRuntime, {
           story: state.value.story,
           sources: state.value.sources,
@@ -249,7 +256,8 @@ export const App = defineComponent({
         warningText.value
           ? h("pre", { class: "visually-hidden", "aria-hidden": "true" }, warningText.value)
           : null,
-      ]);
+        ]
+      );
     };
   },
 });

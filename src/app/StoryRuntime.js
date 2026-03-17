@@ -1,20 +1,23 @@
 import { defineComponent, h, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
+import { getMarkerKindForVisType } from "./navMarkers.js";
 import { renderStory } from "../runtime/renderStory.js";
 
-function buildNavTargets(root) {
+function buildNavTargets(root, story) {
   const sectionElements = [...root.querySelectorAll(".section-shell")];
   const targets = [];
 
   sectionElements.forEach((sectionEl, index) => {
     const stepEls = [...sectionEl.querySelectorAll(".step")];
+    const sectionMeta = story.sections.find((section) => section.id === sectionEl.id);
+    const kind = getMarkerKindForVisType(sectionMeta?.vis?.type);
 
     if (stepEls.length) {
       stepEls.forEach((stepEl) => {
         targets.push({
           id: stepEl.id,
           label: stepEl.textContent.trim().replace(/\s+/g, " ").slice(0, 72),
-          symbol: "\u25cf",
+          kind,
         });
       });
       return;
@@ -23,7 +26,7 @@ function buildNavTargets(root) {
     targets.push({
       id: sectionEl.id,
       label: sectionEl.querySelector("h2, h1")?.textContent?.trim() ?? `Section ${index + 1}`,
-      symbol: "\u25a0",
+      kind,
     });
   });
 
@@ -139,7 +142,7 @@ export const StoryRuntime = defineComponent({
 
       await nextTick();
 
-      const targets = buildNavTargets(root.value);
+      const targets = buildNavTargets(root.value, props.story);
       emit("targets-change", targets);
       setupNavObserver(targets);
     }

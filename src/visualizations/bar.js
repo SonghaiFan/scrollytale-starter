@@ -1,4 +1,10 @@
 import * as d3 from "d3";
+import {
+  applyAxisStyle,
+  createSeriesColorScale,
+  ensureChartSvg,
+  getChartTheme,
+} from "./shared.js";
 
 function getDimensions(container) {
   const bounds = container.getBoundingClientRect();
@@ -60,7 +66,7 @@ export function renderBarChart({ container, section, data }) {
     .map(([key, value]) => ({ key, value }))
     .sort((a, b) => d3.descending(a.value, b.value));
 
-  const svg = d3.select(container).append("svg").attr("class", "chart-svg");
+  const svg = ensureChartSvg(container);
   const g = svg.append("g");
   const bars = g.append("g");
   const gx = g.append("g");
@@ -72,6 +78,7 @@ export function renderBarChart({ container, section, data }) {
     const { width, height, margin } = getDimensions(container);
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
+    const theme = getChartTheme();
     const groupedKeys = grouped.map((d) => d.key);
     const activeKeys = resolveFocusKeys(
       activeStep,
@@ -80,9 +87,10 @@ export function renderBarChart({ container, section, data }) {
       section.copy.steps.length
     );
     const activeKeySet = new Set(activeKeys);
+    const colorScale = createSeriesColorScale(groupedKeys);
     const transition = svg.transition().duration(450);
 
-    svg.attr("viewBox", `0 0 ${width} ${height}`);
+    svg.attr("viewBox", `0 0 ${width} ${height}`).style("background", theme.surface);
     g.attr("transform", `translate(${margin.left},${margin.top})`);
 
     const xScale = d3
@@ -99,6 +107,8 @@ export function renderBarChart({ container, section, data }) {
 
     gx.attr("transform", `translate(0,${innerHeight})`).call(d3.axisBottom(xScale));
     gy.call(d3.axisLeft(yScale).ticks(5));
+    applyAxisStyle(gx);
+    applyAxisStyle(gy);
 
     gx.selectAll("text")
       .attr("transform", "rotate(18)")
@@ -112,10 +122,12 @@ export function renderBarChart({ container, section, data }) {
       .attr("y", (d) => yScale(d.value))
       .attr("width", xScale.bandwidth())
       .attr("height", (d) => innerHeight - yScale(d.value))
-      .attr("rx", 10)
+      .attr("shape-rendering", "crispEdges")
       .transition(transition)
       .attr("fill", (d) =>
-        activeKeySet.size === 0 || activeKeySet.has(d.key) ? "#0f766e" : "#94a3b8"
+        activeKeySet.size === 0 || activeKeySet.has(d.key)
+          ? colorScale(d.key)
+          : theme.mutedInk
       )
       .attr("opacity", (d) =>
         activeKeySet.size === 0 || activeKeySet.has(d.key) ? 1 : 0.24

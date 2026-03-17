@@ -204,6 +204,7 @@ The paragraph flow stays natural, and the image sits inside the story rather tha
 
 - `bar`
 - `line`
+- `scatter`
 - `unit`
 - `html`
 

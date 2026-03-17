@@ -23,7 +23,7 @@ const SUPPORTED_LAYOUTS = new Set([
   "full-width",
 ]);
 
-const SUPPORTED_VIS = new Set(["html", "bar", "line", "unit"]);
+const SUPPORTED_VIS = new Set(["html", "bar", "line", "scatter", "unit"]);
 
 function slugify(value) {
   return String(value ?? "")

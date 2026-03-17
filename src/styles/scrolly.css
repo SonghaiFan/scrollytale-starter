@@ -13,6 +13,40 @@
   max-width: 45ch;
 }
 
+.eyebrow-marker {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1rem;
+}
+
+.eyebrow-ui-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 1rem;
+  min-width: 1rem;
+  min-height: 1.05rem;
+  color: var(--text);
+  opacity: var(--ui-active-opacity);
+}
+
+.eyebrow-ui-marker::before {
+  content: "";
+  display: block;
+  background: currentColor;
+}
+
+.eyebrow-ui-marker.is-section::before {
+  width: 0.56rem;
+  height: 0.56rem;
+}
+
+.eyebrow-ui-marker.is-step::before {
+  width: 0.54rem;
+  height: 0.54rem;
+  border-radius: 999px;
+}
+
 .steps {
   display: grid;
   gap: var(--scrollytale-step-gap, 2rem);
@@ -23,7 +57,7 @@
   margin: 0 auto 2rem auto;
   min-height: 250px;
   padding: 5px;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 4px;
   background: var(--surface);
   backdrop-filter: blur(2px);
@@ -32,14 +66,55 @@
   transition:
     opacity 0.8s ease,
     transform 0.8s ease,
-    border-color 0.8s ease;
+    outline-color 0.8s ease;
   scroll-margin-top: 250px;
+}
+
+.step-inner {
+  display: block;
+}
+
+.step-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 1rem;
+  min-width: 1rem;
+  min-height: 1.05rem;
+  margin: 0 0 0.55rem;
+  color: var(--text);
+  opacity: var(--ui-inactive-opacity);
+  transition: opacity 0.8s ease;
+}
+
+.step-marker::before {
+  content: "";
+  display: block;
+  background: currentColor;
+}
+
+.step-marker.is-section::before {
+  width: 0.56rem;
+  height: 0.56rem;
+}
+
+.step-marker.is-step::before {
+  width: 0.54rem;
+  height: 0.54rem;
+  border-radius: 999px;
+}
+
+.step-content {
+  min-width: 0;
 }
 
 .step.is-active {
   opacity: 1;
   transform: translateY(0);
-  border-color: var(--border);
+}
+
+.step.is-active .step-marker {
+  opacity: var(--ui-active-opacity);
 }
 
 .step:first-child {
@@ -58,9 +133,9 @@
   margin-bottom: 0;
 }
 
-.step p,
-.step li {
-  padding: 1rem;
+.step-content p,
+.step-content li {
+  padding: 1rem 1rem 1rem 0;
   font-size: clamp(1.25rem, 2vw, 2rem);
 }
 
@@ -71,7 +146,7 @@
   width: 100%;
   transform: translate3d(0, 0, 0);
   z-index: 0;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 4px;
   display: grid;
 }

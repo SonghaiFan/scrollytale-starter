@@ -99,7 +99,7 @@ export const AppModeSwitch = defineComponent({
             {
               key: item.key,
               href: item.href,
-              class: `app-mode-link${props.mode === item.key ? " is-active" : ""}`,
+              class: `app-mode-link is-${item.key}${props.mode === item.key ? " is-active" : ""}`,
               onClick: (event) => {
                 event.preventDefault();
                 props.navigateMode(item.key);

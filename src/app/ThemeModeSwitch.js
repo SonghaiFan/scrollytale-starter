@@ -86,7 +86,7 @@ export const ThemeModeSwitch = defineComponent({
             {
               key: item.key,
               type: "button",
-              class: `app-mode-link${props.theme === item.key ? " is-active" : ""}`,
+              class: `app-mode-link is-${item.key}${props.theme === item.key ? " is-active" : ""}`,
               "aria-label": item.label,
               onClick: () => props.setTheme(item.key),
             },

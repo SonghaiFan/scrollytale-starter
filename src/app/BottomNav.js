@@ -3,6 +3,13 @@ import { computed, defineComponent, h, ref } from "vue";
 import { AppModeSwitch } from "./AppModeSwitch.js";
 import { ThemeModeSwitch } from "./ThemeModeSwitch.js";
 
+function renderNavMarker(kind) {
+  return h("span", {
+    class: `bottom-nav-dot bottom-nav-dot-${kind === "section" ? "section" : "step"}`,
+    "aria-hidden": "true",
+  });
+}
+
 function renderPrevIcon() {
   return h(
     "svg",
@@ -296,7 +303,7 @@ export const BottomNav = defineComponent({
                         "button",
                         {
                           type: "button",
-                          class: `app-mode-link${props.debug ? " is-active" : ""}`,
+                          class: `app-mode-link is-debug-tool${props.debug ? " is-active" : ""}`,
                           "aria-label": props.debug ? "Disable scroll debug" : "Enable scroll debug",
                           title: props.debug ? "Disable scroll debug" : "Enable scroll debug",
                           onClick: () => props.setDebug(!props.debug),
@@ -309,7 +316,7 @@ export const BottomNav = defineComponent({
                         "button",
                         {
                           type: "button",
-                          class: `app-mode-link${isConfigOpen.value ? " is-active" : ""}`,
+                          class: `app-mode-link is-settings-tool${isConfigOpen.value ? " is-active" : ""}`,
                           "aria-label": isConfigOpen.value
                             ? "Hide Scrollama settings"
                             : "Show Scrollama settings",
@@ -356,7 +363,14 @@ export const BottomNav = defineComponent({
                           title: target.label,
                           onClick: () => emit("navigate", target.id),
                         },
-                        h("span", { class: "bottom-nav-dot" }, target.symbol)
+                        [
+                          renderNavMarker(target.kind),
+                          h(
+                            "span",
+                            { class: "visually-hidden" },
+                            target.kind === "section" ? "Section" : "Step"
+                          ),
+                        ]
                       )
                     )
                   ),

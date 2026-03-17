@@ -11,21 +11,46 @@
   --border: rgba(0, 0, 0, 0.8);
   --accent: #302ae6;
   --shadow: none;
-  --chrome-bg: rgba(255, 255, 255, 0.82);
-  --chrome-bg-subtle: rgba(255, 255, 255, 0.56);
-  --chrome-border: rgba(0, 0, 0, 0.08);
-  --chrome-active-bg: rgba(0, 0, 0, 0.92);
-  --chrome-active-text: #ffffff;
-  --chrome-hover-bg: rgba(0, 0, 0, 0.08);
-  --panel-bg: rgba(251, 251, 249, 0.96);
-  --panel-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
-  --panel-divider: rgba(0, 0, 0, 0.07);
+  --chrome-bg: rgba(247, 242, 232, 0.96);
+  --chrome-bg-subtle: rgba(244, 236, 222, 0.92);
+  --chrome-border: rgba(0, 0, 0, 0.06);
+  --chrome-active-bg: #111111;
+  --chrome-active-text: #fff8ef;
+  --chrome-hover-bg: rgba(0, 0, 0, 0.06);
+  --panel-bg: rgba(247, 242, 232, 0.98);
+  --panel-shadow: -12px 0 30px rgba(0, 0, 0, 0.04);
+  --panel-divider: rgba(0, 0, 0, 0.08);
   --source-bg: rgba(255, 255, 255, 0.78);
   --source-border: rgba(0, 0, 0, 0.08);
   --source-text: #202124;
-  --source-key: #1d7f58;
-  --source-value: #5f3dc4;
-  --source-html: #c05621;
+  --source-divider: rgba(17, 17, 17, 0.34);
+  --source-heading-mark: #ff5a36;
+  --source-heading-text: #2457d6;
+  --source-key: #2457d6;
+  --source-value: #5f4b26;
+  --source-directive: #ff5a36;
+  --source-directive-rest: #7a673b;
+  --source-html: #d66b8f;
+  --chart-surface: transparent;
+  --chart-frame: rgba(17, 17, 17, 0.08);
+  --chart-ink: #111111;
+  --chart-muted-ink: rgba(17, 17, 17, 0.45);
+  --chart-grid: rgba(17, 17, 17, 0.14);
+  --chart-axis: #111111;
+  --chart-series-1: #2457d6;
+  --chart-series-2: #ff5a36;
+  --chart-series-3: #f0c419;
+  --chart-series-4: #111111;
+  --chart-series-5: #efb7cf;
+  --chart-series-6: #2d9d78;
+  --motif-red: #ff5a36;
+  --motif-blue: #2457d6;
+  --motif-yellow: #f0c419;
+  --motif-pink: #efb7cf;
+  --motif-ink: #111111;
+  --text-accent-structural: #2457d6;
+  --text-accent-editorial: #ff5a36;
+  --text-accent-support: #a66a00;
 }
 
 [data-theme="dark"] {
@@ -35,21 +60,46 @@
   --text: #ffffff;
   --muted: rgba(255, 255, 255, 0.86);
   --border: rgba(255, 255, 255, 0.8);
-  --chrome-bg: rgba(16, 16, 16, 0.86);
-  --chrome-bg-subtle: rgba(20, 20, 20, 0.68);
-  --chrome-border: rgba(255, 255, 255, 0.12);
+  --chrome-bg: rgba(15, 15, 15, 0.94);
+  --chrome-bg-subtle: rgba(26, 26, 26, 0.88);
+  --chrome-border: rgba(255, 255, 255, 0.08);
   --chrome-active-bg: rgba(255, 255, 255, 0.94);
   --chrome-active-text: #000000;
   --chrome-hover-bg: rgba(255, 255, 255, 0.1);
-  --panel-bg: rgba(14, 14, 14, 0.96);
+  --panel-bg: rgba(12, 12, 12, 0.97);
   --panel-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
   --panel-divider: rgba(255, 255, 255, 0.1);
   --source-bg: rgba(20, 20, 20, 0.88);
   --source-border: rgba(255, 255, 255, 0.1);
   --source-text: #f3f4f6;
-  --source-key: #73d4ab;
-  --source-value: #c0a4ff;
-  --source-html: #ffba7a;
+  --source-divider: rgba(245, 241, 232, 0.42);
+  --source-heading-mark: #ff6d47;
+  --source-heading-text: #4f7dff;
+  --source-key: #79a0ff;
+  --source-value: #d5b45f;
+  --source-directive: #ff6d47;
+  --source-directive-rest: #ffd84d;
+  --source-html: #ffc2da;
+  --chart-surface: transparent;
+  --chart-frame: rgba(255, 255, 255, 0.12);
+  --chart-ink: #f5f1e8;
+  --chart-muted-ink: rgba(245, 241, 232, 0.5);
+  --chart-grid: rgba(245, 241, 232, 0.16);
+  --chart-axis: #f5f1e8;
+  --chart-series-1: #4f7dff;
+  --chart-series-2: #ff6d47;
+  --chart-series-3: #ffd84d;
+  --chart-series-4: #f5f1e8;
+  --chart-series-5: #ffc2da;
+  --chart-series-6: #57c49c;
+  --motif-red: #ff6d47;
+  --motif-blue: #4f7dff;
+  --motif-yellow: #ffd84d;
+  --motif-pink: #ffc2da;
+  --motif-ink: #f5f1e8;
+  --text-accent-structural: #4f7dff;
+  --text-accent-editorial: #ff6d47;
+  --text-accent-support: #ffd84d;
 }
 
 * {
@@ -89,7 +139,7 @@ a {
 }
 
 a:hover {
-  color: var(--accent);
+  color: var(--text-accent-structural);
   font-weight: 700;
 }
 
@@ -99,7 +149,7 @@ a:hover {
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: var(--text-accent-editorial);
 }
 
 .dek,

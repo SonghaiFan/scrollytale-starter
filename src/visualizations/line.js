@@ -1,4 +1,10 @@
 import * as d3 from "d3";
+import {
+  applyAxisStyle,
+  createSeriesColorScale,
+  ensureChartSvg,
+  getChartTheme,
+} from "./shared.js";
 
 function getDimensions(container) {
   const bounds = container.getBoundingClientRect();
@@ -62,7 +68,7 @@ function createLineChart() {
   };
   let colorScale = d3
     .scaleOrdinal()
-    .range(["#2563eb", "#ea580c", "#16a34a", "#7c3aed"]);
+    .range(createSeriesColorScale([]).range());
   let dimensions = {
     width: 320,
     height: 360,
@@ -90,10 +96,11 @@ function createLineChart() {
       const activeKeys = focusKeys.length ? focusKeys : groupedKeys.slice(0, 1);
       const activeKeySet = new Set(activeKeys);
       const transition = svg.transition().duration(transitionDuration);
+      const theme = getChartTheme();
 
-      svg.attr("viewBox", `0 0 ${width} ${height}`);
+      svg.attr("viewBox", `0 0 ${width} ${height}`).style("background", theme.surface);
       root.attr("transform", `translate(${margin.left},${margin.top})`);
-      colorScale.domain(groupedKeys);
+      colorScale = createSeriesColorScale(groupedKeys);
 
       const allX = chartData.map((row) => row[x]);
       const isNumericX = allX.every((value) => typeof value === "number");
@@ -113,6 +120,8 @@ function createLineChart() {
         .call(isNumericX ? d3.axisBottom(xScale).ticks(5) : d3.axisBottom(xScale));
 
       gy.transition(transition).call(d3.axisLeft(yScale).ticks(5));
+      applyAxisStyle(gx);
+      applyAxisStyle(gy);
 
       const line = d3
         .line()
@@ -125,13 +134,15 @@ function createLineChart() {
         .join("path")
         .attr("fill", "none")
         .attr("stroke", ([key]) => colorScale(key))
+        .attr("stroke-linecap", "butt")
+        .attr("stroke-linejoin", "miter")
         .attr("d", ([, values]) => line(values))
         .transition(transition)
         .attr("stroke-width", ([key]) =>
-          transitionMode === "focus" && !(activeKeySet.has(key) || grouped.length === 1) ? 2.25 : 4
+          transitionMode === "focus" && !(activeKeySet.has(key) || grouped.length === 1) ? 2 : 3.5
         )
         .attr("opacity", ([key]) =>
-          transitionMode === "focus" && !(activeKeySet.has(key) || grouped.length === 1) ? 0.18 : 1
+          transitionMode === "focus" && !(activeKeySet.has(key) || grouped.length === 1) ? 0.15 : 1
         );
 
       const pointData = grouped.flatMap(([key, values]) =>
@@ -146,15 +157,15 @@ function createLineChart() {
         .selectAll("circle")
         .data(pointData, (d) => `${d.key}-${d.x}`)
         .join("circle")
-        .attr("cx", (d) => xScale(d.x))
-        .attr("cy", (d) => yScale(d.y))
         .attr("fill", (d) => colorScale(d.key))
         .transition(transition)
         .attr("r", (d) =>
-          transitionMode === "focus" && !(activeKeySet.has(d.key) || grouped.length === 1) ? 2.5 : 4
+          transitionMode === "focus" && !(activeKeySet.has(d.key) || grouped.length === 1) ? 2.5 : 3.5
         )
+        .attr("cx", (d) => xScale(d.x))
+        .attr("cy", (d) => yScale(d.y))
         .attr("opacity", (d) =>
-          transitionMode === "focus" && !(activeKeySet.has(d.key) || grouped.length === 1) ? 0.2 : 1
+          transitionMode === "focus" && !(activeKeySet.has(d.key) || grouped.length === 1) ? 0.18 : 1
         );
     });
   }
@@ -211,7 +222,7 @@ export function renderLineChart({ container, section, data }) {
   }
 
   const groupedKeys = d3.groups(data, (row) => (series ? row[series] : "Series")).map(([key]) => key);
-  const svg = d3.select(container).append("svg").attr("class", "chart-svg");
+  const svg = ensureChartSvg(container);
   const chart = createLineChart().fields({ x, y, series });
   let currentIndex = 0;
   let currentStep = null;
