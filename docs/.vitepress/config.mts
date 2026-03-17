@@ -14,6 +14,7 @@ export default defineConfig({
         nav: [
           { text: "Guide", link: "/authoring-workflow" },
           { text: "Story Format", link: "/story-format" },
+          { text: "Design Space", link: "/design-space" },
           { text: "Syntax vNext", link: "/syntax-vnext" },
           { text: "Project Model", link: "/project-model" },
           {
@@ -28,6 +29,7 @@ export default defineConfig({
               { text: "Overview", link: "/" },
               { text: "Authoring Workflow", link: "/authoring-workflow" },
               { text: "Story Format", link: "/story-format" },
+              { text: "Design Space", link: "/design-space" },
               { text: "Syntax vNext", link: "/syntax-vnext" },
               { text: "Project Model", link: "/project-model" },
             ],
@@ -58,6 +60,7 @@ export default defineConfig({
         nav: [
           { text: "指南", link: "/zh/authoring-workflow" },
           { text: "故事格式", link: "/zh/story-format" },
+          { text: "设计空间", link: "/zh/design-space" },
           { text: "下一代语法", link: "/zh/syntax-vnext" },
           { text: "项目模型", link: "/zh/project-model" },
           {
@@ -72,6 +75,7 @@ export default defineConfig({
               { text: "概览", link: "/zh/" },
               { text: "创作流程", link: "/zh/authoring-workflow" },
               { text: "故事格式", link: "/zh/story-format" },
+              { text: "设计空间", link: "/zh/design-space" },
               { text: "下一代语法", link: "/zh/syntax-vnext" },
               { text: "项目模型", link: "/zh/project-model" },
             ],

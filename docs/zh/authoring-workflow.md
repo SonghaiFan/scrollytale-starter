@@ -28,10 +28,11 @@ public/data/housing-gap.csv
 你通常会修改：
 
 - 故事标题
-- data source 的 id 和 path
+- 数据名称和路径
+- section frontmatter
 - section 顺序
 - section 文案
-- 图表字段映射
+- 图表字段，比如 `chart`、`data`、`x`、`y`
 - section 的 layout 选择
 
 ## 4. 运行项目
@@ -77,10 +78,11 @@ npm run build
 如果你在做一个新故事，建议按这个顺序开始：
 
 1. 更新 [`story.md`](https://github.com/SonghaiFan/scrollytale-starter/blob/main/story.md) 顶部 frontmatter
-2. 替换 section 文案
-3. 更新 `vis.data.source`
-4. 更新 `vis.fields`
-5. 如有需要，再微调 `src/styles/custom.css`
+2. 定义或修改各 section 的 frontmatter
+3. 替换 section 标题和正文
+4. 更新 `chart`、`data`、`x`、`y`、`series` 或 `color`
+5. 更新 scrolly section 的 `::step` 块
+6. 如有需要，再微调 `src/styles/custom.css`
 
 ## 默认不要改什么
 

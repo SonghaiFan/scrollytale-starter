@@ -1,59 +1,111 @@
 .section-scrolly {
-  display: grid;
+  position: relative;
+  display: flex;
   gap: 1rem;
   padding: 1rem;
+  text-align: left;
 }
 
 .scrolly-copy {
   display: grid;
   align-content: start;
   gap: 0.75rem;
+  max-width: 45ch;
 }
 
 .steps {
   display: grid;
-  gap: 60vh;
-  padding-bottom: 20vh;
+  gap: 2rem;
+  padding-bottom: 10em;
 }
 
 .step {
-  padding: 1rem 1rem 1.25rem;
+  margin: 0 auto 2rem auto;
+  min-height: 250px;
+  padding: 5px;
   border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.66);
-  opacity: 0.45;
+  border-radius: 4px;
+  background: var(--surface);
+  backdrop-filter: blur(2px);
+  opacity: 0.1;
   transform: translateY(0);
   transition:
-    opacity 160ms ease,
-    transform 160ms ease,
-    border-color 160ms ease;
+    opacity 0.8s ease,
+    transform 0.8s ease,
+    border-color 0.8s ease;
+  scroll-margin-top: 250px;
 }
 
 .step.is-active {
   opacity: 1;
-  transform: translateY(-2px);
-  border-color: rgba(15, 118, 110, 0.42);
+  transform: translateY(0);
+  border-color: var(--border);
+}
+
+.step:first-child {
+  margin-top: 10em;
+}
+
+.step:last-child {
+  margin-bottom: 10em;
+}
+
+.step > :first-child {
+  margin-top: 0;
+}
+
+.step > :last-child {
+  margin-bottom: 0;
+}
+
+.step p,
+.step li {
+  padding: 1rem;
+  font-size: clamp(1.25rem, 2vw, 2rem);
 }
 
 .sticky-figure {
   position: sticky;
   top: 1rem;
   min-height: 72vh;
+  width: 100%;
+  transform: translate3d(0, 0, 0);
+  z-index: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: grid;
+}
+
+.sticky-figure .figure-card,
+.sticky-figure .chart-svg {
+  min-height: 100%;
 }
 
 @media (min-width: 900px) {
   .section-scrolly-left {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    flex-direction: row;
     align-items: start;
   }
 
   .section-scrolly-right {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    flex-direction: row;
     align-items: start;
+  }
+
+  .section-scrolly > * {
+    flex: 1;
+  }
+
+  .section-scrolly .section-copy {
+    padding: 0 1rem;
   }
 }
 
 @media (max-width: 899px) {
+  .section-scrolly {
+    display: grid;
+  }
+
   .sticky-figure {
     position: relative;
     min-height: 360px;
@@ -65,4 +117,3 @@
     padding-bottom: 8vh;
   }
 }
-

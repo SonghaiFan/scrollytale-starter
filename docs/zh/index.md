@@ -23,6 +23,8 @@ features:
     details: 项目结构同时适合人和 AI agent 阅读与修改，鼓励小而安全的改动。
   - title: 清晰分层
     details: starter 是 runtime，独立的 `scrollytale` skill 可以帮助生成 `story.md`，但 starter 本身始终可以单独使用。
+  - title: 进阶 design-space 模型
+    details: 学术 design space 仍然保留在项目内部，但默认不会压到作者的日常写作语法上。
 ---
 
 ## 项目是什么
@@ -88,6 +90,10 @@ features:
 - `structure`：`linear`
 - `layout`：`hero`、`scrolly-left`、`scrolly-right`、`full-width`
 - `vis.type`：`html`、`bar`、`line`、`unit`
+
+更完整的学术 design space 请看 [design-space.md](design-space.md)。即使 runtime 还没有全部实现，starter 已经可以在 `story.md` 中携带其中一部分 metadata。
+
+但把它当作进阶 / 内部模型更合适。新故事通常应该先从 [story-format.md](story-format.md) 里的简化写法开始。
 
 ## 配套 Skill
 

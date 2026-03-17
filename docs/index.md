@@ -23,6 +23,8 @@ features:
     details: The project is structured so humans and AI agents can both understand the authoring rules and make small, safe changes.
   - title: Clear split of concerns
     details: The starter is the runtime. A separate `scrollytale` skill can help generate `story.md`, but the starter remains usable on its own.
+  - title: Advanced design-space model
+    details: The academic design space still exists inside the project, but it stays behind a simpler authoring language by default.
 ---
 
 ## What It Is
@@ -88,6 +90,10 @@ This repo is not:
 - `structure`: `linear`
 - `layout`: `hero`, `scrolly-left`, `scrolly-right`, `full-width`
 - `vis.type`: `html`, `bar`, `line`, `unit`
+
+The broader academic design space is documented in [design-space.md](design-space.md). The starter already accepts some of that metadata in `story.md`, even when the runtime support is still partial.
+
+Treat that page as advanced/internal guidance. New stories should usually start from the simpler examples in [story-format.md](story-format.md).
 
 ## Companion Skill
 

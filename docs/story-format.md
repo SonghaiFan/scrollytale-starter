@@ -1,139 +1,216 @@
 # Story Format
 
-`story.md` uses Markdown plus structured YAML blocks.
+`story.md` should feel like a story document, not a schema.
 
-It has:
+The default rule is simple:
 
-1. one global frontmatter block
-2. one or more `## Section` headings
-3. one fenced `yaml` block under each section heading
-4. optional freeform Markdown after the block
+- write normal Markdown
+- use short frontmatter blocks for section setup
+- use intuitive field names
+- only reach for advanced metadata when you truly need it
 
-## Global Frontmatter
+## The Simplest Mental Model
+
+Most stories only need three layers:
+
+1. one top block for the page title and data files
+2. one short block per section
+3. normal Markdown for the actual writing
+
+## Recommended Global Format
+
+This is the easiest global shape to read and write:
 
 ```yaml
 ---
-title: "Melbourne's Price Gap Holds Year After Year"
-structure: linear
+title: "Melbourne Housing Snapshot"
 data:
-  sources:
-    - id: housing_gap
-      path: ./data/housing-gap.csv
+  housing: ./data/demo.csv
 custom_style: ./src/styles/custom.css
 ---
 ```
 
-### Supported Global Fields
+### Recommended Global Fields
 
 - `title`
-- `structure`
-- `data.sources`
+- `data`
 - `custom_style`
 
-### `data.sources`
+### `data`
 
-Each source needs:
+The easiest data format is a simple map:
 
-- `id`: a short name used inside sections
-- `path`: a path under `public/`, commonly `./data/your-file.csv`
-
-## Section Structure
-
-Example:
-
-````md
-## Trend
 ```yaml
-id: trend
-layout: scrolly-left
-scene: observation
-headline: "The same ordering survives over time"
-dek: "The line chart shows movement, but not reversal."
-action:
-  trigger: step
-transition:
-  type: step
-vis:
-  type: line
-  data:
-    source: housing_gap
-  fields:
-    x: year
-    y: value
-    series: region
-copy:
-  steps:
-    - "All three regions move upward from 2019 to 2022."
-    - "The inner region remains the top line throughout the series."
-    - "Middle and outer regions rise too, but they never catch the leader."
+data:
+  housing: ./data/demo.csv
+  rents: ./data/rents.csv
 ```
 
-Optional body Markdown can go here.
+You can also still use the longer form:
+
+```yaml
+data:
+  sources:
+    - id: housing
+      path: ./data/demo.csv
+```
+
+Both work.
+
+## Recommended Section Format
+
+Each section starts with a short frontmatter block:
+
+```md
+---
+id: trend
+layout: scrolly-left
+chart: line
+data: housing
+x: year
+y: value
+series: region
+---
+```
+
+Then you write the body in plain Markdown.
+
+## Example
+
+````md
+---
+title: "Melbourne Housing Snapshot"
+data:
+  housing: ./data/demo.csv
+---
+
+---
+id: opening
+layout: hero
+---
+
+# Where prices rise, pressure concentrates
+
+This page is written like a document, not like a config file.
+
+---
+id: trend
+layout: scrolly-right
+chart: line
+data: housing
+x: year
+y: value
+series: region
+---
+
+## The gap holds over time
+
+The line chart stays visible while the text scrolls.
+
+::step
+All three series move upward over time.
+::
+
+::step
+The inner region remains the top line throughout the series.
+::
 ````
 
-## Supported v0 Fields
+## Recommended Section Fields
 
-### `layout`
+These are the main fields most people should use:
+
+- `id`
+- `layout`
+- `chart`
+- `data`
+- `x`
+- `y`
+- `series`
+- `color`
+- `headline`
+- `dek`
+
+If `headline` is omitted, the runtime uses the first Markdown heading in the section body.
+
+## Recommended Layout Values
 
 - `hero`
 - `scrolly-left`
 - `scrolly-right`
 - `full-width`
 
-### `scene`
+## Recommended Chart Values
 
-- `focus`
-- `guide`
-- `observation`
-
-### `action.trigger`
-
-- `enter`
-- `exit`
-- `step`
-- `scroll`
-
-### `transition.type`
-
-- `none`
-- `step`
-- `morph-lite`
-
-### `vis.type`
-
+- `bar`
+- `line`
+- `unit`
 - `html`
-- `bar`
-- `line`
-- `unit`
 
-## `vis.fields`
+## `::step`
 
-Typical mappings:
+Use `::step` when a chart should stay in place while the text progresses.
 
-- `bar`
-  - `x`: categorical field
-  - `y`: numeric field
-- `line`
-  - `x`: date or ordered numeric field
-  - `y`: numeric field
-  - `series`: categorical field
-- `unit`
-  - `color`: categorical field
+```md
+::step
+Inner Melbourne sets the upper boundary for the comparison.
+::
+```
 
-## `copy`
+Each step can contain normal Markdown.
 
-Use:
+## Optional `::vis`
 
-- `summary` for static or full-width sections
-- `steps` for scrolly sections
-- `annotations` for future extension
+Most stories do not need `::vis`.
+
+The short section fields above are usually enough. But `::vis` is still available when you want an explicit inline visual declaration:
+
+```md
+::vis{type="bar" data="housing" x="region" y="value"}
+::
+```
+
+## Inline HTML
+
+Inline HTML is allowed directly in the body:
+
+```md
+<div class="callout">
+  This is a custom editorial note.
+</div>
+```
+
+This keeps the file expressive without requiring a component framework.
+
+## Advanced Fields
+
+Some richer fields are still supported, including:
+
+- `structure`
+- `scene`
+- `transition`
+- `action`
+
+These exist mainly for:
+
+- AI reasoning
+- future runtime features
+- alignment with the thesis design space
+
+Most authors should treat them as optional.
+
+If you want to see that internal model, read [design-space.md](design-space.md).
 
 ## Safe Authoring Rule
 
-If a story can be expressed with:
+If your story can be described with:
 
-- a supported layout
-- a supported vis type
+- a supported `layout`
+- a supported `chart`
 - real CSV column names
 
-then it should usually be implemented by editing only `story.md`.
+then it should usually be built by editing only `story.md`.
+
+## Legacy Compatibility
+
+The older YAML-heavy format is still supported, so existing stories do not need immediate migration.

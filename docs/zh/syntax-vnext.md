@@ -4,15 +4,27 @@
 
 它借鉴了 Slidev 更偏 Markdown-first 的创作体验，但目标仍然是滚动叙事网页，而不是 slides。
 
+## 当前状态
+
+这个提案的第一阶段已经在 starter runtime 中实现：
+
+- 用 `---` 分隔的 section frontmatter
+- section body 中的 inline HTML
+- `::vis`
+- `::step`
+- 更短、更直觉的图表字段，比如 `chart`、`data`、`x`、`y`
+
+本页剩余内容依然保留为设计 rationale 和后续方向说明。
+
 ## 为什么要提出新语法
 
 当前的 `story.md` 虽然可用，但仍然太偏配置文件。
 
-现在的创作体验大致是：
+当前推荐的创作体验更接近：
 
-- 一个 section 标题
-- 一大块 YAML
-- 少量 Markdown 正文
+- 一个简短的 section 设置 block
+- 以普通 Markdown 为主的正文
+- 需要 scrolly 节奏时再补 `::step`
 
 这会带来几个问题：
 

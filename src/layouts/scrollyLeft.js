@@ -1,7 +1,7 @@
-function renderStep(step, index) {
+function renderStep(markdown, step, index) {
   return `
     <div class="step${index === 0 ? " is-active" : ""}" data-step-index="${index}">
-      <p>${step}</p>
+      ${markdown.render(step)}
     </div>
   `;
 }
@@ -23,7 +23,7 @@ export function renderScrollyLeft({ section, markdown }) {
       ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
       ${renderBody(markdown, section.body)}
       <div class="steps">
-        ${section.copy.steps.map(renderStep).join("")}
+        ${section.copy.steps.map((step, index) => renderStep(markdown, step, index)).join("")}
       </div>
     </div>
   `;
@@ -34,4 +34,3 @@ export function renderScrollyLeft({ section, markdown }) {
     steps: [...element.querySelectorAll(".step")],
   };
 }
-
