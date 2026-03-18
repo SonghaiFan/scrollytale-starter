@@ -1,6 +1,7 @@
 import { getChartTheme } from "./shared.js";
 import {
   aq,
+  createStepUtils,
   d3,
   evaluateJsonOrExpression,
   getFrameworkDimensions,
@@ -62,6 +63,7 @@ export function renderVegaLiteNative({ container, section, data, sources = {} })
         sources,
         samples,
         step: next.step,
+        stepUtils: createStepUtils(next.step),
         section,
         dimensions,
       });

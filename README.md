@@ -1,71 +1,60 @@
 # scrollytale-starter
 
-A lightweight starter for Markdown-driven D3 scrollytelling.
+A Markdown-first starter for building scroll-driven data stories.
 
-This repo is meant to work in two ways:
-
-- as a standalone project that anyone can clone and edit manually
-- as the runtime/template layer used by an AI authoring skill
-
-The app is now starting a gradual move toward a Vue-driven document experience:
-
-- Vue owns the outer app shell and story boot flow
-- the current D3 layouts and scroll runtime still render the page
-- this keeps the starter stable while opening a path toward inspector and authoring UI
-
-## What It Does
-
-- reads `story.md`
-- parses section YAML blocks into a normalized story model
-- loads CSV data sources
-- renders a small set of scrollytelling layouts
-- binds built-in D3 visualizations to each section
-
-## Run It
+## Quick Start
 
 ```bash
 npm install
 npm run dev
 ```
 
-Use the app in two modes:
+Open:
 
-- presenting: `http://localhost:5173/`
-- authoring: `http://localhost:5173/authoring`
+- Presenting mode: `http://localhost:5173/`
+- Authoring mode: `http://localhost:5173/authoring`
 
-## Run The Docs
+## Build
 
 ```bash
-npm install
+npm run build
+```
+
+## Run Docs
+
+```bash
 npm run docs:dev
 ```
 
-## Start Here
+## Main Docs
 
-- Project overview: [docs/index.md](docs/index.md)
-- Authoring workflow: [docs/authoring-workflow.md](docs/authoring-workflow.md)
-- Story DSL: [docs/story-format.md](docs/story-format.md)
-- Starter vs skill: [docs/project-model.md](docs/project-model.md)
+- `docs/index.md`
+- `docs/authoring-workflow.md`
+- `docs/story-format.md`
+- `docs/demo-walkthrough.md` (demo walkthrough)
+- `docs/project-model.md` (project structure)
 
-## Edit It
+## Typical Workflow
 
-- update `story.md`
-- place CSV files in `public/data`
-- adjust styles in `src/styles/custom.css`
-- extend Vue app-shell logic in `src/app/` as the authoring experience grows
+1. Add data files in `public/data/`
+2. Edit `story.md`
+3. Run `npm run dev` and preview
+4. Run `npm run build` before sharing
 
-## v0 Scope
+For most stories, you only need to edit:
 
-- `structure`: `linear`
-- `layout`: `hero`, `scrolly-left`, `scrolly-right`, `full-width`
-- `vis.type`: `html`, `bar`, `line`, `unit`
+- `story.md`
+- `src/styles/custom.css`
 
-## GitHub Pages
+## Project Layout
 
-This repo now includes a VitePress docs site in `docs/`.
+- `story.md`: main story source
+- `public/data/`: local CSV/JSON files
+- `src/layouts/`: section layout renderers
+- `src/visualizations/`: chart renderers
+- `src/runtime/`: parse/normalize/render pipeline
+- `docs/`: user guide and demo docs
 
-To publish it with GitHub Pages:
+## License
 
-1. Open repository settings on GitHub
-2. Go to `Pages`
-3. Set source to `GitHub Actions`
+MIT

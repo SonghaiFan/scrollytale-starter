@@ -1,117 +1,39 @@
-# Project Model
+# Project Structure
 
-This page explains how `scrollytale-starter` relates to the companion AI skill and how to maintain the project cleanly over time.
+This page explains where things live and what to edit.
 
-## Two Layers
+## Top-Level Files
 
-The overall system has two layers:
+- `story.md`: main story source
+- `package.json`: scripts and dependencies
+- `vite.config.js`: dev/build configuration
 
-1. `scrollytale-starter`
-2. `scrollytale` skill
+## Data and Static Assets
 
-### Layer 1: Starter
+- `public/data/`: local datasets (CSV/JSON)
+- `public/`: static files served as-is
 
-The starter is the runtime.
+## Runtime Code
 
-It is now also the beginning of a document app shell:
+- `src/runtime/`: parse, normalize, render pipeline
+- `src/layouts/`: section layouts (`hero`, `chapter`, `scrolly-*`)
+- `src/visualizations/`: chart renderers
+- `src/app/`: Vue app shell and UI components
+- `src/styles/`: base and theme styles
 
-- Vue owns the outer application lifecycle
-- the existing D3 runtime still handles layouts and scroll behavior
-- future authoring UI can grow in `src/app/` without forcing a full rewrite
+## Docs
 
-It is responsible for:
+- `docs/index.md`: docs homepage
+- `docs/authoring-workflow.md`: onboarding flow
+- `docs/story-format.md`: syntax and examples
+- `docs/design-space.md`: demo walkthrough
 
-- parsing `story.md`
-- loading CSV data
-- rendering layouts
-- rendering built-in visualizations
-- turning story structure into a webpage
+## What To Edit For Typical Work
 
-### Layer 2: Skill
+For normal story production:
 
-The skill is the authoring workflow.
+1. Edit `story.md`
+2. Add data in `public/data/`
+3. Adjust style in `src/styles/custom.css` if needed
 
-It is responsible for:
-
-- cloning the starter
-- inspecting data
-- planning the story
-- generating or revising `story.md`
-
-## Why This Split Matters
-
-This split keeps the project maintainable.
-
-If the runtime and the authoring workflow are mixed together too tightly:
-
-- the starter becomes harder to understand
-- manual users become blocked on AI tooling
-- AI agents change more code than necessary
-
-With the split:
-
-- humans can use the starter directly
-- AI can use the starter through the skill
-- runtime work and authoring work can evolve separately
-
-## Maintenance Rules
-
-### When to Change `story.md`
-
-Change `story.md` when you are:
-
-- making a new story
-- changing section copy
-- remapping charts to different fields
-- reordering or retitling sections
-
-### When to Change `src/styles/custom.css`
-
-Change `custom.css` when you are:
-
-- adjusting spacing
-- changing colors
-- adding a small project-specific look
-
-### When to Change Runtime Code
-
-Change runtime code only when you need:
-
-- a new layout
-- a new vis type
-- a new parser feature
-- a new interaction pattern
-
-Runtime changes usually happen in:
-
-- `src/runtime/`
-- `src/layouts/`
-- `src/visualizations/`
-
-Document-app and authoring-shell changes usually happen in:
-
-- `src/app/`
-- `src/main.js`
-
-## Advice for AI Agents
-
-Default to the smallest useful change.
-
-For a normal story task:
-
-1. read these docs
-2. inspect the CSV
-3. edit `story.md`
-4. run `npm run build`
-
-Do not extend the runtime just because a more complex chart is possible.
-
-## Advice for Maintainers
-
-When adding features, keep the system stable in this order:
-
-1. runtime stays understandable
-2. `story.md` stays easy to author
-3. the skill can still map prompts into supported structures
-
-If a new runtime feature makes `story.md` much harder to read, it is probably too early or too complex for the starter.
+Only change runtime files when adding new features.

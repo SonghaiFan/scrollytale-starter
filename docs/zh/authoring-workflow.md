@@ -1,95 +1,62 @@
 # 创作流程
 
-这是在 `scrollytale-starter` 中创建故事的标准流程。
+这是最快的新故事制作流程。
 
-## 1. Clone Starter
-
-```bash
-git clone https://github.com/SonghaiFan/scrollytale-starter.git
-cd scrollytale-starter
-```
-
-## 2. 添加数据
-
-把你的 CSV 文件放进 `public/data/`。
-
-例如：
-
-```text
-public/data/housing-gap.csv
-```
-
-文件名尽量保持简单，并在写入 `story.md` 后保持稳定。
-
-## 3. 编辑 `story.md`
-
-`story.md` 是页面的唯一事实来源。
-
-你通常会修改：
-
-- 故事标题
-- 数据名称和路径
-- section frontmatter
-- section 顺序
-- section 文案
-- 图表字段，比如 `chart`、`data`、`x`、`y`
-- section 的 layout 选择
-
-## 4. 运行项目
+## 1. 启动项目
 
 ```bash
 npm install
 npm run dev
 ```
 
-然后打开本地 Vite 地址，通常是：
+打开：
 
-- `http://localhost:5173`
+- `http://localhost:5173/`（展示模式）
+- `http://localhost:5173/authoring`（创作面板）
 
-## 5. 分享前先验证
+## 2. 准备数据
+
+把数据文件放到 `public/data/`。
+
+例如：
+
+```text
+public/data/my-data.csv
+```
+
+## 3. 编辑 story.md
+
+大多数工作都在 `story.md`：
+
+- 标题与全局设置
+- section 顺序与 layout
+- 文案与标题
+- 图表代码
+- `::step` 分步叙事
+
+## 4. 验证
 
 ```bash
 npm run build
 ```
 
-如果 build 通过，说明这个故事至少对当前 starter runtime 来说是结构有效的。
+构建通过后再分享。
 
-## 推荐的故事结构
+## 5. 发布
 
-对 v0 来说，建议：
+发布 `dist/` 到静态托管平台即可。
 
-1. 一个 `hero` 开场
-2. 两到四个分析 section
-3. 一个结尾 section
+## 常见编辑顺序
 
-合适的 section 数量通常是：
+1. 先写 section 文案
+2. 每个 section 加一个图表 code block
+3. 只在需要交互时添加 `::step`
+4. 每个 step 只表达一个观点
 
-- 4 到 6 个
+## 默认不需要改动
 
-## 推荐图表选择
-
-- `bar`：适合排序或分类比较
-- `line`：适合时间变化
-- `unit`：适合逐条记录或分类分组
-- `html`：适合占位容器或自定义嵌入内容
-
-## 最先该改什么
-
-如果你在做一个新故事，建议按这个顺序开始：
-
-1. 更新 [`story.md`](https://github.com/SonghaiFan/scrollytale-starter/blob/main/story.md) 顶部 frontmatter
-2. 定义或修改各 section 的 frontmatter
-3. 替换 section 标题和正文
-4. 更新 `chart`、`data`、`x`、`y`、`series` 或 `color`
-5. 更新 scrolly section 的 `::step` 块
-6. 如有需要，再微调 `src/styles/custom.css`
-
-## 默认不要改什么
-
-除非你需要新功能，否则不要先改 runtime 文件：
+除非要新增能力，否则不建议先改 runtime：
 
 - `src/runtime/*`
 - `src/layouts/*`
 - `src/visualizations/*`
-
-对于很多故事来说，只改 `story.md` 和加入一个 CSV 就够了。

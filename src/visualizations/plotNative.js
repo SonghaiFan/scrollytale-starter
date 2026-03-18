@@ -1,6 +1,7 @@
 import { getChartTheme } from "./shared.js";
 import {
   aq,
+  createStepUtils,
   d3,
   evaluateFrameworkSource,
   getFrameworkDimensions,
@@ -71,6 +72,7 @@ export function renderPlotNative({ container, section, data, sources = {} }) {
       }
 
       const defaults = buildDefaultPlotOptions(dimensions, theme);
+      const stepUtils = createStepUtils(next.step);
       const result = evaluateFrameworkSource(source, {
         Plot,
         aq,
@@ -79,6 +81,7 @@ export function renderPlotNative({ container, section, data, sources = {} }) {
         sources,
         samples,
         step: next.step,
+        stepUtils,
         section,
         dimensions,
       });

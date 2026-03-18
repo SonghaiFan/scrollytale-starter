@@ -1,265 +1,287 @@
 ---
-title: "Melbourne Housing Snapshot"
+title: "What the data reveals"
 chrome:
   bottom_nav: true
   theme_toggle: true
-data:
-  housing: ./data/demo.csv
 custom_style: ./src/styles/custom.css
 ---
 
 ---
 id: opening
 layout: hero
-dek: "A compacted scrollytelling starter that turns Markdown into a D3 narrative page."
 ---
-# Where prices rise, pressure concentrates
-This is astarter is moving closer to the original three-to-one editorial rhythm. Sections use frontmatter for layout, Markdown for narrative content, and lightweight directives for visuals and scrolly steps.
+# Data finds the patterns we miss
 
-Scrolling to see how it workses.
+Every dataset hides structure that a table of numbers never shows. A well-chosen chart makes the shape of the data visible in seconds. This story walks through five classic datasets — penguins, cars, diamonds, letters, and Olympic athletes — using each one to demonstrate a different layout and interaction pattern.
 
 ---
-id: region-comparison
+id: intro
+---
+## How this page works
+
+This page is a living demonstration of the Scrollytale authoring format.
+
+The headings and prose you are reading are plain Markdown. Charts are defined as `plot` code blocks directly inside the story file. Scroll interactions come from `::step` directives. No separate configuration files are needed — the entire story lives in a single `story.md`.
+
+Each section below uses a different layout to match the shape of its argument.
+
+---
+id: penguins
 layout: scrolly-right
 ---
-## Inner Melbourne still leads on price
-The chart stays visible while the text scrolls.
+## Three species, one scatterplot
+
+Adelie, Chinstrap, and Gentoo penguins share the same Antarctic islands. They eat similar prey and face similar conditions. Yet plotting bill length against bill depth separates them into three tight clouds — cleanly enough that the chart nearly replaces a species label.
+
+The clusters emerge from evolutionary pressure. Each species occupies a different ecological niche, and bill morphology reflects what and how they eat.
 
 ```plot
 (() => {
-  const rows = aq.from(sources.housing)
-    .groupby("region")
-    .rollup({ value: aq.op.sum("value") })
-    .orderby(aq.desc("value"))
-    .objects();
   const focused = step?.focus && !/^(all|\*)$/i.test(step.focus)
     ? new Set(step.focus.split(",").map(s => s.trim()))
     : null;
-  return Plot.barY(
-    rows.map(d => ({ ...d, __opacity: !focused || focused.has(d.region) ? 1 : 0.2 })),
-    { x: "region", y: "value", fill: "region", fillOpacity: "__opacity", tip: true }
+  return Plot.dot(
+    samples.penguins
+      .filter(d => d.culmen_length_mm != null && d.culmen_depth_mm != null)
+      .map(d => ({
+        ...d,
+        __opacity: !focused || focused.has(d.species) ? 1 : 0.08
+      })),
+    {
+      x: "culmen_length_mm",
+      y: "culmen_depth_mm",
+      stroke: "species",
+      fill: "species",
+      fillOpacity: "__opacity",
+      strokeOpacity: "__opacity",
+      r: 4,
+      tip: true
+    }
   );
 })()
 ```
 
-::step{focus="Inner"}
-**Inner** Melbourne sets the upper boundary for the comparison.
+::step{focus="all"}
+All 344 penguins together. Three clusters are already visible before any filtering — bill shape alone is nearly sufficient to classify species.
 ::
 
-::step{focus="Middle"}
-**Middle** suburbs create the broadest spread in the middle of the ranking.
+::step{focus="Adelie"}
+**Adelie** penguins have shorter bills with greater depth. They are the most widely distributed species and appear on all three islands in the dataset.
 ::
 
-::step{focus="Outer"}
-**Outer** suburbs remain lower, but not uniform.
+::step{focus="Chinstrap"}
+**Chinstrap** penguins sit at longer, still-deep bills. Their narrow measurement range makes them the most tightly clustered of the three, with almost no overlap with Gentoo.
+::
+
+::step{focus="Gentoo"}
+**Gentoo** penguins stand apart: long, shallow bills, and the heaviest body mass in the dataset. They are the easiest species to identify from bill shape alone.
 ::
 
 ---
-id: trend-over-time
+id: cars-efficiency
 layout: scrolly-left
 ---
-## The gap holds across the time series
-The section body stays mostly normal Markdown.
+## Fifty years of fuel efficiency
+
+The oil embargo of 1973 forced a reckoning in the American automobile industry. This dataset — originally from the Carnegie Mellon StatLib repository — captures the transition: engine displacement fell, and miles per gallon climbed. The shift did not happen uniformly across all engine types.
+
+```plot
+(() => {
+  const rows = samples.cars
+    .filter(d => d["economy (mpg)"] != null)
+    .map(d => ({
+      ...d,
+      year: d.year < 100 ? 1900 + d.year : d.year,
+      cyl: String(d.cylinders)
+    }));
+  const grouped = stepUtils.focusBy(
+    "cyl",
+    aq.from(rows)
+    .groupby("cyl", "year")
+    .rollup({ mpg: aq.op.mean("economy (mpg)") })
+    .orderby("year")
+    .objects(),
+    { inactiveOpacity: 0.08 }
+  );
+  return Plot.line(grouped, {
+    x: "year",
+    y: "mpg",
+    stroke: "cyl",
+    strokeOpacity: "__opacity",
+    strokeWidth: 2.5,
+    tip: true
+  });
+})()
+```
 
 ::step{focus="all"}
-```plot
-Plot.line(aq.from(sources.housing).orderby("region", "year").objects(), {
-  x: "year",
-  y: "value",
-  stroke: "region",
-  strokeWidth: 2.5,
-  tip: true
-})
-```
-All three series move upward over time.
+All cylinder groups from 1970 to 1982. The overall fleet efficiency improved from the mid-seventies onward as composition shifted away from large engines.
 ::
 
-::step{filter="Inner"}
-```plot
-Plot.line(
-  aq.from(sources.housing).filter(d => d.region === "Inner").orderby("year").objects(),
-  { x: "year", y: "value", stroke: "region", strokeWidth: 2.5, tip: true }
-)
-```
-The **Inner** region keeps the highest line throughout the series.
+::step{focus="4"}
+**4-cylinder** cars were the efficiency leaders throughout. Their MPG stayed highest and grew steadily — driven largely by Japanese and European imports entering the American market.
 ::
 
-::step{filter="Outer,Middle"}
-```plot
-Plot.line(
-  aq.from(sources.housing).filter(d => d.region !== "Inner").orderby("region", "year").objects(),
-  { x: "year", y: "value", stroke: "region", strokeWidth: 2.5, tip: true }
-)
-```
-The gap narrows slightly, but never closes between the lower two regions.
+::step{focus="6"}
+**6-cylinder** cars occupied the middle ground: better than the large V8s, but never as efficient as the smallest engines. Their gains across the period were modest.
+::
+
+::step{focus="8"}
+**8-cylinder** cars dominated the early data. Efficiency improved after the crisis, but they remained the lowest performers — and nearly vanished from new model lines by 1982.
 ::
 
 ---
-id: dot-comparison
-layout: scrolly-right
----
-
-## Each step defines its own Plot block
-
-The visual state lives directly in each step as a code block. No chart type or field mapping in the YAML.
-
-::step{focus="all"}
-```plot
-Plot.dot(aq.from(sources.housing).objects(), {
-  x: "year",
-  y: "value",
-  stroke: "region",
-  fill: "region",
-  symbol: "square",
-  r: 6,
-  tip: true
-})
-```
-
-All points remain visible so the three regional clusters are easy to compare.
-::
-
-::step{filter="Inner"}
-```plot
-Plot.dot(
-  aq.from(sources.housing).filter((d) => d.region === "Inner").objects(),
-  {
-    x: "year",
-    y: "value",
-    fill: "region",
-    symbol: "square",
-    r: 7,
-    tip: true
-  }
-)
-```
-
-The **Inner** region stays highest across the full set of years.
-::
-
-::step{filter="Outer,Middle"}
-```plot
-Plot.dot(
-  aq.from(sources.housing).filter((d) => d.region !== "Inner").objects(),
-  {
-    x: "year",
-    y: "value",
-    stroke: "region",
-    fill: "region",
-    symbol: "square",
-    r: 6,
-    tip: true
-  }
-)
-```
-
-The lower two groups stay closer together, but they still separate over time.
-::
-
----
-id: vega-lite-comparison
-layout: scrolly-left
----
-
-## Steps can also swap native Vega-Lite specs
-
-Each step defines a complete Vega-Lite spec. Data is provided explicitly via `sources`.
-
-::step
-```vega-lite
-({
-  data: { values: sources.housing },
-  mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
-  encoding: {
-    x: { field: "region", type: "nominal", sort: "-y" },
-    y: { field: "value", type: "quantitative" },
-    color: { field: "region", type: "nominal", legend: null }
-  }
-})
-```
-
-The first step uses the full dataset as a compact bar comparison.
-::
-
-::step
-```vega-lite
-{
-  "data": {
-    "values": [
-      {"region": "Inner", "value": 402},
-      {"region": "Middle", "value": 326}
-    ]
-  },
-  "mark": {"type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3},
-  "encoding": {
-    "x": {"field": "region", "type": "nominal"},
-    "y": {"field": "value", "type": "quantitative"},
-    "color": {"field": "region", "type": "nominal", "legend": null}
-  }
-}
-```
-
-The second step swaps in a spec with inline data.
-::
-
----
-id: unit-view
+id: diamonds-price
 layout: scrolly-overlay
 ---
+## What makes a diamond expensive?
 
-## Overlay copy can travel over the figure
-
-This section uses the overlay layout so the story text sits above the visual rather than beside it.
+Carat weight is the most obvious driver of diamond price. But cut quality changes the relationship substantially. A well-cut stone commands a premium over a poorly cut stone of the same mass. With 53,940 diamonds in this dataset, the full distribution becomes visible — and cut quality begins to separate the clouds.
 
 ```plot
-Plot.dot(sources.housing, {
-  x: "year",
-  y: "value",
-  fill: "region",
-  r: 7,
-  tip: true
-})
+(() => {
+  const cutOrder = ["Fair", "Good", "Very Good", "Premium", "Ideal"];
+  const rows = step?.filter
+    ? samples.diamonds.filter(d => d.cut === step.filter)
+    : samples.diamonds;
+  return Plot.dot(rows, {
+    x: "carat",
+    y: "price",
+    stroke: "cut",
+    fill: "cut",
+    r: 1.5,
+    fillOpacity: 0.4,
+    tip: true,
+    color: { domain: cutOrder }
+  });
+})()
 ```
 
 ::step
-The visual stays full and present behind the copy.
+The full dataset: 53,940 diamonds plotted by carat and price. The relationship is clear but noisy — cut quality colors the points but is hard to read at this density.
 ::
 
-::step
-Each step behaves like a translucent card over the chart.
+::step{filter="Fair"}
+**Fair** cut stones sacrifice sparkle for weight retention. The price ceiling for a given carat is lower than any other cut category — the market discounts the lost light return.
 ::
 
-::step
-This gives the page a stronger editorial rhythm than a standard side-by-side layout.
+::step{filter="Good"}
+**Good** cut stones recover some of the sparkle. Prices are higher than Fair at equivalent weight, and the distribution begins to tighten.
+::
+
+::step{filter="Premium"}
+**Premium** cut stones are optimised for carat weight while preserving strong sparkle. Prices are high and variable — Premium stones can be overpriced relative to Ideal at the same carat.
+::
+
+::step{filter="Ideal"}
+**Ideal** cut stones have the highest light return. The price ceiling is highest here — and the distribution is notably tighter than other cuts, reflecting a consistent quality standard.
 ::
 
 ---
-id: unit-view-summary
+id: alphabet-frequency
 ---
-## A chart can also live in a chapter section
+## Some patterns need no scrolling
+
+Not every insight requires interaction. The frequency distribution of English letters is fully legible as a single static chart. The 26-letter hierarchy underpins everything from Morse code design to Scrabble tile values — E, T, A, O, I dominate, while Q, X, Z sit at the tail.
 
 ```plot
 Plot.plot({
-  x: {
-    axis: "top",
-    grid: true,
-    percent: true
-  },
+  x: { axis: "top", grid: true, percent: true, label: "Frequency in English text (%)" },
+  y: { label: null },
   marks: [
     Plot.ruleX([0]),
-    Plot.barX(alphabet, {x: "frequency", y: "letter", sort: {y: "x", reverse: true}})
+    Plot.barX(
+      samples.alphabet,
+      {
+        x: "frequency",
+        y: "letter",
+        fill: "steelblue",
+        sort: { y: "x", reverse: true },
+        tip: true
+      }
+    )
   ]
 })
 ```
 
-A body-level code block defines a static figure with no scrolly interaction.
+Samuel Morse observed letter frequency in a printer's type case to assign the shortest codes to the most common letters. E (·) and T (–) are the two most frequent letters — and the two shortest Morse symbols.
+
+---
+id: olympians-body
+layout: scrolly-right
+---
+## Body type follows sport
+
+Olympic athletes are not a uniform population. The physical demands of each sport select for very different morphologies — decades of specialisation have sharpened the divergence. Plotting height against weight for six disciplines reveals clusters that reflect those demands directly.
+
+```plot
+(() => {
+  const sports = ["swimming", "athletics", "gymnastics", "weightlifting", "basketball", "rowing"];
+  const toTitleCase = value => String(value)
+    .split(" ")
+    .map(token => token ? token[0].toUpperCase() + token.slice(1) : token)
+    .join(" ");
+  const rows = stepUtils.focusBy(
+    "sport",
+    samples.olympians
+    .filter(d => sports.includes(String(d.sport).toLowerCase()) && d.height != null && d.weight != null)
+    .map(d => ({
+      ...d,
+      sportLabel: toTitleCase(d.sport)
+    })),
+    { inactiveOpacity: 0.05, activeOpacity: 0.8 }
+  );
+  return Plot.dot(rows, {
+    x: "weight",
+    y: "height",
+    stroke: "sportLabel",
+    fill: "sportLabel",
+    fillOpacity: "__opacity",
+    strokeOpacity: "__opacity",
+    r: 3,
+    tip: true
+  });
+})()
+```
+
+::step{focus="all"}
+Six sports, hundreds of athletes. Two poles are already visible: tall-and-lean at the top, short-and-dense at the bottom. Most sports occupy one pole or the other.
+::
+
+::step{focus="Basketball"}
+**Basketball** players cluster top-right — the tallest and heaviest group. Height above 190 cm is nearly universal; weight varies between guards and centres.
+::
+
+::step{focus="Rowing"}
+**Rowing** athletes are tall but lighter than basketball players. The sport rewards height for leverage but demands cardiovascular endurance, which limits added mass.
+::
+
+::step{focus="Swimming"}
+**Swimming** athletes sit centre-top: moderate-to-tall, moderate weight. A lean, long body reduces drag and increases stroke length — the optimal shape for water.
+::
+
+::step{focus="Athletics"}
+**Athletics** spans the widest spread of any sport here. Sprinters are heavier and more muscular; distance runners are lighter and shorter. Every event selects for a different optimum.
+::
+
+::step{focus="Weightlifting"}
+**Weightlifting** athletes are compact and dense — short-to-medium height, high weight. The sport is contested by weight class, which constrains height while rewarding strength.
+::
+
+::step{focus="Gymnastics"}
+**Gymnastics** is the inverse of basketball: short, light, tightly clustered. The physical demands have converged on a narrow morphological window that has grown narrower over decades.
+::
 
 ---
 id: closing
 ---
 
-## Prompt plus CSV becomes a story spec
+## Syntax and story, together
 
-In the intended workflow, AI authors this file first, then the runtime turns it into a webpage. The same internal story model still powers rendering, but the authoring surface now feels much closer to writing a document.
+This page used five datasets, four layout types, and three interaction patterns — all authored in a single Markdown file with no separate configuration.
 
-![Calm shoreline](https://picsum.photos/1200/480?grayscale)
+The format is designed so that chart code lives beside the prose that explains it. Each `::step` block owns both the narrative and the visual state for that moment. The `focus` keyword highlights a subset while keeping context visible; `filter` removes everything else.
+
+To write your own story: open `story.md`, add a frontmatter block with an `id` and a `layout`, write a `plot` code block, and add `::step` directives. `samples` gives you twelve ready-to-use datasets. `sources` connects to your own CSV or JSON files. The runtime handles the rest.
+
+![A calm shoreline](https://picsum.photos/1200/480?grayscale)

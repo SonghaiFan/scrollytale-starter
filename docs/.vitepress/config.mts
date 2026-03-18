@@ -2,7 +2,7 @@ import { defineConfig } from "vitepress";
 
 export default defineConfig({
   title: "Scrollytale Starter",
-  description: "A standalone starter for Markdown-driven D3 scrollytelling.",
+  description: "A clean starter for Markdown-driven scrollytelling.",
   base: "/scrollytale-starter/",
   cleanUrls: true,
   ignoreDeadLinks: true,
@@ -14,10 +14,8 @@ export default defineConfig({
         nav: [
           { text: "Guide", link: "/authoring-workflow" },
           { text: "Story Format", link: "/story-format" },
-          { text: "Three-to-One Fidelity", link: "/three-to-one-fidelity" },
-          { text: "Design Space", link: "/design-space" },
-          { text: "Syntax vNext", link: "/syntax-vnext" },
-          { text: "Project Model", link: "/project-model" },
+          { text: "Demo", link: "/demo-walkthrough" },
+          { text: "Project Structure", link: "/project-model" },
           {
             text: "GitHub",
             link: "https://github.com/SonghaiFan/scrollytale-starter",
@@ -25,15 +23,13 @@ export default defineConfig({
         ],
         sidebar: [
           {
-            text: "Getting Started",
+            text: "Get Started",
             items: [
               { text: "Overview", link: "/" },
               { text: "Authoring Workflow", link: "/authoring-workflow" },
               { text: "Story Format", link: "/story-format" },
-              { text: "Three-to-One Fidelity", link: "/three-to-one-fidelity" },
-              { text: "Design Space", link: "/design-space" },
-              { text: "Syntax vNext", link: "/syntax-vnext" },
-              { text: "Project Model", link: "/project-model" },
+              { text: "Demo Walkthrough", link: "/demo-walkthrough" },
+              { text: "Project Structure", link: "/project-model" },
             ],
           },
         ],
@@ -47,7 +43,7 @@ export default defineConfig({
           },
         ],
         footer: {
-          message: "Built with VitePress for humans and AI agents.",
+          message: "Built with VitePress.",
           copyright: "Scrollytale Starter",
         },
       },
@@ -57,15 +53,13 @@ export default defineConfig({
       lang: "zh-CN",
       link: "/zh/",
       title: "Scrollytale Starter",
-      description: "一个基于 Markdown 驱动的 D3 scrollytelling 独立 starter。",
+      description: "一个清晰易用的 Markdown 滚动叙事 starter。",
       themeConfig: {
         nav: [
           { text: "指南", link: "/zh/authoring-workflow" },
           { text: "故事格式", link: "/zh/story-format" },
-          { text: "Three-to-One 还原", link: "/zh/three-to-one-fidelity" },
-          { text: "设计空间", link: "/zh/design-space" },
-          { text: "下一代语法", link: "/zh/syntax-vnext" },
-          { text: "项目模型", link: "/zh/project-model" },
+          { text: "示例", link: "/zh/demo-walkthrough" },
+          { text: "项目结构", link: "/zh/project-model" },
           {
             text: "GitHub",
             link: "https://github.com/SonghaiFan/scrollytale-starter",
@@ -78,10 +72,8 @@ export default defineConfig({
               { text: "概览", link: "/zh/" },
               { text: "创作流程", link: "/zh/authoring-workflow" },
               { text: "故事格式", link: "/zh/story-format" },
-              { text: "Three-to-One 还原", link: "/zh/three-to-one-fidelity" },
-              { text: "设计空间", link: "/zh/design-space" },
-              { text: "下一代语法", link: "/zh/syntax-vnext" },
-              { text: "项目模型", link: "/zh/project-model" },
+              { text: "示例演练", link: "/zh/demo-walkthrough" },
+              { text: "项目结构", link: "/zh/project-model" },
             ],
           },
         ],
@@ -95,7 +87,7 @@ export default defineConfig({
           },
         ],
         footer: {
-          message: "使用 VitePress 构建，服务于人和 AI agent。",
+          message: "使用 VitePress 构建。",
           copyright: "Scrollytale Starter",
         },
       },

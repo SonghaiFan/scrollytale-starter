@@ -8,6 +8,8 @@
 
 .section-scrolly-intro {
   padding: 1.5rem 1rem 0.75rem;
+  width: min(75ch, 100%);
+  margin-inline: auto;
 }
 
 /* ── Scrolly body (figure + steps side by side) ── */
