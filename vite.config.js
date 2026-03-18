@@ -19,7 +19,7 @@ function validateSectionRaw(raw) {
     return "Section must start with frontmatter delimited by ---";
   }
 
-  const match = source.match(STORY_SECTION_RE);
+  const match = /^---\n([\s\S]*?)\n---/m.exec(source);
 
   if (!match || match.index !== 0) {
     return "Section frontmatter is malformed.";
@@ -60,6 +60,25 @@ async function readJsonBody(req) {
   }
 
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
+function storyHmrPlugin() {
+  return {
+    name: "scrollytale-story-hmr",
+    async handleHotUpdate({ file, server, read }) {
+      const storyPath = path.resolve(server.config.root, "story.md");
+      if (file !== storyPath) return;
+
+      const source = await read();
+      server.ws.send({
+        type: "custom",
+        event: "scrollytale:story-update",
+        data: { source },
+      });
+
+      return []; // suppress default module invalidation / full reload
+    },
+  };
 }
 
 function authoringSavePlugin() {
@@ -155,5 +174,5 @@ export default defineConfig({
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
   },
-  plugins: [authoringSavePlugin()],
+  plugins: [storyHmrPlugin(), authoringSavePlugin()],
 });

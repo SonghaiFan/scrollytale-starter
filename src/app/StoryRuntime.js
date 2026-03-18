@@ -127,6 +127,8 @@ export const StoryRuntime = defineComponent({
     }
 
     async function mountStory() {
+      const scrollY = window.scrollY;
+
       storyController?.destroy?.();
       navObserver?.disconnect();
 
@@ -141,6 +143,8 @@ export const StoryRuntime = defineComponent({
       });
 
       await nextTick();
+
+      window.scrollTo({ top: scrollY, behavior: "instant" });
 
       const targets = buildNavTargets(root.value, props.story);
       emit("targets-change", targets);
@@ -160,6 +164,13 @@ export const StoryRuntime = defineComponent({
       () => props.requestedTarget?.nonce,
       () => {
         scrollToTarget(props.requestedTarget?.id);
+      }
+    );
+
+    watch(
+      () => props.story,
+      async () => {
+        await mountStory();
       }
     );
 

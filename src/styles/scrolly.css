@@ -1,10 +1,33 @@
 .section-scrolly {
   position: relative;
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
   background: var(--page-bg);
   text-align: left;
+}
+
+/* ── Intro block (chapter-style prose above the scrolly zone) ── */
+
+.section-scrolly-intro {
+  padding: 1.5rem 1rem 0.75rem;
+}
+
+/* ── Scrolly body (figure + steps side by side) ── */
+
+.section-scrolly-body {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1rem 1rem;
+}
+
+/* ── Overlay body (figure behind steps via CSS grid stacking) ── */
+
+.section-scrolly-overlay-body {
+  display: grid;
+  align-items: start;
+  isolation: isolate;
+}
+
+.section-scrolly-overlay-body > * {
+  grid-area: 1 / 1;
 }
 
 .scrolly-copy {
@@ -73,6 +96,20 @@
 
 .step-inner {
   display: block;
+}
+
+.step-eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: 0.65rem;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--text);
+  opacity: 0.45;
+}
+
+.step.is-active .step-eyebrow {
+  opacity: 0.65;
 }
 
 .step-marker {
@@ -190,17 +227,7 @@
   min-height: 0;
 }
 
-.section-scrolly-overlay {
-  display: grid;
-  align-items: start;
-  isolation: isolate;
-}
-
-.section-scrolly-overlay > * {
-  grid-area: 1 / 1;
-}
-
-.section-scrolly-overlay .section-copy {
+.section-scrolly-overlay-body .scrolly-copy {
   position: relative;
   z-index: 1;
   width: min(45ch, calc(100% - 2rem));
@@ -209,69 +236,60 @@
   pointer-events: none;
 }
 
-.section-scrolly-overlay .section-copy > * {
+.section-scrolly-overlay-body .scrolly-copy > * {
   pointer-events: auto;
 }
 
-.section-scrolly-overlay .sticky-figure {
+.section-scrolly-overlay-body .sticky-figure {
   z-index: 0;
   min-height: var(--scrollytale-figure-height, 78vh);
 }
 
-.section-scrolly-overlay .steps {
+.section-scrolly-overlay-body .steps {
   gap: calc(var(--scrollytale-step-gap, 2rem) * 0.7);
 }
 
-.section-scrolly-overlay .step {
+.section-scrolly-overlay-body .step {
   max-width: 42ch;
 }
 
-.section-scrolly-overlay .step:first-child {
+.section-scrolly-overlay-body .step:first-child {
   margin-top: 6rem;
 }
 
-.section-scrolly-overlay .step:last-child {
+.section-scrolly-overlay-body .step:last-child {
   margin-bottom: 12rem;
 }
 
 @media (min-width: 900px) {
-  .section-scrolly-left {
-    flex-direction: row;
+  .section-scrolly-left .section-scrolly-body,
+  .section-scrolly-right .section-scrolly-body {
     align-items: start;
   }
 
-  .section-scrolly-overlay {
-    display: grid;
-  }
-
-  .section-scrolly-right {
-    flex-direction: row;
-    align-items: start;
-  }
-
-  .section-scrolly > * {
+  .section-scrolly-body > * {
     flex: 1;
   }
 
-  .section-scrolly .section-copy {
+  .section-scrolly-body .scrolly-copy {
     padding: 0 1rem;
   }
 }
 
 @media (max-width: 899px) {
-  .section-scrolly {
+  .section-scrolly-body {
     display: grid;
   }
 
-  .section-scrolly-overlay > * {
+  .section-scrolly-overlay-body > * {
     grid-area: auto;
   }
 
-  .section-scrolly-overlay .section-copy {
+  .section-scrolly-overlay-body .scrolly-copy {
     width: 100%;
   }
 
-  .section-scrolly-overlay .sticky-figure {
+  .section-scrolly-overlay-body .sticky-figure {
     height: 360px;
     min-height: 360px;
   }

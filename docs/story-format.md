@@ -220,11 +220,17 @@ Inner Melbourne sets the upper boundary for the comparison.
 ::
 ```
 
-Each step can contain normal Markdown.
+Each step can contain normal Markdown and an optional code block that defines the visual state for that step.
 
-`::step` can also carry a small amount of chart state.
+### Step keywords: `focus` and `filter`
 
-For example, `line` and `bar` currently support `focus`:
+Steps can carry one of two semantic keywords as a hint about the visual intent.
+The keyword appears as an eyebrow label at the top of the step card and in the authoring panel.
+
+| Keyword | Meaning | Code pattern |
+|---|---|---|
+| `focus` | Highlight a subset; keep others visible but muted | All data rendered, focused items at full opacity |
+| `filter` | Show only the subset; remove everything else | Data pre-filtered before passing to the mark |
 
 ```md
 ::step{focus="all"}
@@ -232,97 +238,140 @@ All series stay visible together.
 ::
 
 ::step{focus="Inner"}
-Focus the Inner series or bar.
+Inner is highlighted; other series remain at reduced opacity.
 ::
 
-::step{focus="Outer,Middle"}
-Focus multiple series or categories together.
+::step{filter="Inner"}
+Only the Inner series is rendered.
+::
+
+::step{filter="Outer,Middle"}
+Only Outer and Middle are rendered.
 ::
 ```
 
-This is closer to how the case studies work:
+The keyword is a documentation hint and a UI label — it does not drive the renderer.
+The actual visual comes from the code block inside the step.
 
-- step text explains the narrative
-- step attributes describe the visual state change
+### Code-writing guide
 
-## Native Framework Blocks
+Use the keyword to decide how to write the code block:
 
-If a section declares `chart: plot` or `chart: vega-lite`, each step can define the visual directly with a fenced code block.
+**`focus`** — render all data, keep the focused category's color, mute all others with reduced opacity.
+Read `step.focus` in the code block so the same block works for every step:
 
-Observable Plot example:
+```plot
+// Works for focus="Inner", focus="Middle", focus="all", or no focus
+(() => {
+  const rows = aq.from(sources.housing)
+    .groupby("region")
+    .rollup({ value: aq.op.sum("value") })
+    .orderby(aq.desc("value"))
+    .objects();
+  const focused = step?.focus && !/^(all|\*)$/i.test(step.focus)
+    ? new Set(step.focus.split(",").map(s => s.trim()))
+    : null;
+  return Plot.barY(
+    rows.map(d => ({ ...d, __opacity: !focused || focused.has(d.region) ? 1 : 0.2 })),
+    { x: "region", y: "value", fill: "region", fillOpacity: "__opacity", tip: true }
+  );
+})()
+```
+
+**`filter`** — pre-filter the data so only the target rows are passed to the mark:
+
+```plot
+// filter="Inner": only Inner rows
+Plot.line(
+  aq.from(sources.housing).filter(d => d.region === "Inner").orderby("year").objects(),
+  { x: "year", y: "value", stroke: "region", strokeWidth: 2.5, tip: true }
+)
+```
+
+```plot
+// filter="Outer,Middle": everything except Inner
+Plot.line(
+  aq.from(sources.housing).filter(d => d.region !== "Inner").orderby("region", "year").objects(),
+  { x: "year", y: "value", stroke: "region", strokeWidth: 2.5, tip: true }
+)
+```
+
+## Section-level code blocks and per-step overrides
+
+The section body can hold a single code block that defines the **default chart** for the entire section.
+Steps with no code block reuse it; steps that need a different visual include their own block.
 
 ````md
 ---
-id: native-plot
+id: region-comparison
 layout: scrolly-right
-chart: plot
-data: housing
 ---
 
-## Plot block in step content
+## Inner Melbourne still leads on price
 
-::step
+The chart stays visible while the text scrolls.
+
 ```plot
-Plot.dot(aq.from(data).objects(), {
-  x: "year",
-  y: "value",
-  stroke: "region",
-  tip: true
-})
+Plot.barY(
+  aq.from(sources.housing).groupby("region").rollup({ value: aq.op.sum("value") }).orderby(aq.desc("value")).objects(),
+  { x: "region", y: "value", fill: "region", tip: true }
+)
 ```
 
-Show all points.
+::step{focus="Inner"}
+Narrative only — reuses the section-level chart above.
+::
+
+::step{filter="Inner"}
+```plot
+Plot.barY(
+  aq.from(sources.housing).filter(d => d.region === "Inner").groupby("region").rollup({ value: aq.op.sum("value") }).objects(),
+  { x: "region", y: "value", fill: "region", tip: true }
+)
+```
+This step overrides the chart to show only Inner.
 ::
 ````
 
-Vega-Lite example:
+The section-level code block is extracted from the body prose and never rendered as visible Markdown.
+Non-code body text (headings, paragraphs) renders as normal HTML — not as a step card.
+
+## Code block scope
+
+All `plot` and `vega-lite` code blocks receive these variables:
+
+- `sources` — the full map of all loaded datasets (e.g. `sources.housing`)
+- `data` — the section's own dataset array (empty when no `data:` key in section frontmatter)
+- `aq` — Arquero for filtering, grouping, and reshaping
+- `d3` — D3 utilities
+- `Plot` — Observable Plot (in `plot` blocks)
+- `step`, `section`, `dimensions`
+
+Always reference data as `sources.housing` (or whichever key you declared in global `data:`).
+
+For `vega-lite` blocks, use a JavaScript object expression `({ ... })` when you need to access `sources`.
+Pure JSON works when data is fully inline:
 
 ````md
----
-id: native-vl
-layout: scrolly-right
-chart: vega-lite
-data: housing
----
-
-## Vega-Lite block in step content
-
 ::step
 ```vega-lite
-{
-  "mark": "bar",
-  "encoding": {
-    "x": {"field": "region", "type": "nominal"},
-    "y": {"field": "value", "type": "quantitative"}
+({
+  data: { values: sources.housing },
+  mark: { type: "bar" },
+  encoding: {
+    x: { field: "region", type: "nominal" },
+    y: { field: "value", type: "quantitative" }
   }
-}
+})
 ```
-
-Show the default bar chart.
 ::
 ````
 
 For `plot`, the block can return:
 
-- a Plot mark such as `Plot.dot(...)`
-- a full Plot config object
+- a Plot mark such as `Plot.dot(...)` or `Plot.line(...)`
+- a full Plot config object `{ marks: [...], x: {...}, ... }`
 - a DOM node returned by `Plot.plot(...)`
-
-For `vega-lite`, the block can be:
-
-- valid JSON
-- a JavaScript object expression
-
-If the Vega-Lite spec omits `data`, the starter automatically injects the section's loaded dataset as `values`.
-
-Both native block types currently receive these variables:
-
-- `data`: the loaded row array for the section
-- `aq`: Arquero for filtering, grouping, and reshaping data
-- `d3`: D3 utilities when needed
-- `step`: the current step object
-- `section`: the current section config
-- `dimensions`: the current container width, height, and margins
 
 ## Optional `::vis`
 

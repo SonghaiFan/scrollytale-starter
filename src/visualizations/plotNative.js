@@ -6,6 +6,7 @@ import {
   getFrameworkDimensions,
   getFrameworkUpdatePayload,
   loadPlotModule,
+  loadSamples,
   renderFrameworkError,
 } from "./frameworkShared.js";
 
@@ -43,7 +44,7 @@ function isPlotConfig(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-export function renderPlotNative({ container, section, data }) {
+export function renderPlotNative({ container, section, data, sources = {} }) {
   let currentIndex = 0;
   let currentStep = null;
   let renderToken = 0;
@@ -64,7 +65,7 @@ export function renderPlotNative({ container, section, data }) {
     }
 
     try {
-      const Plot = await loadPlotModule();
+      const [Plot, samples] = await Promise.all([loadPlotModule(), loadSamples()]);
       if (token !== renderToken) {
         return;
       }
@@ -75,6 +76,8 @@ export function renderPlotNative({ container, section, data }) {
         aq,
         d3,
         data,
+        sources,
+        samples,
         step: next.step,
         section,
         dimensions,

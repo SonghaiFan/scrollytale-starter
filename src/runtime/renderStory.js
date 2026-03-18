@@ -136,6 +136,7 @@ export function renderStory({
       container: sectionResult.figure,
       section,
       data: sectionData,
+      sources,
     });
     sectionControllers.push({
       sectionEl: sectionResult.element,

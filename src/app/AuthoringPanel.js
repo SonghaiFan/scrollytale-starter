@@ -11,19 +11,13 @@ function formatStepDescriptor(step) {
     return "{step}";
   }
 
-  const pairs = Object.entries(step).filter(
-    ([key, value]) => key !== "body" && key !== "text" && value != null && value !== ""
-  );
+  if (step.focus) return `focus · ${step.focus}`;
+  if (step.filter) return `filter · ${step.filter}`;
+  if (step.vis?.type) return `{ ${step.vis.type} }`;
 
-  if (!pairs.length) {
-    return "{step}";
-  }
-
-  const formatted = pairs
-    .map(([key, value]) => `${key}=${JSON.stringify(String(value))}`)
-    .join(" ");
-
-  return `{${formatted}}`;
+  const body = typeof step.body === "string" ? step.body : "";
+  const snippet = body.replace(/[#*`[\]]/g, "").trim().slice(0, 48);
+  return snippet || "{step}";
 }
 
 function renderSourceTokens(line) {

@@ -151,6 +151,21 @@ export const App = defineComponent({
       window.removeEventListener("popstate", syncRouteState);
     });
 
+    if (import.meta.hot) {
+      import.meta.hot.on("scrollytale:story-update", ({ source }) => {
+        try {
+          const parsed = parseStory(source);
+          const story = normalizeStory(parsed);
+          state.value = { ...state.value, story };
+          if (story.warnings.length) {
+            console.warn("Story HMR warnings:", story.warnings);
+          }
+        } catch (err) {
+          console.error("Story HMR update failed:", err);
+        }
+      });
+    }
+
     function navigateTo(targetId) {
       state.value.requestedTarget = {
         id: targetId,

@@ -285,7 +285,10 @@ function normalizeStepEntry(entry) {
 function normalizeSection(section, index, warnings) {
   const config = section.config ?? {};
   const layoutMeta = normalizeLayoutMetadata(config.layout, warnings, section.title);
-  const requestedVis = config.vis?.type ?? "html";
+  const stepVisType = Array.isArray(config.copy?.steps)
+    ? (config.copy.steps.find((s) => s?.vis?.type)?.vis?.type ?? null)
+    : null;
+  const requestedVis = config.vis?.type ?? stepVisType ?? "html";
   const id = config.id ?? (slugify(section.title) || `section-${index + 1}`);
   const summary = config.copy?.summary ?? "";
   const steps = Array.isArray(config.copy?.steps)

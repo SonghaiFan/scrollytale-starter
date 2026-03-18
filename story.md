@@ -14,24 +14,33 @@ layout: hero
 dek: "A compacted scrollytelling starter that turns Markdown into a D3 narrative page."
 ---
 # Where prices rise, pressure concentrates
-
 This is astarter is moving closer to the original three-to-one editorial rhythm. Sections use frontmatter for layout, Markdown for narrative content, and lightweight directives for visuals and scrolly steps.
 
-Scrolling to see how it works.
+Scrolling to see how it workses.
 
 ---
 id: region-comparison
 layout: scrolly-right
-chart: bar
-data: housing
-x: region
-y: value
-dek: "Each step can shift emphasis while the chart remains in place."
 ---
-
 ## Inner Melbourne still leads on price
+The chart stays visible while the text scrolls.
 
-The chart stays visible while the text scrolls. In the simplest authoring mode, the binding can live directly in the section frontmatter.
+```plot
+(() => {
+  const rows = aq.from(sources.housing)
+    .groupby("region")
+    .rollup({ value: aq.op.sum("value") })
+    .orderby(aq.desc("value"))
+    .objects();
+  const focused = step?.focus && !/^(all|\*)$/i.test(step.focus)
+    ? new Set(step.focus.split(",").map(s => s.trim()))
+    : null;
+  return Plot.barY(
+    rows.map(d => ({ ...d, __opacity: !focused || focused.has(d.region) ? 1 : 0.2 })),
+    { x: "region", y: "value", fill: "region", fillOpacity: "__opacity", tip: true }
+  );
+})()
+```
 
 ::step{focus="Inner"}
 **Inner** Melbourne sets the upper boundary for the comparison.
@@ -48,46 +57,55 @@ The chart stays visible while the text scrolls. In the simplest authoring mode, 
 ---
 id: trend-over-time
 layout: scrolly-left
-chart: line
-data: housing
-x: year
-y: value
-series: region
 ---
 ## The gap holds across the time series
-
-The line chart reads directly from the same CSV, but the section body stays mostly normal Markdown.
+The section body stays mostly normal Markdown.
 
 ::step{focus="all"}
+```plot
+Plot.line(aq.from(sources.housing).orderby("region", "year").objects(), {
+  x: "year",
+  y: "value",
+  stroke: "region",
+  strokeWidth: 2.5,
+  tip: true
+})
+```
 All three series move upward over time.
 ::
 
-::step{focus="Inner"}
+::step{filter="Inner"}
+```plot
+Plot.line(
+  aq.from(sources.housing).filter(d => d.region === "Inner").orderby("year").objects(),
+  { x: "year", y: "value", stroke: "region", strokeWidth: 2.5, tip: true }
+)
+```
 The **Inner** region keeps the highest line throughout the series.
 ::
 
-::step{focus="Outer,Middle"}
+::step{filter="Outer,Middle"}
+```plot
+Plot.line(
+  aq.from(sources.housing).filter(d => d.region !== "Inner").orderby("region", "year").objects(),
+  { x: "year", y: "value", stroke: "region", strokeWidth: 2.5, tip: true }
+)
+```
 The gap narrows slightly, but never closes between the lower two regions.
 ::
 
 ---
 id: dot-comparison
 layout: scrolly-right
-chart: plot
-data: housing
-x: year
-y: value
-series: region
-dek: "This section is wired to a native Observable Plot block defined directly inside each step."
 ---
 
-## Steps can now define native Observable Plot blocks
+## Each step defines its own Plot block
 
-This section uses the same dataset as the line chart, but the visual state now lives directly in each step as a Plot code block.
+The visual state lives directly in each step as a code block. No chart type or field mapping in the YAML.
 
 ::step{focus="all"}
 ```plot
-Plot.dot(aq.from(data).objects(), {
+Plot.dot(aq.from(sources.housing).objects(), {
   x: "year",
   y: "value",
   stroke: "region",
@@ -101,10 +119,10 @@ Plot.dot(aq.from(data).objects(), {
 All points remain visible so the three regional clusters are easy to compare.
 ::
 
-::step{focus="Inner"}
+::step{filter="Inner"}
 ```plot
 Plot.dot(
-  aq.from(data).filter((d) => d.region === "Inner").objects(),
+  aq.from(sources.housing).filter((d) => d.region === "Inner").objects(),
   {
     x: "year",
     y: "value",
@@ -119,10 +137,10 @@ Plot.dot(
 The **Inner** region stays highest across the full set of years.
 ::
 
-::step{focus="Outer,Middle"}
+::step{filter="Outer,Middle"}
 ```plot
 Plot.dot(
-  aq.from(data).filter((d) => d.region !== "Inner").objects(),
+  aq.from(sources.housing).filter((d) => d.region !== "Inner").objects(),
   {
     x: "year",
     y: "value",
@@ -141,25 +159,23 @@ The lower two groups stay closer together, but they still separate over time.
 ---
 id: vega-lite-comparison
 layout: scrolly-left
-chart: vega-lite
-data: housing
-dek: "The same step-driven pattern also works with Vega-Lite specs."
 ---
 
 ## Steps can also swap native Vega-Lite specs
 
-This section shows the same idea with Vega-Lite. If a spec omits `data`, the starter injects the section dataset automatically.
+Each step defines a complete Vega-Lite spec. Data is provided explicitly via `sources`.
 
 ::step
 ```vega-lite
-{
-  "mark": {"type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3},
-  "encoding": {
-    "x": {"field": "region", "type": "nominal", "sort": "-y"},
-    "y": {"field": "value", "type": "quantitative"},
-    "color": {"field": "region", "type": "nominal", "legend": null}
+({
+  data: { values: sources.housing },
+  mark: { type: "bar", cornerRadiusTopLeft: 3, cornerRadiusTopRight: 3 },
+  encoding: {
+    x: { field: "region", type: "nominal", sort: "-y" },
+    y: { field: "value", type: "quantitative" },
+    color: { field: "region", type: "nominal", legend: null }
   }
-}
+})
 ```
 
 The first step uses the full dataset as a compact bar comparison.
@@ -183,21 +199,27 @@ The first step uses the full dataset as a compact bar comparison.
 }
 ```
 
-The second step swaps in a completely different Vega-Lite spec.
+The second step swaps in a spec with inline data.
 ::
 
 ---
 id: unit-view
 layout: scrolly-overlay
-chart: unit
-data: housing
-color: region
-dek: "Overlay sections keep the figure behind the text, which gets us closer to the original three-to-one rhythm."
 ---
 
 ## Overlay copy can travel over the figure
 
-This section uses the new overlay layout so the story text sits above the visual rather than beside it.
+This section uses the overlay layout so the story text sits above the visual rather than beside it.
+
+```plot
+Plot.dot(sources.housing, {
+  x: "year",
+  y: "value",
+  fill: "region",
+  r: 7,
+  tip: true
+})
+```
 
 ::step
 The visual stays full and present behind the copy.
@@ -213,14 +235,24 @@ This gives the page a stronger editorial rhythm than a standard side-by-side lay
 
 ---
 id: unit-view-summary
-chart: unit
-data: housing
-color: region
 ---
+## A chart can also live in a chapter section
 
-## Each row can also become a unit mark
+```plot
+Plot.plot({
+  x: {
+    axis: "top",
+    grid: true,
+    percent: true
+  },
+  marks: [
+    Plot.ruleX([0]),
+    Plot.barX(alphabet, {x: "frequency", y: "letter", sort: {y: "x", reverse: true}})
+  ]
+})
+```
 
-The unit chart keeps row-level granularity and shows how a simple categorical palette can support a final section.
+A body-level code block defines a static figure with no scrolly interaction.
 
 ---
 id: closing

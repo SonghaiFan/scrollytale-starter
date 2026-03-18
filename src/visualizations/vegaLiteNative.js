@@ -5,6 +5,7 @@ import {
   evaluateJsonOrExpression,
   getFrameworkDimensions,
   getFrameworkUpdatePayload,
+  loadSamples,
   loadVegaEmbedModule,
   renderFrameworkError,
 } from "./frameworkShared.js";
@@ -17,7 +18,7 @@ function resolveVegaLiteSource(section, step) {
   return section.vis.options?.source ?? "";
 }
 
-export function renderVegaLiteNative({ container, section, data }) {
+export function renderVegaLiteNative({ container, section, data, sources = {} }) {
   let currentIndex = 0;
   let currentStep = null;
   let renderToken = 0;
@@ -49,7 +50,7 @@ export function renderVegaLiteNative({ container, section, data }) {
     container.replaceChildren(host);
 
     try {
-      const { default: embed } = await loadVegaEmbedModule();
+      const [{ default: embed }, samples] = await Promise.all([loadVegaEmbedModule(), loadSamples()]);
       if (token !== renderToken) {
         return;
       }
@@ -58,6 +59,8 @@ export function renderVegaLiteNative({ container, section, data }) {
         aq,
         d3,
         data,
+        sources,
+        samples,
         step: next.step,
         section,
         dimensions,
@@ -74,10 +77,8 @@ export function renderVegaLiteNative({ container, section, data }) {
           spec.height ?? Math.max(160, dimensions.height - dimensions.margin.top - dimensions.margin.bottom),
         data:
           spec.data ??
-          (Array.isArray(data)
-            ? {
-                values: data,
-              }
+          (Array.isArray(data) && data.length
+            ? { values: data }
             : undefined),
       };
 

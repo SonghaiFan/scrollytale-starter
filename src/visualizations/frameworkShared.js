@@ -1,8 +1,37 @@
 import * as aq from "arquero";
 import * as d3 from "d3";
 
+import aaplUrl from "@observablehq/sample-datasets/aapl.csv?url";
+import alphabetUrl from "@observablehq/sample-datasets/alphabet.csv?url";
+import carsUrl from "@observablehq/sample-datasets/cars.csv?url";
+import citywagesUrl from "@observablehq/sample-datasets/citywages.csv?url";
+import diamondsUrl from "@observablehq/sample-datasets/diamonds.csv?url";
+import flareUrl from "@observablehq/sample-datasets/flare.csv?url";
+import industriesUrl from "@observablehq/sample-datasets/industries.csv?url";
+import miserablesUrl from "@observablehq/sample-datasets/miserables.json?url";
+import olympiansUrl from "@observablehq/sample-datasets/olympians.csv?url";
+import penguinsUrl from "@observablehq/sample-datasets/penguins.csv?url";
+import pizzaUrl from "@observablehq/sample-datasets/pizza.csv?url";
+import weatherUrl from "@observablehq/sample-datasets/weather.csv?url";
+
+const SAMPLE_ENTRIES = [
+  ["aapl", aaplUrl, "csv"],
+  ["alphabet", alphabetUrl, "csv"],
+  ["cars", carsUrl, "csv"],
+  ["citywages", citywagesUrl, "csv"],
+  ["diamonds", diamondsUrl, "csv"],
+  ["flare", flareUrl, "csv"],
+  ["industries", industriesUrl, "csv"],
+  ["miserables", miserablesUrl, "json"],
+  ["olympians", olympiansUrl, "csv"],
+  ["penguins", penguinsUrl, "csv"],
+  ["pizza", pizzaUrl, "csv"],
+  ["weather", weatherUrl, "csv"],
+];
+
 let plotModulePromise = null;
 let vegaEmbedModulePromise = null;
+let samplesPromise = null;
 
 export function getFrameworkDimensions(container) {
   const bounds = container.getBoundingClientRect();
@@ -60,6 +89,22 @@ export function loadPlotModule() {
   }
 
   return plotModulePromise;
+}
+
+export function loadSamples() {
+  if (!samplesPromise) {
+    samplesPromise = Promise.all(
+      SAMPLE_ENTRIES.map(async ([id, url, type]) => {
+        const table =
+          type === "json"
+            ? await aq.loadJSON(url)
+            : await aq.loadCSV(url, { autoType: true });
+        return [id, table.objects()];
+      })
+    ).then(Object.fromEntries);
+  }
+
+  return samplesPromise;
 }
 
 export function loadVegaEmbedModule() {
