@@ -1,0 +1,8 @@
+interface:
+  display_name: "Scrollytale"
+  short_description: "Draft D3 scrollytelling stories from prompts and CSVs."
+  brand_color: "#0F766E"
+  default_prompt: "Use $scrollytale to turn my prompt and CSV into a scrollytelling `story.md` based on `scrollytale-starter`."
+
+policy:
+  allow_implicit_invocation: true

@@ -3,6 +3,45 @@
  * It intentionally overrides the generic starter styles for the default preset.
  */
 
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Observable Plot theme tokens
+ *
+ * Defined on :root so getComputedStyle(document.documentElement) can read them
+ * in shared.js / frameworkShared.js. All margin values are unitless integers
+ * (Plot expects numbers, not CSS lengths).
+ * ───────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Font — Raleway gives an editorial sans-serif feel in chart labels */
+  --plot-font-family: "Raleway", system-ui, sans-serif;
+  --plot-font-size: 12px;
+
+  /* Margins — generous left for y-axis labels, snug top/right */
+  --plot-margin-top: 20;
+  --plot-margin-right: 20;
+  --plot-margin-bottom: 44;
+  --plot-margin-left: 52;
+
+  /* ── Chart colour palette ──────────────────────────────────────────────────
+   * Override base.css series colours here to match the editorial design.
+   * The six motif colours are used in order by categorical scales.
+   * ─────────────────────────────────────────────────────────────────────── */
+  --chart-series-1: #2457d6;   /* blue  — primary   */
+  --chart-series-2: #ff5a36;   /* red   — highlight */
+  --chart-series-3: #f0c419;   /* amber — accent    */
+  --chart-series-4: #2d9d78;   /* teal  — positive  */
+  --chart-series-5: #efb7cf;   /* pink  — soft      */
+  --chart-series-6: #111111;   /* ink   — neutral   */
+}
+
+[data-theme="dark"] {
+  --chart-series-1: #4f7dff;
+  --chart-series-2: #ff6d47;
+  --chart-series-3: #ffd84d;
+  --chart-series-4: #57c49c;
+  --chart-series-5: #ffc2da;
+  --chart-series-6: #f5f1e8;
+}
+
 .app-shell {
   width: 100%;
   margin: 0;
@@ -36,123 +75,372 @@
   letter-spacing: -0.05em;
 }
 
+/* ── Hero: editorial full-viewport, content anchored to bottom-left ── */
+
 .story-section.is-hero {
+  position: relative;
   width: 100vw;
   min-height: 100vh;
   margin-top: 0;
   margin-left: calc(50% - 50vw);
   margin-bottom: 6rem;
-  padding: 4rem 1rem 6rem;
-  align-items: center;
-  justify-items: center;
-  text-align: center;
+  padding: 0;
+  align-items: end;
+  justify-items: start;
+  text-align: left;
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.5)),
-    linear-gradient(transparent 65%, var(--page-bg)),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.30) 30%,
+      rgba(255, 255, 255, 0.78) 62%,
+      rgba(255, 255, 255, 0.96) 80%,
+      #ffffff 100%
+    ),
     url(https://picsum.photos/id/1040/1600/1200?grayscale);
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center;
+  background-position: center 30%;
 }
 
 .story-section.is-hero .section-content {
-  max-width: 88ch;
-  margin: 0 auto;
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 clamp(1.5rem, 6vw, 7rem) clamp(3.5rem, 6vh, 5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+/* Semantic header wrapper inside section-content */
+.hero-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 60ch;
+}
+
+/* ── Eyebrow: rule + label ── */
 .story-section.is-hero .eyebrow {
-  display: inline-block;
-  margin: 0 auto 1.25rem;
-  padding: 0.15rem 0.55rem;
-  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.18em;
+  /* Light mode: dark ink against white wash */
+  color: rgba(0, 0, 0, 0.45);
 }
 
+.story-section.is-hero .eyebrow::before {
+  content: "";
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+/* ── Headline ── */
+.story-section.is-hero .hero-headline,
 .story-section.is-hero .section-content h2 {
-  margin: 0 auto 1rem;
-  max-width: 12ch;
-  color: var(--accent);
-  text-transform: uppercase;
-  font-size: clamp(4rem, 9vw, 7rem);
+  margin: 0 0 1.25rem;
+  max-width: 20ch;
+  font-family: var(--font-sans, "Raleway", sans-serif);
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  font-weight: 700;
+  line-height: var(--lh-tight, 1.1);
+  letter-spacing: -0.03em;
+  /* Light mode: near-black for strong contrast on white wash */
+  color: #111111;
+  text-transform: none;
 }
 
+/* ── Dek / lead body text ── */
 .story-section.is-hero .dek,
 .story-section.is-hero .summary,
 .story-section.is-hero .body-copy p,
 .story-section.is-hero .body-copy li {
-  color: rgba(255, 255, 255, 0.96);
+  max-width: 54ch;
+  font-family: var(--font-serif, "Lora", Georgia, serif);
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  line-height: var(--lh-relaxed, 1.75);
+  /* Light mode: dark muted ink */
+  color: rgba(0, 0, 0, 0.72);
+}
+
+/* ── Dark mode text overrides ── */
+[data-theme="dark"] .story-section.is-hero .eyebrow {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .story-section.is-hero .eyebrow::before {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .story-section.is-hero .hero-headline,
+[data-theme="dark"] .story-section.is-hero .section-content h2 {
+  color: #f8f4ec;
+}
+
+[data-theme="dark"] .story-section.is-hero .dek,
+[data-theme="dark"] .story-section.is-hero .summary,
+[data-theme="dark"] .story-section.is-hero .body-copy p,
+[data-theme="dark"] .story-section.is-hero .body-copy li {
+  color: rgba(255, 255, 255, 0.80);
 }
 
 .story-section.is-hero .body-copy {
-  max-width: 62ch;
-  margin: 0 auto;
-}
-
-.story-section.is-hero .body-copy p,
-.story-section.is-hero .body-copy li {
-  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  margin: 0;
 }
 
 .story-section.is-hero .figure-card {
   max-width: 78ch;
-  margin: 2rem auto 0;
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
+  margin: 2rem 0 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: #f8f4ec;
+  backdrop-filter: blur(6px);
 }
 
 .story-section.is-hero .figure-card p {
-  color: rgba(255, 255, 255, 0.96);
+  color: rgba(255, 255, 255, 0.88);
 }
 
-.scroll-downs {
-  position: relative;
-  margin: 5rem auto 0;
-  width: 35px;
-  height: 55px;
+/* ── Dark mode: deep black scrim ── */
+[data-theme="dark"] .story-section.is-hero {
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.10) 0%,
+      rgba(0, 0, 0, 0.25) 30%,
+      rgba(0, 0, 0, 0.82) 62%,
+      rgba(0, 0, 0, 0.97) 80%,
+      #000000 100%
+    ),
+    url(https://picsum.photos/id/1040/1600/1200?grayscale);
 }
 
-.mousey {
-  width: 10px;
-  padding: 10px 15px;
-  height: 45px;
-  border: 2px solid rgba(255, 255, 255, 0.92);
-  border-radius: 25px;
-  opacity: 0.85;
-  box-sizing: content-box;
+/* ── Scroll cue: vertical line + rotated label, bottom-right ── */
+.hero-scroll-cue {
+  position: absolute;
+  right: clamp(1.5rem, 4vw, 4rem);
+  bottom: clamp(2rem, 4vh, 3.5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  pointer-events: none;
 }
 
-.scroller {
-  width: 10px;
-  height: 10px;
-  border-radius: 100%;
-  background-color: rgba(255, 255, 255, 0.92);
-  animation-name: scroll;
-  animation-duration: 2.5s;
-  animation-timing-function: cubic-bezier(0.15, 0.41, 0.69, 0.94);
-  animation-iteration-count: infinite;
+.hero-scroll-label {
+  font-family: var(--font-mono, "Roboto Mono", ui-monospace, monospace);
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  /* Light mode: dark ink */
+  color: rgba(0, 0, 0, 0.35);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
 }
 
-@keyframes scroll {
-  0% {
-    opacity: 0;
-  }
-
-  10% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateY(15px);
-    opacity: 0;
-  }
+.hero-scroll-line {
+  display: block;
+  width: 1px;
+  height: 3.5rem;
+  /* Light mode: dark line */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45),
+    rgba(0, 0, 0, 0)
+  );
+  transform-origin: top;
+  animation: hero-scroll-pulse 2.8s ease-in-out infinite;
 }
+
+[data-theme="dark"] .hero-scroll-label {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+[data-theme="dark"] .hero-scroll-line {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+@keyframes hero-scroll-pulse {
+  0%   { transform: scaleY(0.15); opacity: 0; }
+  20%  { opacity: 1; }
+  75%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Scrolly section — chapter-break header
+ *
+ * Each scrolly section opens with .section-content.scrolly-intro acting as a
+ * chapter title card. The design echoes the hero: a thin rule signals the break,
+ * an eyebrow with a leading dash labels the section, and a display headline
+ * anchors the reader before the visualisation begins.
+ * ───────────────────────────────────────────────────────────────────────────── */
 
 .story-section.is-scrolly {
-  padding: 1rem;
+  padding: 0;
+  /* Auto-increment a counter so we can display "01 / 02 / …" labels */
+  counter-increment: story-section;
 }
 
+/* Full-width top rule — the primary chapter-break signal */
+.story-section.is-scrolly::before {
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--text);
+  opacity: 0.12;
+  /* Span edge-to-edge inside the scrolly container */
+  margin: 0 0 clamp(2.5rem, 5vh, 4rem);
+}
+
+/* Intro block: constrained measure, generous vertical breathing room */
 .story-section.is-scrolly .section-content {
-  padding: 0 1rem;
+  padding: 0 clamp(1rem, 3vw, 2rem) clamp(2rem, 4vh, 3rem);
+  width: min(var(--measure-wide, 75ch), 100%);
+  margin-inline: auto;
+}
+
+/* ── Eyebrow row: auto-counter + nav marker ── */
+.story-section.is-scrolly .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 1.25rem;
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.18em;
+  color: var(--text);
+  opacity: 0.45;
+}
+
+/* Section counter prefix: "01", "02", … */
+.story-section.is-scrolly .eyebrow::before {
+  content: counter(story-section, decimal-leading-zero);
+  font-family: var(--font-mono, "Roboto Mono", ui-monospace, monospace);
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.12em;
+  color: var(--text-accent-editorial);
+  opacity: 1;
+  flex-shrink: 0;
+}
+
+/* Thin separator between counter and label */
+.story-section.is-scrolly .eyebrow::after {
+  content: "";
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  order: 2;
+  /* push the line to appear between counter and the marker icon */
+}
+
+/* ── Section headline ── */
+.story-section.is-scrolly .scrolly-intro h2 {
+  margin: 0 0 1rem;
+  max-width: 24ch;
+  font-family: var(--font-sans, "Raleway", sans-serif);
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 700;
+  line-height: var(--lh-tight, 1.1);
+  letter-spacing: -0.025em;
+  color: var(--text);
+}
+
+/* ── Dek: serif lead-in ── */
+.story-section.is-scrolly .scrolly-intro .dek {
+  max-width: 58ch;
+  font-family: var(--font-serif, "Lora", Georgia, serif);
+  font-size: clamp(var(--text-base, 1rem), 1.3vw, var(--text-lg, 1.25rem));
+  line-height: var(--lh-relaxed, 1.75);
+  color: var(--muted);
+}
+
+/* ── Body copy ── */
+.story-section.is-scrolly .scrolly-intro .body-copy p,
+.story-section.is-scrolly .scrolly-intro .body-copy li {
+  font-family: var(--font-serif, "Lora", Georgia, serif);
+  font-size: clamp(var(--text-base, 1rem), 1.2vw, var(--text-md, 1.125rem));
+  line-height: var(--lh-relaxed, 1.75);
+  max-width: 62ch;
+  color: var(--muted);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+ * Chapter section — same break language, lighter weight
+ * .story-section.is-chapter is a narrative pause between scrolly zones.
+ * It uses the same top rule + counter but a more compact heading scale.
+ * ───────────────────────────────────────────────────────────────────────────── */
+
+.story-section.is-chapter {
+  counter-increment: story-section;
+}
+
+.story-section.is-chapter::before {
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--text);
+  opacity: 0.1;
+  margin: 0 0 clamp(2rem, 4vh, 3rem);
+}
+
+.story-section.is-chapter .section-content .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.18em;
+  color: var(--text);
+  opacity: 0.45;
+}
+
+.story-section.is-chapter .section-content .eyebrow::before {
+  content: counter(story-section, decimal-leading-zero);
+  font-family: var(--font-mono, "Roboto Mono", ui-monospace, monospace);
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.12em;
+  color: var(--text-accent-editorial);
+  opacity: 1;
+  flex-shrink: 0;
+}
+
+.story-section.is-chapter .section-content .eyebrow::after {
+  content: "";
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  order: 2;
+}
+
+/* Chapter headline — slightly smaller than scrolly intro */
+.story-section.is-chapter .section-content h2 {
+  margin: 0 0 0.85rem;
+  max-width: 28ch;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  font-weight: 700;
+  line-height: var(--lh-tight, 1.1);
+  letter-spacing: -0.02em;
+}
+
+/* Reset the counter on the story root so sections count from 1 */
+.story-root {
+  counter-reset: story-section;
 }
 
 .story-section.is-left .scrolly-text,
@@ -164,6 +452,20 @@
 .story-section.is-left .section-media,
 .story-section.is-right .section-media {
   flex: 1 1 0;
+}
+
+/* ── Visualisation figure padding ─────────────────────────────────────────────
+ * Gives charts breathing room inside their container.
+ * getFrameworkDimensions() subtracts these values when computing chart width/height,
+ * so the chart SVG is sized to the content area, not the border-box.
+ * ───────────────────────────────────────────────────────────────────────────── */
+.sticky-figure {
+  padding: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+/* Full-width and chapter figure containers */
+.section-media {
+  padding: clamp(0.5rem, 1vw, 1rem);
 }
 
 .step {
@@ -212,16 +514,46 @@
 }
 
 @media (max-width: 899px) {
-  .story-section.is-hero {
-    padding-top: 5rem;
+  .story-section.is-hero .section-content {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: 3.5rem;
   }
 
+  .story-section.is-hero .hero-headline,
   .story-section.is-hero .section-content h2 {
-    font-size: clamp(3.3rem, 14vw, 5.2rem);
+    font-size: clamp(2.4rem, 12vw, 3.6rem);
+    max-width: 100%;
+  }
+
+  .story-section.is-hero .dek,
+  .story-section.is-hero .body-copy p,
+  .story-section.is-hero .body-copy li {
+    font-size: 1rem;
+  }
+
+  .hero-scroll-cue {
+    display: none;
   }
 
   .section-content h2 {
     font-size: clamp(2.8rem, 12vw, 4.6rem);
+  }
+
+  /* Scrolly / chapter intro: tighter on mobile */
+  .story-section.is-scrolly::before,
+  .story-section.is-chapter::before {
+    margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+  }
+
+  .story-section.is-scrolly .section-content {
+    padding-inline: 1rem;
+  }
+
+  .story-section.is-scrolly .scrolly-intro h2,
+  .story-section.is-chapter .section-content h2 {
+    font-size: clamp(1.5rem, 8vw, 2.2rem);
+    max-width: 100%;
   }
 
   .bottom-nav-button {

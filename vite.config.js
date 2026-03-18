@@ -1,7 +1,9 @@
 import fs from "node:fs/promises";
+import { readdirSync } from "node:fs";
 import path from "node:path";
 
 import yaml from "js-yaml";
+import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 
 import { parseStory } from "./src/runtime/parseStory.js";
@@ -60,6 +62,49 @@ async function readJsonBody(req) {
   }
 
   return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
+/**
+ * Generates a virtual module `virtual:sample-datasets` that exports the full
+ * list of datasets from the installed @observablehq/sample-datasets package.
+ *
+ * The module shape is identical to the old SAMPLE_ENTRIES array:
+ *   Array<[id: string, url: string, type: "csv" | "json"]>
+ *
+ * Adding or removing a file from the package is reflected automatically —
+ * no changes to application code are needed.
+ */
+/**
+ * Generates virtual:sample-datasets from files in public/data/.
+ * Because public/ is served verbatim by Vite, each file is accessible
+ * at /data/<filename> at runtime — no bundling or ?url imports needed.
+ */
+function sampleDatasetsPlugin() {
+  const VIRTUAL_ID = "virtual:sample-datasets";
+  const RESOLVED_ID = "\0" + VIRTUAL_ID;
+
+  return {
+    name: "scrollytale-sample-datasets",
+    resolveId(id) {
+      if (id === VIRTUAL_ID) return RESOLVED_ID;
+    },
+    load(id) {
+      if (id !== RESOLVED_ID) return;
+
+      const dataDir = path.resolve("public/data");
+      const files = readdirSync(dataDir).filter((f) => /\.(csv|json)$/.test(f));
+
+      const entries = files
+        .map((f) => {
+          const datasetId = f.replace(/\.\w+$/, "");
+          const type = f.endsWith(".json") ? "json" : "csv";
+          return `  ["${datasetId}", "/data/${f}", "${type}"]`;
+        })
+        .join(",\n");
+
+      return `export default [\n${entries}\n];\n`;
+    },
+  };
 }
 
 function storyHmrPlugin() {
@@ -174,5 +219,5 @@ export default defineConfig({
     __VUE_PROD_DEVTOOLS__: false,
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
   },
-  plugins: [storyHmrPlugin(), authoringSavePlugin()],
+  plugins: [vue(), sampleDatasetsPlugin(), storyHmrPlugin(), authoringSavePlugin()],
 });

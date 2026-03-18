@@ -1,33 +1,8 @@
 import * as aq from "arquero";
 import * as d3 from "d3";
 
-import aaplUrl from "@observablehq/sample-datasets/aapl.csv?url";
-import alphabetUrl from "@observablehq/sample-datasets/alphabet.csv?url";
-import carsUrl from "@observablehq/sample-datasets/cars.csv?url";
-import citywagesUrl from "@observablehq/sample-datasets/citywages.csv?url";
-import diamondsUrl from "@observablehq/sample-datasets/diamonds.csv?url";
-import flareUrl from "@observablehq/sample-datasets/flare.csv?url";
-import industriesUrl from "@observablehq/sample-datasets/industries.csv?url";
-import miserablesUrl from "@observablehq/sample-datasets/miserables.json?url";
-import olympiansUrl from "@observablehq/sample-datasets/olympians.csv?url";
-import penguinsUrl from "@observablehq/sample-datasets/penguins.csv?url";
-import pizzaUrl from "@observablehq/sample-datasets/pizza.csv?url";
-import weatherUrl from "@observablehq/sample-datasets/weather.csv?url";
-
-const SAMPLE_ENTRIES = [
-  ["aapl", aaplUrl, "csv"],
-  ["alphabet", alphabetUrl, "csv"],
-  ["cars", carsUrl, "csv"],
-  ["citywages", citywagesUrl, "csv"],
-  ["diamonds", diamondsUrl, "csv"],
-  ["flare", flareUrl, "csv"],
-  ["industries", industriesUrl, "csv"],
-  ["miserables", miserablesUrl, "json"],
-  ["olympians", olympiansUrl, "csv"],
-  ["penguins", penguinsUrl, "csv"],
-  ["pizza", pizzaUrl, "csv"],
-  ["weather", weatherUrl, "csv"],
-];
+import { readIntVar } from "./shared.js";
+import SAMPLE_ENTRIES from "virtual:sample-datasets";
 
 let plotModulePromise = null;
 let vegaEmbedModulePromise = null;
@@ -35,10 +10,20 @@ let samplesPromise = null;
 
 export function getFrameworkDimensions(container) {
   const bounds = container.getBoundingClientRect();
+  // Subtract container padding so the chart never overflows into the gutters.
+  const style = getComputedStyle(container);
+  const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+
   return {
-    width: Math.max(bounds.width, 320),
-    height: Math.max(bounds.height, 360),
-    margin: { top: 24, right: 24, bottom: 48, left: 64 },
+    width:  Math.max(bounds.width  - padX, 320),
+    height: Math.max(bounds.height - padY, 360),
+    margin: {
+      top:    readIntVar("--plot-margin-top",    20),
+      right:  readIntVar("--plot-margin-right",  20),
+      bottom: readIntVar("--plot-margin-bottom", 44),
+      left:   readIntVar("--plot-margin-left",   52),
+    },
   };
 }
 

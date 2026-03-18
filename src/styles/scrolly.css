@@ -274,16 +274,30 @@
   width: min(45ch, calc(100% - 2rem));
   margin: 0 auto;
   padding: 0;
+  /* The entire text column is non-blocking so the figure receives
+     all mouse events (Plot tooltips, hover, zoom, click, etc.).
+     pointer-events: none propagates to all descendants by default —
+     only explicitly re-enabled elements below will intercept events. */
   pointer-events: none;
 }
 
-.scrolly-main.is-overlay .scrolly-text > * {
+/* Re-enable only for genuinely interactive inline elements within steps.
+   .steps, .step, .step-inner, .step-content remain non-blocking. */
+.scrolly-main.is-overlay .step-content a,
+.scrolly-main.is-overlay .step-content button,
+.scrolly-main.is-overlay .step-content [role="button"],
+.scrolly-main.is-overlay .step-content label,
+.scrolly-main.is-overlay .step-content input,
+.scrolly-main.is-overlay .step-content select,
+.scrolly-main.is-overlay .step-content textarea {
   pointer-events: auto;
 }
 
 .scrolly-main.is-overlay .sticky-figure {
   z-index: 0;
   min-height: var(--scrollytale-figure-height, 78vh);
+  /* Explicitly own all pointer events — nothing above should block these */
+  pointer-events: auto;
 }
 
 .scrolly-main.is-overlay .steps {

@@ -1,12 +1,14 @@
 import * as d3 from "d3";
 
-function readVar(name, fallback) {
-  if (typeof window === "undefined") {
-    return fallback;
-  }
-
+export function readVar(name, fallback) {
+  if (typeof window === "undefined") return fallback;
   const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return value || fallback;
+}
+
+export function readIntVar(name, fallback) {
+  const parsed = parseInt(readVar(name, ""), 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 export function getChartPalette() {
@@ -26,12 +28,15 @@ export function createSeriesColorScale(keys) {
 
 export function getChartTheme() {
   return {
-    ink: readVar("--chart-ink", "#111111"),
-    mutedInk: readVar("--chart-muted-ink", "rgba(17, 17, 17, 0.45)"),
-    grid: readVar("--chart-grid", "rgba(17, 17, 17, 0.14)"),
-    axis: readVar("--chart-axis", "#111111"),
-    surface: readVar("--chart-surface", "transparent"),
-    frame: readVar("--chart-frame", "rgba(17, 17, 17, 0.08)"),
+    ink:        readVar("--chart-ink",        "#111111"),
+    mutedInk:   readVar("--chart-muted-ink",  "rgba(17, 17, 17, 0.45)"),
+    grid:       readVar("--chart-grid",       "rgba(17, 17, 17, 0.14)"),
+    axis:       readVar("--chart-axis",       "#111111"),
+    surface:    readVar("--chart-surface",    "transparent"),
+    frame:      readVar("--chart-frame",      "rgba(17, 17, 17, 0.08)"),
+    // Plot-specific font — driven by --plot-font-family / --plot-font-size in CSS
+    fontFamily: readVar("--plot-font-family", '"Roboto Mono", ui-monospace, monospace'),
+    fontSize:   readVar("--plot-font-size",   "11px"),
   };
 }
 
@@ -46,8 +51,8 @@ export function applyAxisStyle(axisLayer) {
   axisLayer
     .selectAll("text")
     .attr("fill", theme.ink)
-    .style("font-family", '"Roboto Mono", ui-monospace, monospace')
-    .style("font-size", "11px");
+    .style("font-family", theme.fontFamily)
+    .style("font-size", theme.fontSize);
 }
 
 export function ensureChartSvg(container) {

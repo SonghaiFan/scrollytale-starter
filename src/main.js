@@ -6,6 +6,6 @@ import "./styles/custom.css";
 
 import { createApp } from "vue";
 
-import { App } from "./app/App.js";
+import App from "./app/App.vue";
 
 createApp(App).mount("#app");

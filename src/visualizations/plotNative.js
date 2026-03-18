@@ -31,8 +31,8 @@ function buildDefaultPlotOptions(dimensions, theme) {
     style: {
       background: theme.surface,
       color: theme.ink,
-      fontFamily: '"Roboto Mono", ui-monospace, monospace',
-      fontSize: "11px",
+      fontFamily: theme.fontFamily,
+      fontSize: theme.fontSize,
     },
   };
 }
