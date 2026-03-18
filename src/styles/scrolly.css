@@ -1,4 +1,4 @@
-.section-scrolly {
+.story-section.is-scrolly {
   position: relative;
   background: var(--page-bg);
   text-align: left;
@@ -6,37 +6,38 @@
 
 /* ── Intro block (chapter-style prose above the scrolly zone) ── */
 
-.section-scrolly-intro {
-  padding: 1.5rem 1rem 0.75rem;
-  width: min(75ch, 100%);
+.scrolly-intro {
+  padding: var(--space-3, 1.5rem) var(--space-2, 1rem) var(--space-2, 1rem);
+  width: min(var(--measure-wide, 75ch), 100%);
   margin-inline: auto;
+  margin-bottom: var(--space-scrolly-intro-bottom);
 }
 
 /* ── Scrolly body (figure + steps side by side) ── */
 
-.section-scrolly-body {
+.scrolly-main {
   display: flex;
   gap: 1rem;
-  padding: 0 1rem 1rem;
+  padding: 0 1rem var(--space-scrolly-main-bottom);
 }
 
 /* ── Overlay body (figure behind steps via CSS grid stacking) ── */
 
-.section-scrolly-overlay-body {
+.scrolly-main.is-overlay {
   display: grid;
   align-items: start;
   isolation: isolate;
 }
 
-.section-scrolly-overlay-body > * {
+.scrolly-main.is-overlay > * {
   grid-area: 1 / 1;
 }
 
-.scrolly-copy {
+.scrolly-text {
   display: grid;
   align-content: start;
-  gap: 0.75rem;
-  max-width: 45ch;
+  gap: var(--space-2, 1rem);
+  max-width: var(--measure-narrow, 45ch);
 }
 
 .eyebrow-marker {
@@ -82,7 +83,8 @@
 .step {
   margin: 0 auto 2rem auto;
   min-height: 250px;
-  padding: 5px;
+  /* 8pt grid: 20px top/bottom, 24px left/right */
+  padding: 1.25rem 1.5rem;
   border: 0;
   border-radius: 4px;
   background: var(--surface);
@@ -102,9 +104,9 @@
 
 .step-eyebrow {
   margin: 0 0 0.4rem;
-  font-size: 0.65rem;
-  font-family: ui-monospace, monospace;
-  letter-spacing: 0.06em;
+  font-size: var(--text-xs, 0.65rem);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  letter-spacing: 0.08em;
   text-transform: lowercase;
   color: var(--text);
   opacity: 0.45;
@@ -150,6 +152,39 @@
 
 .step-content > :first-child {
   margin-top: 0;
+}
+
+/* ── Step heading hierarchy ── */
+/* h3/h4 within a step card serve as sub-labels, not page titles */
+.step-content h3 {
+  margin: 0 0 0.35em;
+  font-family: var(--font-sans, "Raleway", sans-serif);
+  font-size: var(--text-lg, 1.25rem);
+  font-weight: 600;
+  line-height: var(--lh-snug, 1.35);
+  letter-spacing: -0.01em;
+}
+
+.step-content h4 {
+  margin: 0 0 0.3em;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--text-sm, 0.8rem);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* Annotation / caption text within step */
+.step-content small,
+.step-content figcaption {
+  display: block;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.04em;
+  line-height: var(--lh-normal, 1.6);
+  color: var(--muted);
+  opacity: 0.75;
 }
 
 .step-marker-step .step-content > :first-child::before,
@@ -204,8 +239,12 @@
 
 .step-content p,
 .step-content li {
-  padding: 1rem 1rem 1rem 0;
-  font-size: clamp(1.25rem, 2vw, 2rem);
+  padding: 0.5rem 0;
+  /* Narrative reading size: comfortable at 18px, scales down on mobile */
+  font-size: clamp(var(--text-base, 1rem), 1.25vw, var(--text-md, 1.125rem));
+  line-height: var(--lh-loose, 1.9);
+  /* Serif for narrative step prose */
+  font-family: var(--font-serif, "Lora", Georgia, serif);
 }
 
 .sticky-figure {
@@ -229,7 +268,7 @@
   min-height: 0;
 }
 
-.section-scrolly-overlay-body .scrolly-copy {
+.scrolly-main.is-overlay .scrolly-text {
   position: relative;
   z-index: 1;
   width: min(45ch, calc(100% - 2rem));
@@ -238,60 +277,60 @@
   pointer-events: none;
 }
 
-.section-scrolly-overlay-body .scrolly-copy > * {
+.scrolly-main.is-overlay .scrolly-text > * {
   pointer-events: auto;
 }
 
-.section-scrolly-overlay-body .sticky-figure {
+.scrolly-main.is-overlay .sticky-figure {
   z-index: 0;
   min-height: var(--scrollytale-figure-height, 78vh);
 }
 
-.section-scrolly-overlay-body .steps {
+.scrolly-main.is-overlay .steps {
   gap: calc(var(--scrollytale-step-gap, 2rem) * 0.7);
 }
 
-.section-scrolly-overlay-body .step {
-  max-width: 42ch;
+.scrolly-main.is-overlay .step {
+  max-width: var(--measure-narrow, 45ch);
 }
 
-.section-scrolly-overlay-body .step:first-child {
+.scrolly-main.is-overlay .step:first-child {
   margin-top: 6rem;
 }
 
-.section-scrolly-overlay-body .step:last-child {
+.scrolly-main.is-overlay .step:last-child {
   margin-bottom: 12rem;
 }
 
 @media (min-width: 900px) {
-  .section-scrolly-left .section-scrolly-body,
-  .section-scrolly-right .section-scrolly-body {
+  .story-section.is-left .scrolly-main,
+  .story-section.is-right .scrolly-main {
     align-items: start;
   }
 
-  .section-scrolly-body > * {
+  .scrolly-main > * {
     flex: 1;
   }
 
-  .section-scrolly-body .scrolly-copy {
+  .scrolly-main .scrolly-text {
     padding: 0 1rem;
   }
 }
 
 @media (max-width: 899px) {
-  .section-scrolly-body {
+  .scrolly-main {
     display: grid;
   }
 
-  .section-scrolly-overlay-body > * {
+  .scrolly-main.is-overlay > * {
     grid-area: auto;
   }
 
-  .section-scrolly-overlay-body .scrolly-copy {
+  .scrolly-main.is-overlay .scrolly-text {
     width: 100%;
   }
 
-  .section-scrolly-overlay-body .sticky-figure {
+  .scrolly-main.is-overlay .sticky-figure {
     height: 360px;
     min-height: 360px;
   }

@@ -1,17 +1,33 @@
 .app-shell {
   width: min(1320px, calc(100vw - 2rem));
   margin: 0 auto;
-  padding: 0 0 8rem;
+  padding: 0 0 var(--space-app-bottom);
 }
 
 .vue-app-shell {
   --authoring-panel-width: clamp(22rem, 28vw, 28rem);
   --chrome-height: 0rem;
+
+  /* ── Section rhythm ── */
+  --space-app-bottom: var(--space-7, 6rem);
+  --space-section-gap: 2.25rem;
+  --space-section-margin: var(--space-4, 2rem);
+  --space-section-pad-y: clamp(0.75rem, 1.8vh, 1.5rem);
+  --space-section-pad-y-wide: clamp(1rem, 2vh, 1.75rem);
+  --space-scrolly-intro-bottom: clamp(2rem, 2.5vh, 5rem);
+  --space-scrolly-main-bottom: 0.75rem;
+
+  /* ── Nav markers ── */
   --nav-marker-frame-size: 0.82rem;
   --nav-marker-step-size: 0.42rem;
   --nav-marker-section-size: 0.42rem;
+
+  /* ── Interaction states ── */
   --ui-inactive-opacity: 0.48;
   --ui-active-opacity: 1;
+
+  /* ── Step scroll pacing — one clear idea per viewport pause ── */
+  --scrollytale-step-gap: clamp(40vh, 60vh, 80vh);
 }
 
 .visually-hidden {
@@ -87,11 +103,11 @@
 
 .story-root {
   display: grid;
-  gap: 3rem;
+  gap: var(--space-section-gap);
   padding-top: 0;
 }
 
-.section-shell {
+.story-section {
   position: relative;
   isolation: isolate;
   border: 0;
@@ -100,36 +116,48 @@
   box-shadow: none;
 }
 
-.section-copy,
-.section-figure {
+.section-content,
+.section-media {
   min-width: 0;
 }
 
-.section-copy {
+.section-content {
   padding: 0;
 }
 
-.section-copy h2 {
-  margin: 0 0 1rem;
-  font-size: clamp(2.2rem, 4vw, 4.6rem);
-  line-height: 1.02;
-  font-weight: 600;
+.section-content h2 {
+  margin: 0 0 var(--space-2, 1rem);
+  font-family: var(--font-sans, "Raleway", sans-serif);
+  font-size: clamp(var(--text-2xl, 1.953rem), 4vw, var(--text-4xl, 3.052rem));
+  line-height: var(--lh-tight, 1.1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.section-hero,
-.section-chapter,
-.section-full-width {
+/* Section dek — lead paragraph immediately after h2 */
+.section-content .dek,
+.section-content .summary {
+  margin: 0 0 var(--space-3, 1.5rem);
+  font-size: clamp(var(--text-md, 1.125rem), 1.5vw, var(--text-lg, 1.25rem));
+  line-height: var(--lh-snug, 1.35);
+  font-weight: 400;
+  max-width: var(--measure-prose, 65ch);
+}
+
+.story-section.is-hero,
+.story-section.is-chapter,
+.story-section.is-full {
   display: grid;
   gap: 1rem;
   padding: 0;
 }
 
-.section-figure {
+.section-media {
   min-height: 420px;
   padding: 0;
 }
 
-.section-figure-wide {
+.section-media.is-wide {
   min-height: 480px;
 }
 
@@ -147,10 +175,11 @@
 
 .figure-kicker {
   margin: 0;
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.75rem;
+  font-family: var(--font-mono, "Roboto Mono", ui-monospace, monospace);
+  font-size: var(--text-xs, 0.64rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  line-height: var(--lh-normal, 1.6);
 }
 
 .chart-svg {
@@ -186,14 +215,14 @@
 }
 
 .vue-app-shell.is-debug-mode .figure-card,
-.vue-app-shell.is-debug-mode .section-figure,
+.vue-app-shell.is-debug-mode .section-media,
 .vue-app-shell.is-debug-mode .sticky-figure,
 .vue-app-shell.is-debug-mode .step {
   outline: 1px dashed var(--border);
   outline-offset: 0;
 }
 
-.section-hero {
+.story-section.is-hero {
   min-height: 720px;
   margin-top: 0;
   margin-left: calc(50% - 50vw);
@@ -209,91 +238,97 @@
   align-items: end;
 }
 
-.section-hero .section-copy {
+.story-section.is-hero .section-content {
   max-width: 75ch;
   margin: 0 auto;
 }
 
-.section-hero .section-copy h2 {
+.story-section.is-hero .section-content h2 {
   margin-top: 2rem;
   color: var(--text-accent-structural);
 }
 
-.section-hero .section-figure {
+.story-section.is-hero .section-media {
   display: none;
 }
 
-.section-full-width {
-  min-height: var(--scrollytale-chapter-height, 640px);
+.story-section.is-full {
+  min-height: auto;
   width: 100vw;
   max-width: none;
-  margin: 3rem calc(50% - 50vw);
+  margin: var(--space-section-margin) calc(50% - 50vw);
   padding-inline: 1rem;
+  padding-block: var(--space-section-pad-y-wide);
 }
 
-.section-full-width .section-copy {
+.story-section.is-full .section-content {
   text-align: left;
   width: min(75ch, 100%);
   margin-inline: auto;
 }
 
-.section-full-width .section-figure {
+.story-section.is-full .section-media {
   margin-top: 1rem;
   width: min(1600px, 100%);
   margin-inline: auto;
 }
 
-.section-chapter {
-  min-height: var(--scrollytale-chapter-height, 640px);
-  margin: 3rem auto;
+.story-section.is-chapter {
+  min-height: auto;
+  margin: var(--space-section-margin) auto;
   max-width: 75ch;
+  padding-block: var(--space-section-pad-y);
 }
 
-.section-chapter .section-copy {
+.story-section.is-chapter .section-content {
   text-align: left;
 }
 
-.section-chapter .body-copy img,
-.section-full-width .body-copy img {
+.story-section.is-chapter .body-copy img,
+.story-section.is-full .body-copy img {
   display: block;
   width: min(100%, 1000px);
   height: auto;
   margin: 2rem auto;
 }
 
-.section-chapter .body-copy p > img:only-child,
-.section-full-width .body-copy p > img:only-child {
+.story-section.is-chapter .body-copy p > img:only-child,
+.story-section.is-full .body-copy p > img:only-child {
   margin-block: 2rem;
 }
 
-.section-chapter .body-copy figure,
-.section-full-width .body-copy figure {
+.story-section.is-chapter .body-copy figure,
+.story-section.is-full .body-copy figure {
   margin: 2rem auto;
 }
 
-.section-chapter .body-copy figcaption,
-.section-full-width .body-copy figcaption {
-  margin-top: 0.75rem;
-  font-size: 0.95rem;
+.story-section.is-chapter .body-copy figcaption,
+.story-section.is-full .body-copy figcaption {
+  margin-top: var(--space-1, 0.5rem);
+  font-family: var(--font-mono, "Roboto Mono", ui-monospace, monospace);
+  font-size: var(--text-xs, 0.64rem);
+  letter-spacing: 0.04em;
+  line-height: var(--lh-normal, 1.6);
   color: var(--muted);
   text-align: center;
+  opacity: 0.8;
 }
 
-.section-chapter-with-figure {
+.story-section.is-chapter.has-figure {
   max-width: 1100px;
 }
 
-.section-chapter-with-figure .section-figure {
+.story-section.is-chapter.has-figure .section-media {
   margin-top: 1rem;
 }
 
 @media (min-width: 900px) {
-  .section-chapter-with-figure {
+  .story-section.is-chapter.has-figure {
     grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     align-items: start;
   }
 
-  .section-full-width {
+  .story-section.is-full {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     align-items: stretch;
   }
@@ -1018,18 +1053,18 @@
     padding-left: 1.25rem;
   }
 
-  .vue-app-shell.is-authoring-mode .section-hero {
+  .vue-app-shell.is-authoring-mode .story-section.is-hero {
     width: calc(100vw - var(--authoring-panel-width));
     margin-left: calc(50% - (100vw - var(--authoring-panel-width)) / 2);
     margin-right: calc(50% - (100vw - var(--authoring-panel-width)) / 2);
   }
 
-  .vue-app-shell.is-authoring-mode .section-full-width,
-  .vue-app-shell.is-authoring-mode .section-scrolly {
+  .vue-app-shell.is-authoring-mode .story-section.is-full,
+  .vue-app-shell.is-authoring-mode .story-section.is-scrolly {
     width: calc(100vw - var(--authoring-panel-width) - 2rem);
   }
 
-  .vue-app-shell.is-authoring-mode .section-full-width {
+  .vue-app-shell.is-authoring-mode .story-section.is-full {
     margin-left: calc(50% - (100vw - var(--authoring-panel-width)) / 2);
     margin-right: calc(50% - (100vw - var(--authoring-panel-width)) / 2);
   }

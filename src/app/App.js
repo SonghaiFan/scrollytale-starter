@@ -45,8 +45,8 @@ function getStoredScrollamaConfig() {
 
 function renderError(message) {
   return h("main", { class: "app-shell" }, [
-    h("section", { class: "section-shell section-full-width" }, [
-      h("div", { class: "section-copy" }, [
+    h("section", { class: "story-section is-full" }, [
+      h("div", { class: "section-content" }, [
         h("p", { class: "eyebrow" }, "Runtime error"),
         h("h1", null, "Scrollytale starter could not boot."),
         h("pre", { class: "error-block" }, message),
@@ -57,8 +57,8 @@ function renderError(message) {
 
 function renderLoading() {
   return h("main", { class: "app-shell" }, [
-    h("section", { class: "section-shell section-full-width" }, [
-      h("div", { class: "section-copy" }, [
+    h("section", { class: "story-section is-full" }, [
+      h("div", { class: "section-content" }, [
         h("p", { class: "eyebrow" }, "Loading"),
         h("h1", null, "Preparing the story model"),
         h(

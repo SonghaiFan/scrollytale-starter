@@ -4,7 +4,7 @@ import { getMarkerKindForVisType } from "./navMarkers.js";
 import { renderStory } from "../runtime/renderStory.js";
 
 function buildNavTargets(root, story) {
-  const sectionElements = [...root.querySelectorAll(".section-shell")];
+  const sectionElements = [...root.querySelectorAll(".story-section")];
   const targets = [];
 
   sectionElements.forEach((sectionEl, index) => {

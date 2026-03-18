@@ -6,11 +6,11 @@ function renderBody(markdown, body) {
 
 export function renderHero({ section, markdown }) {
   const element = document.createElement("section");
-  element.className = "section-shell section-hero";
+  element.className = "story-section is-hero";
   element.id = section.id;
 
   element.innerHTML = `
-    <div class="section-copy">
+    <div class="section-content">
       <p class="eyebrow eyebrow-marker">${renderMarkerSpanForKind("section", "eyebrow-ui-marker")}</p>
       <h2>${section.headline}</h2>
       ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
@@ -22,12 +22,12 @@ export function renderHero({ section, markdown }) {
         </div>
       </div>
     </div>
-    <div class="section-figure"></div>
+    <div class="section-media"></div>
   `;
 
   return {
     element,
-    figure: element.querySelector(".section-figure"),
+    figure: element.querySelector(".section-media"),
     steps: [],
   };
 }

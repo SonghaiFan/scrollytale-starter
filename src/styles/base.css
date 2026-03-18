@@ -1,6 +1,45 @@
-@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700&family=Roboto+Mono:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Raleway:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&display=swap");
 
 :root {
+  /* ── Font families ── */
+  --font-sans: "Raleway", system-ui, sans-serif;
+  --font-serif: "Lora", Georgia, "Times New Roman", serif;
+  --font-mono: "Roboto Mono", ui-monospace, "Menlo", monospace;
+
+  /* ── Modular type scale (ratio 1.25) ── */
+  /* Base: 1rem = 16px */
+  --text-xs:   0.64rem;   /* ~10px  — labels, captions */
+  --text-sm:   0.80rem;   /* ~13px  — metadata, eyebrows */
+  --text-base: 1rem;      /*  16px  — UI text */
+  --text-md:   1.125rem;  /*  18px  — step body prose */
+  --text-lg:   1.25rem;   /*  20px  — dek, subheadings */
+  --text-xl:   1.563rem;  /*  25px  — section headline */
+  --text-2xl:  1.953rem;  /*  31px  — chapter title */
+  --text-3xl:  2.441rem;  /*  39px  — display / hero */
+  --text-4xl:  3.052rem;  /*  49px  — hero display */
+
+  /* ── Spacing scale (8pt grid) ── */
+  --space-1:  0.5rem;   /*  8px */
+  --space-2:  1rem;     /* 16px */
+  --space-3:  1.5rem;   /* 24px */
+  --space-4:  2rem;     /* 32px */
+  --space-5:  3rem;     /* 48px */
+  --space-6:  4rem;     /* 64px */
+  --space-7:  6rem;     /* 96px */
+  --space-8:  8rem;     /* 128px */
+
+  /* ── Line heights ── */
+  --lh-tight:   1.15;  /* display / headlines */
+  --lh-snug:    1.35;  /* subheadings */
+  --lh-normal:  1.6;   /* UI text */
+  --lh-relaxed: 1.75;  /* body prose */
+  --lh-loose:   1.9;   /* step annotations */
+
+  /* ── Measure (max line length) ── */
+  --measure-narrow: 45ch;  /* step cards */
+  --measure-prose:  65ch;  /* body copy */
+  --measure-wide:   75ch;  /* full-width copy blocks */
+
   --primary: #302ae6;
   --secondary: #03b976;
   --page-bg: #ffffff;
@@ -113,7 +152,8 @@ html {
 body {
   margin: 0 auto;
   min-width: 320px;
-  font-family: "Raleway", sans-serif;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
   color: var(--text);
   background-color: var(--page-bg);
   text-align: center;
@@ -130,7 +170,7 @@ svg {
 
 p,
 li {
-  line-height: 1.6;
+  line-height: var(--lh-relaxed);
 }
 
 a {
@@ -143,13 +183,49 @@ a:hover {
   font-weight: 700;
 }
 
+/* ── Typographic roles ── */
+
 .eyebrow {
   margin: 0 0 0.75rem;
-  font-family: "Roboto Mono", ui-monospace, monospace;
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-accent-editorial);
+}
+
+/* Dek and summary: slightly larger, lead-in weight */
+.dek,
+.summary {
+  font-size: var(--text-lg);
+  line-height: var(--lh-snug);
+  font-weight: 400;
+}
+
+/* Body copy and narrative prose use serif for reading comfort */
+.body-copy,
+.body-copy p,
+.body-copy li {
+  font-family: var(--font-serif);
+  font-size: clamp(var(--text-base), 1.1vw, var(--text-md));
+  line-height: var(--lh-relaxed);
+}
+
+.body-copy p,
+.body-copy li {
+  max-width: var(--measure-wide);
+}
+
+/* Step prose inherits serif + relaxed reading rhythm */
+.step p,
+.step li {
+  font-family: var(--font-serif);
+  line-height: var(--lh-loose);
+}
+
+.figure-card p {
+  font-size: var(--text-sm);
+  line-height: var(--lh-normal);
 }
 
 .dek,
@@ -159,11 +235,6 @@ a:hover {
 .step li,
 .figure-card p {
   color: var(--muted);
-}
-
-.body-copy p,
-.body-copy li {
-  max-width: 75ch;
 }
 
 .error-block {

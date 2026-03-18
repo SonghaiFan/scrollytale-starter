@@ -15,23 +15,23 @@ function shouldRenderFigure(section) {
 export function renderChapter({ section, markdown }) {
   const element = document.createElement("section");
   const hasFigure = shouldRenderFigure(section);
-  element.className = `section-shell section-chapter${hasFigure ? " section-chapter-with-figure" : ""}`;
+  element.className = `story-section is-chapter${hasFigure ? " has-figure" : ""}`;
   element.id = section.id;
 
   element.innerHTML = `
-    <div class="section-copy">
+    <div class="section-content">
       <p class="eyebrow eyebrow-marker">${renderMarkerSpanForKind("section", "eyebrow-ui-marker")}</p>
       <h2>${section.headline}</h2>
       ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
       ${section.copy.summary ? `<p class="summary">${section.copy.summary}</p>` : ""}
       ${renderBody(markdown, section.body)}
     </div>
-    ${hasFigure ? '<div class="section-figure section-figure-wide"></div>' : ""}
+    ${hasFigure ? '<div class="section-media is-wide"></div>' : ""}
   `;
 
   return {
     element,
-    figure: hasFigure ? element.querySelector(".section-figure") : null,
+    figure: hasFigure ? element.querySelector(".section-media") : null,
     steps: [],
   };
 }
