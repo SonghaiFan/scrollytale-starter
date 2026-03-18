@@ -135,7 +135,6 @@ export function renderBarChart({ container, section, data }) {
   }
 
   draw(0);
-  window.addEventListener("resize", () => draw(currentIndex, currentStep));
 
   return {
     update(payload) {
@@ -143,6 +142,9 @@ export function renderBarChart({ container, section, data }) {
       currentIndex = index;
       currentStep = typeof payload === "number" ? null : payload?.step ?? null;
       draw(index, currentStep);
+    },
+    resize() {
+      draw(currentIndex, currentStep);
     },
   };
 }

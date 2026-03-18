@@ -244,11 +244,13 @@ export function renderLineChart({ container, section, data }) {
   }
 
   render(0);
-  window.addEventListener("resize", () => render({ index: currentIndex, step: currentStep }));
 
   return {
     update(payload) {
       render(payload);
+    },
+    resize() {
+      render({ index: currentIndex, step: currentStep });
     },
   };
 }

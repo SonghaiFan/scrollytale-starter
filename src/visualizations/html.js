@@ -9,6 +9,6 @@ export function renderHtmlContainer({ container, section }) {
 
   return {
     update() {},
+    resize() {},
   };
 }
-

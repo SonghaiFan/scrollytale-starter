@@ -138,7 +138,6 @@ export function renderScatterChart({ container, section, data }) {
   }
 
   draw(0);
-  window.addEventListener("resize", () => draw(currentIndex, currentStep));
 
   return {
     update(payload) {
@@ -146,6 +145,9 @@ export function renderScatterChart({ container, section, data }) {
       currentIndex = next.index;
       currentStep = next.step;
       draw(next.index, next.step);
+    },
+    resize() {
+      draw(currentIndex, currentStep);
     },
   };
 }

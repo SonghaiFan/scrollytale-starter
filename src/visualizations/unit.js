@@ -112,7 +112,6 @@ export function renderUnitChart({ container, section, data }) {
   }
 
   draw(0, null);
-  window.addEventListener("resize", () => draw(currentIndex, currentStep));
 
   return {
     update(payload) {
@@ -120,6 +119,9 @@ export function renderUnitChart({ container, section, data }) {
       currentIndex = next.index;
       currentStep = next.step;
       draw(next.index, next.step);
+    },
+    resize() {
+      draw(currentIndex, currentStep);
     },
   };
 }

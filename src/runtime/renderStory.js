@@ -57,9 +57,10 @@ function setupScrolly(section, sectionEl, steps, visController, debug, scrollama
 }
 
 function applyViewportSizing(app) {
-  const stepH = Math.floor(window.innerHeight * 0.95);
-  const figureHeight = window.innerHeight * 0.9;
-  const figureMarginTop = (window.innerHeight - figureHeight) / 4;
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  const stepH = Math.max(360, Math.floor(viewportHeight * 0.95));
+  const figureHeight = Math.max(320, Math.floor(viewportHeight * 0.9));
+  const figureMarginTop = Math.max(16, (viewportHeight - figureHeight) / 4);
 
   app.style.setProperty("--scrollytale-step-gap", `${stepH}px`);
   app.style.setProperty("--scrollytale-figure-height", `${figureHeight}px`);
@@ -87,8 +88,28 @@ export function renderStory({
 
   const storyRoot = app.querySelector(".story-root");
   const sectionElements = [];
-  const resizeHandler = () => {
+  const sectionControllers = [];
+  let resizeFrame = 0;
+
+  const runResize = () => {
     applyViewportSizing(app);
+    sectionControllers.forEach(({ sectionEl }) => {
+      sectionEl.__scrollytaleScroller?.resize?.();
+    });
+    sectionControllers.forEach(({ visController }) => {
+      visController?.resize?.();
+    });
+  };
+
+  const resizeHandler = () => {
+    if (resizeFrame) {
+      window.cancelAnimationFrame(resizeFrame);
+    }
+
+    resizeFrame = window.requestAnimationFrame(() => {
+      resizeFrame = 0;
+      runResize();
+    });
   };
 
   story.sections.forEach((section) => {
@@ -116,6 +137,10 @@ export function renderStory({
       section,
       data: sectionData,
     });
+    sectionControllers.push({
+      sectionEl: sectionResult.element,
+      visController,
+    });
 
     if (section.layout.startsWith("scrolly")) {
       setupScrolly(
@@ -136,6 +161,9 @@ export function renderStory({
   return {
     sectionElements,
     destroy() {
+      if (resizeFrame) {
+        window.cancelAnimationFrame(resizeFrame);
+      }
       sectionElements.forEach((sectionEl) => {
         sectionEl.__scrollytaleScroller?.destroy?.();
       });
