@@ -1,10 +1,8 @@
+import * as aq from "arquero";
 import * as d3 from "d3";
-import {
-  applyAxisStyle,
-  createSeriesColorScale,
-  ensureChartSvg,
-  getChartTheme,
-} from "./shared.js";
+
+import { createSeriesColorScale, getChartTheme } from "./shared.js";
+import { loadPlotModule, renderFrameworkError } from "./frameworkShared.js";
 
 function getDimensions(container) {
   const bounds = container.getBoundingClientRect();
@@ -60,156 +58,16 @@ function resolveFocusKeys(step, groupedKeys, fallbackIndex) {
     : [groupedKeys[Math.min(fallbackIndex, groupedKeys.length - 1)]].filter(Boolean);
 }
 
-function createLineChart() {
-  let fields = {
-    x: null,
-    y: null,
-    series: null,
-  };
-  let colorScale = d3
-    .scaleOrdinal()
-    .range(createSeriesColorScale([]).range());
-  let dimensions = {
-    width: 320,
-    height: 360,
-    margin: { top: 24, right: 24, bottom: 48, left: 64 },
-  };
-  let focusKeys = [];
-  let transitionMode = "focus";
-  let transitionDuration = 450;
+function isNumeric(values) {
+  return values.every((value) => typeof value === "number");
+}
 
-  function chart(selection) {
-    selection.each(function render(chartData) {
-      const svg = d3.select(this);
-      const root = svg.selectAll("g.chart-root").data([null]).join("g").attr("class", "chart-root");
-      const linesLayer = root.selectAll("g.lines-layer").data([null]).join("g").attr("class", "lines-layer");
-      const pointsLayer = root.selectAll("g.points-layer").data([null]).join("g").attr("class", "points-layer");
-      const gx = root.selectAll("g.x-axis-layer").data([null]).join("g").attr("class", "x-axis-layer");
-      const gy = root.selectAll("g.y-axis-layer").data([null]).join("g").attr("class", "y-axis-layer");
-
-      const { x, y, series } = fields;
-      const { width, height, margin } = dimensions;
-      const innerWidth = width - margin.left - margin.right;
-      const innerHeight = height - margin.top - margin.bottom;
-      const grouped = d3.groups(chartData, (row) => (series ? row[series] : "Series"));
-      const groupedKeys = grouped.map(([key]) => key);
-      const activeKeys = focusKeys.length ? focusKeys : groupedKeys.slice(0, 1);
-      const activeKeySet = new Set(activeKeys);
-      const transition = svg.transition().duration(transitionDuration);
-      const theme = getChartTheme();
-
-      svg.attr("viewBox", `0 0 ${width} ${height}`).style("background", theme.surface);
-      root.attr("transform", `translate(${margin.left},${margin.top})`);
-      colorScale = createSeriesColorScale(groupedKeys);
-
-      const allX = chartData.map((row) => row[x]);
-      const isNumericX = allX.every((value) => typeof value === "number");
-      const xScale = isNumericX
-        ? d3.scaleLinear().domain(d3.extent(allX)).range([0, innerWidth])
-        : d3.scalePoint().domain(allX).range([0, innerWidth]).padding(0.5);
-
-      const yScale = d3
-        .scaleLinear()
-        .domain([0, d3.max(chartData, (row) => Number(row[y]) || 0) ?? 0])
-        .nice()
-        .range([innerHeight, 0]);
-
-      gx
-        .attr("transform", `translate(0,${innerHeight})`)
-        .transition(transition)
-        .call(isNumericX ? d3.axisBottom(xScale).ticks(5) : d3.axisBottom(xScale));
-
-      gy.transition(transition).call(d3.axisLeft(yScale).ticks(5));
-      applyAxisStyle(gx);
-      applyAxisStyle(gy);
-
-      const line = d3
-        .line()
-        .x((row) => xScale(row[x]))
-        .y((row) => yScale(Number(row[y]) || 0));
-
-      linesLayer
-        .selectAll("path")
-        .data(grouped, ([key]) => key)
-        .join("path")
-        .attr("fill", "none")
-        .attr("stroke", ([key]) => colorScale(key))
-        .attr("stroke-linecap", "butt")
-        .attr("stroke-linejoin", "miter")
-        .attr("d", ([, values]) => line(values))
-        .transition(transition)
-        .attr("stroke-width", ([key]) =>
-          transitionMode === "focus" && !(activeKeySet.has(key) || grouped.length === 1) ? 2 : 3.5
-        )
-        .attr("opacity", ([key]) =>
-          transitionMode === "focus" && !(activeKeySet.has(key) || grouped.length === 1) ? 0.15 : 1
-        );
-
-      const pointData = grouped.flatMap(([key, values]) =>
-        values.map((row) => ({
-          key,
-          x: row[x],
-          y: Number(row[y]) || 0,
-        }))
-      );
-
-      pointsLayer
-        .selectAll("circle")
-        .data(pointData, (d) => `${d.key}-${d.x}`)
-        .join("circle")
-        .attr("fill", (d) => colorScale(d.key))
-        .transition(transition)
-        .attr("r", (d) =>
-          transitionMode === "focus" && !(activeKeySet.has(d.key) || grouped.length === 1) ? 2.5 : 3.5
-        )
-        .attr("cx", (d) => xScale(d.x))
-        .attr("cy", (d) => yScale(d.y))
-        .attr("opacity", (d) =>
-          transitionMode === "focus" && !(activeKeySet.has(d.key) || grouped.length === 1) ? 0.18 : 1
-        );
-    });
+function compareValues(left, right, numeric) {
+  if (numeric) {
+    return Number(left) - Number(right);
   }
 
-  chart.fields = function setFields(nextFields) {
-    if (!arguments.length) return fields;
-    fields = {
-      ...fields,
-      ...nextFields,
-    };
-    return chart;
-  };
-
-  chart.colorScale = function setColorScale(nextScale) {
-    if (!arguments.length) return colorScale;
-    colorScale = nextScale;
-    return chart;
-  };
-
-  chart.dimensions = function setDimensions(nextDimensions) {
-    if (!arguments.length) return dimensions;
-    dimensions = nextDimensions;
-    return chart;
-  };
-
-  chart.focusKeys = function setFocusKeys(nextKeys) {
-    if (!arguments.length) return focusKeys;
-    focusKeys = Array.isArray(nextKeys) ? nextKeys : [];
-    return chart;
-  };
-
-  chart.transitionMode = function setTransitionMode(nextMode) {
-    if (!arguments.length) return transitionMode;
-    transitionMode = nextMode || "focus";
-    return chart;
-  };
-
-  chart.transitionDuration = function setTransitionDuration(nextDuration) {
-    if (!arguments.length) return transitionDuration;
-    transitionDuration = Number.isFinite(nextDuration) ? nextDuration : transitionDuration;
-    return chart;
-  };
-
-  return chart;
+  return String(left).localeCompare(String(right));
 }
 
 export function renderLineChart({ container, section, data }) {
@@ -218,39 +76,139 @@ export function renderLineChart({ container, section, data }) {
 
   if (!x || !y || !data.length) {
     container.innerHTML = `<div class="figure-card">Line chart needs data and both x/y fields.</div>`;
-    return { update() {} };
+    return { update() {}, resize() {} };
   }
 
-  const groupedKeys = d3.groups(data, (row) => (series ? row[series] : "Series")).map(([key]) => key);
-  const svg = ensureChartSvg(container);
-  const chart = createLineChart().fields({ x, y, series });
+  const sortedData = aq
+    .from(data)
+    .orderby(series ? [series, x] : [x])
+    .objects();
+  const groupedKeys = [
+    ...new Set(sortedData.map((row) => (series ? row[series] : "Series"))),
+  ];
   let currentIndex = 0;
   let currentStep = null;
+  let renderToken = 0;
 
-  function render(payload) {
+  async function draw(payload) {
     const next = getUpdatePayload(payload);
-    const dimensions = getDimensions(container);
+    const { width, height, margin } = getDimensions(container);
+    const theme = getChartTheme();
     const focus = resolveFocusKeys(next.step, groupedKeys, next.index);
+    const activeKeySet = new Set(focus);
+    const colorScale = createSeriesColorScale(groupedKeys);
+    const allX = sortedData.map((row) => row[x]);
+    const numericX = isNumeric(allX);
+    const transitionMode = next.step?.transition ?? "focus";
+    const allActive = groupedKeys.length <= 1 || transitionMode !== "focus";
+    const token = ++renderToken;
 
     currentIndex = next.index;
     currentStep = next.step;
 
-    svg.datum(data).call(
-      chart
-        .dimensions(dimensions)
-        .focusKeys(focus)
-        .transitionMode(next.step?.transition ?? "focus")
-    );
+    try {
+      const Plot = await loadPlotModule();
+      if (token !== renderToken) {
+        return;
+      }
+
+      const plotData = sortedData
+        .map((row, index) => {
+          const key = series ? row[series] : "Series";
+          const isActive = allActive || activeKeySet.has(key);
+          return {
+            ...row,
+            __index: index,
+            __group: key,
+            __stroke: colorScale(key),
+            __strokeOpacity: isActive ? 1 : 0.15,
+            __strokeWidth: isActive ? 3.5 : 2,
+            __fill: colorScale(key),
+            __fillOpacity: isActive ? 1 : 0.18,
+            __r: isActive ? 3.5 : 2.5,
+          };
+        })
+        .sort((left, right) => {
+          if (left.__group !== right.__group) {
+            return String(left.__group).localeCompare(String(right.__group));
+          }
+
+          const byX = compareValues(left[x], right[x], numericX);
+          if (byX !== 0) {
+            return byX;
+          }
+
+          return left.__index - right.__index;
+        });
+
+      const plot = Plot.plot({
+        width,
+        height,
+        marginTop: margin.top,
+        marginRight: margin.right,
+        marginBottom: margin.bottom,
+        marginLeft: margin.left,
+        className: "chart-plot",
+        style: {
+          background: theme.surface,
+          color: theme.ink,
+          fontFamily: '"Roboto Mono", ui-monospace, monospace',
+          fontSize: "11px",
+        },
+        x: {
+          label: null,
+          ticks: numericX ? 5 : undefined,
+          grid: false,
+        },
+        y: {
+          label: null,
+          ticks: 5,
+          grid: false,
+        },
+        marks: [
+          Plot.line(plotData, {
+            x,
+            y,
+            z: "__group",
+            stroke: "__stroke",
+            strokeOpacity: "__strokeOpacity",
+            strokeWidth: "__strokeWidth",
+          }),
+          Plot.dot(plotData, {
+            x,
+            y,
+            fill: "__fill",
+            fillOpacity: "__fillOpacity",
+            r: "__r",
+            stroke: null,
+          }),
+        ],
+      });
+
+      plot.classList.add("chart-svg");
+      if (token !== renderToken) {
+        return;
+      }
+      container.replaceChildren(plot);
+    } catch (error) {
+      renderFrameworkError(
+        container,
+        error instanceof Error ? error.message : "Unknown line render error."
+      );
+    }
   }
 
-  render(0);
+  draw(0);
 
   return {
     update(payload) {
-      render(payload);
+      void draw(payload);
     },
     resize() {
-      render({ index: currentIndex, step: currentStep });
+      void draw({ index: currentIndex, step: currentStep });
+    },
+    destroy() {
+      renderToken += 1;
     },
   };
 }

@@ -5,6 +5,7 @@ const LEGACY_SECTION_RE = /^##\s+(.+)$/gm;
 const SECTION_FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n*/gm;
 const DIRECTIVE_RE =
   /^::(vis|step|annotation)(?:\{([^}]*)\})?[ \t]*\n([\s\S]*?)^::[ \t]*$/gm;
+const VIS_CODE_BLOCK_RE = /```(plot|vega-lite|vegalite|vl)\s*\n([\s\S]*?)\n```/gm;
 
 function parseYamlBlock(source) {
   return yaml.load(source) ?? {};
@@ -75,6 +76,46 @@ function normalizeInlineVisConfig(rawVis, rawSectionConfig) {
   };
 }
 
+function normalizeFrameworkVisConfig(rawBlock, rawSectionConfig) {
+  if (!rawBlock?.source) {
+    return null;
+  }
+
+  const sectionConfig = rawSectionConfig ?? {};
+  const fields = {};
+  const fieldKeys = ["x", "y", "series", "color", "group", "label", "value"];
+
+  fieldKeys.forEach((key) => {
+    const value = sectionConfig[key] ?? sectionConfig.vis?.fields?.[key];
+    if (value != null) {
+      fields[key] = value;
+    }
+  });
+
+  const visType =
+    typeof sectionConfig.vis === "string"
+      ? sectionConfig.vis
+      : sectionConfig.vis?.type ?? sectionConfig.chart ?? rawBlock.framework;
+
+  const dataSource =
+    typeof sectionConfig.data === "string"
+      ? sectionConfig.data
+      : sectionConfig.vis?.data?.source ?? sectionConfig.data?.source ?? null;
+
+  return {
+    type: visType ?? rawBlock.framework,
+    data: {
+      source: dataSource,
+    },
+    fields,
+    options: {
+      ...(typeof sectionConfig.vis === "object" ? sectionConfig.vis?.options ?? {} : {}),
+      source: rawBlock.source,
+      framework: rawBlock.framework,
+    },
+  };
+}
+
 function mergeVisConfigs(baseConfig, overrideConfig) {
   if (!baseConfig && !overrideConfig) {
     return null;
@@ -103,6 +144,34 @@ function mergeVisConfigs(baseConfig, overrideConfig) {
       ...(baseConfig.options ?? {}),
       ...(overrideConfig.options ?? {}),
     },
+  };
+}
+
+function normalizeVisFramework(language) {
+  if (language === "vegalite" || language === "vl") {
+    return "vega-lite";
+  }
+
+  return language;
+}
+
+function extractFrameworkVisBlocks(body) {
+  let firstBlock = null;
+
+  const cleanedBody = body.replace(VIS_CODE_BLOCK_RE, (_, rawLanguage = "", rawSource = "") => {
+    if (!firstBlock) {
+      firstBlock = {
+        framework: normalizeVisFramework(rawLanguage.trim().toLowerCase()),
+        source: rawSource.trim(),
+      };
+    }
+
+    return "";
+  });
+
+  return {
+    body: cleanedBody.replace(/\n{3,}/g, "\n\n").trim(),
+    visBlock: firstBlock,
   };
 }
 
@@ -141,9 +210,18 @@ function extractBodyDirectives(body, baseConfig = {}) {
       }
 
       if (type === "step" && content) {
+        const extractedStep = extractFrameworkVisBlocks(content);
         steps.push({
           ...parseDirectiveAttributes(attrSource),
-          body: content,
+          body: extractedStep.body,
+          ...(extractedStep.visBlock
+            ? {
+                vis: {
+                  type: extractedStep.visBlock.framework,
+                  source: extractedStep.visBlock.source,
+                },
+              }
+            : {}),
         });
       }
 
@@ -155,9 +233,12 @@ function extractBodyDirectives(body, baseConfig = {}) {
     }
   );
 
+  const extractedBody = extractFrameworkVisBlocks(cleanedBody.replace(/\n{3,}/g, "\n\n").trim());
+
   return {
-    body: cleanedBody.replace(/\n{3,}/g, "\n\n").trim(),
+    body: extractedBody.body,
     visConfig,
+    visBlock: extractedBody.visBlock,
     steps,
     annotations,
   };
@@ -224,7 +305,8 @@ function parseFrontmatterSection(section, index) {
   const extracted = extractBodyDirectives(section.rawBody, baseConfig);
   const heading = extractLeadingHeading(extracted.body);
   const baseVis = normalizeInlineVisConfig({}, baseConfig);
-  const mergedVis = mergeVisConfigs(baseVis, extracted.visConfig);
+  const blockVis = normalizeFrameworkVisConfig(extracted.visBlock, baseConfig);
+  const mergedVis = mergeVisConfigs(mergeVisConfigs(baseVis, extracted.visConfig), blockVis);
   const existingCopy = baseConfig.copy ?? {};
 
   const config = {

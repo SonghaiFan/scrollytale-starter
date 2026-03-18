@@ -167,6 +167,9 @@ export function renderStory({
       sectionElements.forEach((sectionEl) => {
         sectionEl.__scrollytaleScroller?.destroy?.();
       });
+      sectionControllers.forEach(({ visController }) => {
+        visController?.destroy?.();
+      });
       cleanupScrollamaDebug();
       window.removeEventListener("resize", resizeHandler);
     },

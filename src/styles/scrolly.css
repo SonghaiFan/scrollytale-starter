@@ -3,6 +3,7 @@
   display: flex;
   gap: 1rem;
   padding: 1rem;
+  background: var(--page-bg);
   text-align: left;
 }
 
@@ -179,6 +180,8 @@
   border: 0;
   border-radius: 4px;
   display: grid;
+  overflow: hidden;
+  background: var(--surface-strong);
 }
 
 .sticky-figure .figure-card,
@@ -190,6 +193,7 @@
 .section-scrolly-overlay {
   display: grid;
   align-items: start;
+  isolation: isolate;
 }
 
 .section-scrolly-overlay > * {
@@ -210,6 +214,7 @@
 }
 
 .section-scrolly-overlay .sticky-figure {
+  z-index: 0;
   min-height: var(--scrollytale-figure-height, 78vh);
 }
 

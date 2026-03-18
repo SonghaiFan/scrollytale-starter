@@ -23,7 +23,7 @@ const SUPPORTED_LAYOUTS = new Set([
   "full-width",
 ]);
 
-const SUPPORTED_VIS = new Set(["html", "bar", "line", "scatter", "unit"]);
+const SUPPORTED_VIS = new Set(["html", "bar", "line", "scatter", "unit", "plot", "vega-lite"]);
 
 function slugify(value) {
   return String(value ?? "")
@@ -263,7 +263,7 @@ function normalizeStepEntry(entry) {
         ? entry.text
         : "";
 
-  if (!body.trim()) {
+  if (!body.trim() && !entry.vis) {
     return null;
   }
 

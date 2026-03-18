@@ -1,4 +1,14 @@
-import * as d3 from "d3";
+import * as aq from "arquero";
+
+function getSourceType(path) {
+  const value = String(path ?? "").toLowerCase();
+
+  if (value.endsWith(".json")) {
+    return "json";
+  }
+
+  return "csv";
+}
 
 export async function loadSources(sourceConfigs) {
   const entries = await Promise.all(
@@ -7,11 +17,15 @@ export async function loadSources(sourceConfigs) {
         throw new Error("Every data source needs both an id and a path.");
       }
 
-      const rows = await d3.csv(source.path, d3.autoType);
-      return [source.id, rows];
+      const sourceType = getSourceType(source.path);
+      const table =
+        sourceType === "json"
+          ? await aq.loadJSON(source.path)
+          : await aq.loadCSV(source.path, { autoType: true });
+
+      return [source.id, table.objects()];
     })
   );
 
   return Object.fromEntries(entries);
 }
-

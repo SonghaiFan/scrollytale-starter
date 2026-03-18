@@ -71,6 +71,122 @@ The gap narrows slightly, but never closes between the lower two regions.
 ::
 
 ---
+id: dot-comparison
+layout: scrolly-right
+chart: plot
+data: housing
+x: year
+y: value
+series: region
+dek: "This section is wired to a native Observable Plot block defined directly inside each step."
+---
+
+## Steps can now define native Observable Plot blocks
+
+This section uses the same dataset as the line chart, but the visual state now lives directly in each step as a Plot code block.
+
+::step{focus="all"}
+```plot
+Plot.dot(aq.from(data).objects(), {
+  x: "year",
+  y: "value",
+  stroke: "region",
+  fill: "region",
+  symbol: "square",
+  r: 6,
+  tip: true
+})
+```
+
+All points remain visible so the three regional clusters are easy to compare.
+::
+
+::step{focus="Inner"}
+```plot
+Plot.dot(
+  aq.from(data).filter((d) => d.region === "Inner").objects(),
+  {
+    x: "year",
+    y: "value",
+    fill: "region",
+    symbol: "square",
+    r: 7,
+    tip: true
+  }
+)
+```
+
+The **Inner** region stays highest across the full set of years.
+::
+
+::step{focus="Outer,Middle"}
+```plot
+Plot.dot(
+  aq.from(data).filter((d) => d.region !== "Inner").objects(),
+  {
+    x: "year",
+    y: "value",
+    stroke: "region",
+    fill: "region",
+    symbol: "square",
+    r: 6,
+    tip: true
+  }
+)
+```
+
+The lower two groups stay closer together, but they still separate over time.
+::
+
+---
+id: vega-lite-comparison
+layout: scrolly-left
+chart: vega-lite
+data: housing
+dek: "The same step-driven pattern also works with Vega-Lite specs."
+---
+
+## Steps can also swap native Vega-Lite specs
+
+This section shows the same idea with Vega-Lite. If a spec omits `data`, the starter injects the section dataset automatically.
+
+::step
+```vega-lite
+{
+  "mark": {"type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3},
+  "encoding": {
+    "x": {"field": "region", "type": "nominal", "sort": "-y"},
+    "y": {"field": "value", "type": "quantitative"},
+    "color": {"field": "region", "type": "nominal", "legend": null}
+  }
+}
+```
+
+The first step uses the full dataset as a compact bar comparison.
+::
+
+::step
+```vega-lite
+{
+  "data": {
+    "values": [
+      {"region": "Inner", "value": 402},
+      {"region": "Middle", "value": 326}
+    ]
+  },
+  "mark": {"type": "bar", "cornerRadiusTopLeft": 3, "cornerRadiusTopRight": 3},
+  "encoding": {
+    "x": {"field": "region", "type": "nominal"},
+    "y": {"field": "value", "type": "quantitative"},
+    "color": {"field": "region", "type": "nominal", "legend": null}
+  }
+}
+```
+
+The second step swaps in a completely different Vega-Lite spec.
+::
+
+---
 id: unit-view
 layout: scrolly-overlay
 chart: unit

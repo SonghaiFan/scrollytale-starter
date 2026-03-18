@@ -207,6 +207,8 @@ The paragraph flow stays natural, and the image sits inside the story rather tha
 - `scatter`
 - `unit`
 - `html`
+- `plot`
+- `vega-lite`
 
 ## `::step`
 
@@ -242,6 +244,85 @@ This is closer to how the case studies work:
 
 - step text explains the narrative
 - step attributes describe the visual state change
+
+## Native Framework Blocks
+
+If a section declares `chart: plot` or `chart: vega-lite`, each step can define the visual directly with a fenced code block.
+
+Observable Plot example:
+
+````md
+---
+id: native-plot
+layout: scrolly-right
+chart: plot
+data: housing
+---
+
+## Plot block in step content
+
+::step
+```plot
+Plot.dot(aq.from(data).objects(), {
+  x: "year",
+  y: "value",
+  stroke: "region",
+  tip: true
+})
+```
+
+Show all points.
+::
+````
+
+Vega-Lite example:
+
+````md
+---
+id: native-vl
+layout: scrolly-right
+chart: vega-lite
+data: housing
+---
+
+## Vega-Lite block in step content
+
+::step
+```vega-lite
+{
+  "mark": "bar",
+  "encoding": {
+    "x": {"field": "region", "type": "nominal"},
+    "y": {"field": "value", "type": "quantitative"}
+  }
+}
+```
+
+Show the default bar chart.
+::
+````
+
+For `plot`, the block can return:
+
+- a Plot mark such as `Plot.dot(...)`
+- a full Plot config object
+- a DOM node returned by `Plot.plot(...)`
+
+For `vega-lite`, the block can be:
+
+- valid JSON
+- a JavaScript object expression
+
+If the Vega-Lite spec omits `data`, the starter automatically injects the section's loaded dataset as `values`.
+
+Both native block types currently receive these variables:
+
+- `data`: the loaded row array for the section
+- `aq`: Arquero for filtering, grouping, and reshaping data
+- `d3`: D3 utilities when needed
+- `step`: the current step object
+- `section`: the current section config
+- `dimensions`: the current container width, height, and margins
 
 ## Optional `::vis`
 
