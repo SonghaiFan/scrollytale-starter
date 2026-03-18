@@ -25,10 +25,12 @@ export function renderScrollyLeft({ section, markdown }) {
   element.innerHTML = `
     <div class="section-figure sticky-figure"></div>
     <div class="section-copy scrolly-copy">
-      <p class="eyebrow eyebrow-marker">${renderMarkerSpanForVisType(section.vis.type, "eyebrow-ui-marker")}</p>
-      <h2>${section.headline}</h2>
-      ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
-      ${renderBody(markdown, section.body)}
+      <div class="scrolly-intro">
+        <p class="eyebrow eyebrow-marker">${renderMarkerSpanForVisType(section.vis.type, "eyebrow-ui-marker")}</p>
+        <h2>${section.headline}</h2>
+        ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
+        ${renderBody(markdown, section.body)}
+      </div>
       <div class="steps">
         ${section.copy.steps.map((step, index) => renderStep(markdown, step, index, section.vis.type)).join("")}
       </div>

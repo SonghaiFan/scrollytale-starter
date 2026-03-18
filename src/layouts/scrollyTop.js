@@ -17,21 +17,25 @@ function renderBody(markdown, body) {
   return body ? `<div class="body-copy">${markdown.render(body)}</div>` : "";
 }
 
-export function renderScrollyRight({ section, markdown }) {
+export function renderScrollyTop({ section, markdown }) {
   const element = document.createElement("section");
-  element.className = "section-shell section-scrolly section-scrolly-right";
+  element.className = "section-shell section-scrolly section-scrolly-top";
   element.id = section.id;
 
   element.innerHTML = `
     <div class="section-copy scrolly-copy">
-      <div class="scrolly-intro">
-        <p class="eyebrow eyebrow-marker">${renderMarkerSpanForVisType(section.vis.type, "eyebrow-ui-marker")}</p>
-        <h2>${section.headline}</h2>
-        ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
-        ${renderBody(markdown, section.body)}
-      </div>
-      <div class="steps">
-        ${section.copy.steps.map((step, index) => renderStep(markdown, step, index, section.vis.type)).join("")}
+      <div class="scrolly-strip">
+        <article class="scrolly-intro-card is-active">
+          <div class="scrolly-intro">
+            <p class="eyebrow eyebrow-marker">${renderMarkerSpanForVisType(section.vis.type, "eyebrow-ui-marker")}</p>
+            <h2>${section.headline}</h2>
+            ${section.dek ? `<p class="dek">${section.dek}</p>` : ""}
+            ${renderBody(markdown, section.body)}
+          </div>
+        </article>
+        <div class="steps">
+          ${section.copy.steps.map((step, index) => renderStep(markdown, step, index, section.vis.type)).join("")}
+        </div>
       </div>
     </div>
     <div class="section-figure sticky-figure"></div>
@@ -41,5 +45,10 @@ export function renderScrollyRight({ section, markdown }) {
     element,
     figure: element.querySelector(".section-figure"),
     steps: [...element.querySelectorAll(".step")],
+    strip: element.querySelector(".scrolly-strip"),
+    narrativeCards: [
+      element.querySelector(".scrolly-intro-card"),
+      ...element.querySelectorAll(".step"),
+    ].filter(Boolean),
   };
 }

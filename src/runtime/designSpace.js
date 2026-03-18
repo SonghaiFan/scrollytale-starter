@@ -34,6 +34,12 @@ export const DESIGN_SPACE = {
         container: "text-container",
         overlap: null,
       },
+      "scrolly-bottom": {
+        axis: "horizontal",
+        binding: "fixed-to-text",
+        container: "vis-container",
+        overlap: null,
+      },
       "scrolly-left": {
         axis: "vertical",
         binding: "float-to-text",
@@ -49,6 +55,18 @@ export const DESIGN_SPACE = {
       "scrolly-right": {
         axis: "vertical",
         binding: "float-to-text",
+        container: "vis-container",
+        overlap: null,
+      },
+      "scrolly-top": {
+        axis: "horizontal",
+        binding: "fixed-to-text",
+        container: "vis-container",
+        overlap: null,
+      },
+      "vis-container": {
+        axis: "vertical",
+        binding: "fixed-to-text",
         container: "vis-container",
         overlap: null,
       },
@@ -113,10 +131,14 @@ export const STARTER_SUPPORT = {
   },
   layout: {
     chapter: "supported",
+    "side-by-side": "supported",
     hero: "supported",
+    "scrolly-bottom": "supported",
     "scrolly-left": "supported",
     "scrolly-overlay": "supported",
     "scrolly-right": "supported",
+    "scrolly-top": "supported",
+    "vis-container": "supported",
     "full-width": "supported",
   },
   transition: {

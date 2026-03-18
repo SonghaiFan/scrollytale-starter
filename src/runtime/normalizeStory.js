@@ -16,14 +16,68 @@ import {
 
 const SUPPORTED_LAYOUTS = new Set([
   "chapter",
+  "side-by-side",
+  "vis-container",
   "hero",
+  "scrolly-bottom",
   "scrolly-left",
   "scrolly-overlay",
   "scrolly-right",
+  "scrolly-top",
   "full-width",
 ]);
 
 const SUPPORTED_VIS = new Set(["html", "bar", "line", "scatter", "unit"]);
+const SUPPORTED_LAYOUT_NAMES = new Set([
+  "float-to-text",
+  "fixed-to-text",
+  "text-container",
+  "vis-container",
+  "text-over-vis",
+]);
+
+const LAYOUT_NAME_ALIASES = {
+  "text-container": {
+    preset: "chapter",
+    axis: "vertical",
+    binding: "fixed-to-text",
+    container: "text-container",
+    overlap: null,
+  },
+  "text-over-vis": {
+    preset: "scrolly-overlay",
+    axis: "vertical",
+    binding: "float-to-text",
+    container: "vis-container",
+    overlap: "text-over-vis",
+  },
+  "vis-container": {
+    preset: "vis-container",
+    axis: "vertical",
+    binding: "fixed-to-text",
+    container: "vis-container",
+    overlap: null,
+  },
+};
+
+const STARTER_LAYOUT_DEFAULTS = {
+  "side-by-side": {
+    axis: "horizontal",
+    binding: "fixed-to-text",
+    container: "vis-container",
+    overlap: null,
+  },
+};
+
+const HORIZONTAL_FLOW_LAYOUTS = new Set(["scrolly-bottom", "scrolly-top"]);
+const HORIZONTAL_FLOW_EQUIVALENTS = {
+  "scrolly-left": "scrolly-top",
+  "scrolly-right": "scrolly-bottom",
+};
+const VERTICAL_FLOW_EQUIVALENTS = {
+  "scrolly-bottom": "scrolly-right",
+  "scrolly-top": "scrolly-left",
+};
 
 function slugify(value) {
   return String(value ?? "")
@@ -154,9 +208,23 @@ function normalizeStructure(rawStructure, warnings) {
 }
 
 function normalizeLayoutMetadata(rawLayout, warnings, title) {
-  const layoutConfig = typeof rawLayout === "string" ? { preset: rawLayout } : rawLayout ?? {};
-  const requestedLayout = layoutConfig.preset ?? "chapter";
-  const defaults = getLayoutPresetMetadata(requestedLayout) ?? {};
+  const layoutConfig =
+    typeof rawLayout === "string"
+      ? { preset: rawLayout, name: SUPPORTED_LAYOUT_NAMES.has(rawLayout) ? rawLayout : null }
+      : rawLayout ?? {};
+  const layoutName = layoutConfig.name ?? null;
+  const side = layoutConfig.side === "left" ? "left" : "right";
+  const nameAlias = layoutName ? LAYOUT_NAME_ALIASES[layoutName] ?? null : null;
+
+  let requestedLayout = layoutConfig.preset ?? "chapter";
+
+  if (layoutName === "float-to-text" || layoutName === "fixed-to-text") {
+    requestedLayout = side === "left" ? "scrolly-left" : "scrolly-right";
+  } else if (nameAlias) {
+    requestedLayout = nameAlias.preset;
+  }
+
+  const defaults = getLayoutPresetMetadata(requestedLayout) ?? STARTER_LAYOUT_DEFAULTS[requestedLayout] ?? {};
 
   if (!SUPPORTED_LAYOUTS.has(requestedLayout)) {
     warnings.push(
@@ -165,10 +233,26 @@ function normalizeLayoutMetadata(rawLayout, warnings, title) {
   }
 
   const preset = SUPPORTED_LAYOUTS.has(requestedLayout) ? requestedLayout : "chapter";
-  const axis = layoutConfig.axis ?? defaults.axis ?? "vertical";
-  const binding = layoutConfig.binding ?? defaults.binding ?? "fixed-to-text";
-  const container = layoutConfig.container ?? defaults.container ?? "text-container";
-  const overlap = layoutConfig.overlap ?? defaults.overlap ?? null;
+  const axis = layoutConfig.axis ?? nameAlias?.axis ?? defaults.axis ?? "vertical";
+  const binding =
+    layoutConfig.binding ??
+    (layoutName === "float-to-text"
+      ? "float-to-text"
+      : layoutName === "fixed-to-text"
+        ? "fixed-to-text"
+        : nameAlias?.binding ?? defaults.binding ?? "fixed-to-text");
+  const container = layoutConfig.container ?? nameAlias?.container ?? defaults.container ?? "text-container";
+  const overlap = layoutConfig.overlap ?? nameAlias?.overlap ?? defaults.overlap ?? null;
+
+  if (layoutName && !SUPPORTED_LAYOUT_NAMES.has(layoutName)) {
+    warnings.push(`Section "${title}" declared unknown layout name "${layoutName}". Ignoring it.`);
+  }
+
+  if (layoutName === "float-to-text" || layoutName === "fixed-to-text") {
+    warnings.push(
+      `Section "${title}" uses layout name "${layoutName}" and is currently rendered as "${preset}" using side "${side}".`
+    );
+  }
 
   if (!KNOWN_LAYOUT_AXES.has(axis)) {
     warnings.push(`Section "${title}" declared unknown layout axis "${axis}".`);
@@ -187,7 +271,9 @@ function normalizeLayoutMetadata(rawLayout, warnings, title) {
   }
 
   return {
+    name: layoutName,
     preset,
+    side: layoutName === "float-to-text" || layoutName === "fixed-to-text" ? side : null,
     axis,
     binding,
     container,
@@ -285,6 +371,7 @@ function normalizeStepEntry(entry) {
 function normalizeSection(section, index, warnings) {
   const config = section.config ?? {};
   const layoutMeta = normalizeLayoutMetadata(config.layout, warnings, section.title);
+  const chapterFlow = config.chapter?.flow ?? null;
   const requestedVis = config.vis?.type ?? "html";
   const id = config.id ?? (slugify(section.title) || `section-${index + 1}`);
   const summary = config.copy?.summary ?? "";
@@ -300,6 +387,11 @@ function normalizeSection(section, index, warnings) {
     section.title
   );
   const segue = normalizeSegue(config.transition?.segue, warnings, section.title);
+  const layoutAxis = chapterFlow ?? layoutMeta.axis;
+
+  if (chapterFlow != null && !KNOWN_LAYOUT_AXES.has(chapterFlow)) {
+    warnings.push(`Section "${section.title}" declared unknown chapter flow "${chapterFlow}".`);
+  }
 
   if (!SUPPORTED_VIS.has(requestedVis)) {
     warnings.push(
@@ -315,6 +407,11 @@ function normalizeSection(section, index, warnings) {
     headline: config.headline ?? section.title,
     dek: config.dek ?? "",
     layout: layoutMeta.preset,
+    chapter: {
+      flow: KNOWN_LAYOUT_AXES.has(layoutAxis) ? layoutAxis : layoutMeta.axis,
+      explicitFlow: KNOWN_LAYOUT_AXES.has(chapterFlow) ? chapterFlow : null,
+      isAnchor: false,
+    },
     scene,
     action: {
       trigger,
@@ -338,7 +435,10 @@ function normalizeSection(section, index, warnings) {
       annotations: Array.isArray(config.copy?.annotations) ? config.copy.annotations : [],
     },
     designSpace: {
-      layout: layoutMeta,
+      layout: {
+        ...layoutMeta,
+        axis: KNOWN_LAYOUT_AXES.has(layoutAxis) ? layoutAxis : layoutMeta.axis,
+      },
       transition: {
         scene,
         segue,
@@ -347,8 +447,84 @@ function normalizeSection(section, index, warnings) {
         trigger,
         affordances,
       },
+      chapter: {
+        flow: KNOWN_LAYOUT_AXES.has(layoutAxis) ? layoutAxis : layoutMeta.axis,
+      },
     },
   };
+}
+
+function resolveLayoutForFlow(section, warnings) {
+  const flow = section.chapter?.flow ?? "vertical";
+  let layout = section.layout;
+
+  if (flow === "horizontal" && HORIZONTAL_FLOW_EQUIVALENTS[layout]) {
+    const nextLayout = HORIZONTAL_FLOW_EQUIVALENTS[layout];
+    warnings.push(
+      `Section "${section.title}" uses "${layout}" inside a horizontal chapter. Use "${nextLayout}" for horizontal-flow scrolly sections.`
+    );
+    layout = nextLayout;
+  }
+
+  if (flow !== "horizontal" && HORIZONTAL_FLOW_LAYOUTS.has(layout)) {
+    const nextLayout = VERTICAL_FLOW_EQUIVALENTS[layout];
+    warnings.push(
+      `Section "${section.title}" uses "${layout}" outside a horizontal chapter. Falling back to "${nextLayout}".`
+    );
+    layout = nextLayout;
+  }
+
+  const layoutMeta = getLayoutPresetMetadata(layout) ?? section.designSpace.layout;
+
+  return {
+    ...section,
+    layout,
+    designSpace: {
+      ...section.designSpace,
+      layout: {
+        ...section.designSpace.layout,
+        ...layoutMeta,
+        preset: layout,
+        axis: flow === "horizontal" ? "horizontal" : layoutMeta.axis ?? section.designSpace.layout.axis,
+      },
+      chapter: {
+        flow,
+      },
+    },
+  };
+}
+
+function applyChapterFlow(sections, warnings) {
+  let currentFlow = "vertical";
+
+  return sections.map((section) => {
+    const explicitFlow = section.chapter?.explicitFlow ?? null;
+
+    if (explicitFlow) {
+      currentFlow = explicitFlow;
+    }
+
+    const withFlow = {
+      ...section,
+      chapter: {
+        flow: currentFlow,
+        explicitFlow,
+        isAnchor: Boolean(explicitFlow),
+      },
+      designSpace: {
+        ...section.designSpace,
+        layout: {
+          ...section.designSpace.layout,
+          axis: currentFlow,
+        },
+        chapter: {
+          flow: currentFlow,
+        },
+      },
+    };
+
+    return resolveLayoutForFlow(withFlow, warnings);
+  });
 }
 
 export function normalizeStory(parsed) {
@@ -367,7 +543,10 @@ export function normalizeStory(parsed) {
     designSpace: {
       structure: structureMeta,
     },
-    sections: parsed.sections.map((section, index) => normalizeSection(section, index, warnings)),
+    sections: applyChapterFlow(
+      parsed.sections.map((section, index) => normalizeSection(section, index, warnings)),
+      warnings
+    ),
     warnings,
   };
 }

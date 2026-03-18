@@ -64,7 +64,7 @@ function renderLoading() {
         h(
           "p",
           null,
-          "Vue now owns the outer app shell, while the existing scrollytelling runtime still handles layouts, D3 charts, and scroll interactions."
+          "Vue now owns the outer app shell, while the scrollytelling runtime handles layouts, D3 charts, and scroll interactions."
         ),
       ]),
     ]),

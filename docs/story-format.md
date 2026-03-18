@@ -158,10 +158,81 @@ If `headline` is omitted, the runtime uses the first Markdown heading in the sec
 
 - `chapter`
 - `hero`
+- `side-by-side`
+- `vis-container`
+- `scrolly-bottom`
 - `scrolly-left`
 - `scrolly-overlay`
 - `scrolly-right`
+- `scrolly-top`
 - `full-width`
+
+## Thesis Layout Names
+
+If you prefer the thesis layout names, the starter now accepts a first batch of them directly.
+
+The easiest supported forms are:
+
+```yaml
+layout: side-by-side
+layout: text-container
+layout: vis-container
+layout: text-over-vis
+chapter:
+  flow: horizontal
+chapter:
+  flow: vertical
+```
+
+For the side-based names, use the object form:
+
+```yaml
+layout:
+  name: float-to-text
+  side: right
+```
+
+```yaml
+layout:
+  name: fixed-to-text
+  side: left
+```
+
+Current runtime mapping:
+
+- `side-by-side` -> the current starter strip preset
+- `text-container` -> `chapter`
+- `vis-container` -> `vis-container`
+- `text-over-vis` -> `scrolly-overlay`
+- `chapter.flow: horizontal` -> thesis flow metadata
+- `chapter.flow: vertical` -> thesis flow metadata
+- `float-to-text` + `side` -> `scrolly-left` / `scrolly-right`
+- `fixed-to-text` + `side` -> `scrolly-left` / `scrolly-right`
+
+This lets us keep your preferred design-space vocabulary while still rendering through the existing runtime presets, without forcing `horizontal` and `vertical` to pretend to be layout presets.
+
+For horizontal chapters, use the dedicated horizontal scrolly layouts:
+
+```yaml
+chapter:
+  flow: horizontal
+---
+layout: scrolly-bottom
+```
+
+`scrolly-bottom` and `scrolly-top` are only meant for `chapter.flow: horizontal`.
+
+### `chapter.flow`
+
+Use chapter flow when you want to keep the thesis direction semantic without turning it into a layout preset.
+
+```yaml
+chapter:
+  flow: horizontal
+```
+
+For now this is stored as story metadata. The section can still render as a normal `chapter`, while the runtime keeps the intended flow direction available for future layout behavior.
+The current runtime already uses it to group consecutive sections into a horizontal chapter. That flow also carries forward to the sections that follow, until another section declares a new `chapter.flow`.
 
 ### `chapter`
 

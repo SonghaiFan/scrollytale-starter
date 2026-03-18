@@ -12,23 +12,25 @@ function buildNavTargets(root, story) {
     const sectionMeta = story.sections.find((section) => section.id === sectionEl.id);
     const kind = getMarkerKindForVisType(sectionMeta?.vis?.type);
 
-    if (stepEls.length) {
+    if (stepEls.length && sectionMeta?.chapter?.flow !== "horizontal") {
       stepEls.forEach((stepEl) => {
         targets.push({
           id: stepEl.id,
-          label: stepEl.textContent.trim().replace(/\s+/g, " ").slice(0, 72),
-          kind,
+            label: stepEl.textContent.trim().replace(/\s+/g, " ").slice(0, 72),
+            kind,
+            flow: sectionMeta?.chapter?.flow ?? "vertical",
+          });
         });
-      });
-      return;
-    }
+        return;
+      }
 
-    targets.push({
-      id: sectionEl.id,
-      label: sectionEl.querySelector("h2, h1")?.textContent?.trim() ?? `Section ${index + 1}`,
-      kind,
+      targets.push({
+        id: sectionEl.id,
+        label: sectionEl.querySelector("h2, h1")?.textContent?.trim() ?? `Section ${index + 1}`,
+        kind,
+        flow: sectionMeta?.chapter?.flow ?? "vertical",
+      });
     });
-  });
 
   return targets;
 }
@@ -79,10 +81,28 @@ export const StoryRuntime = defineComponent({
       if (!targetId || !root.value) {
         return;
       }
+      const targetEl = root.value.querySelector(`#${CSS.escape(targetId)}`);
 
-      root.value
-        .querySelector(`#${CSS.escape(targetId)}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!targetEl) {
+        return;
+      }
+
+      const sectionEl = targetEl.closest(".section-shell");
+      const horizontalGroup = sectionEl?.closest(".flow-group-horizontal");
+
+      if (horizontalGroup && sectionEl?.dataset.horizontalIndex) {
+        const index = Number(sectionEl.dataset.horizontalIndex);
+        const top =
+          horizontalGroup.getBoundingClientRect().top + window.scrollY + index * window.innerHeight;
+
+        window.scrollTo({
+          top,
+          behavior: "smooth",
+        });
+        return;
+      }
+
+      targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function setupNavObserver(targets) {

@@ -158,10 +158,80 @@ The inner region remains the top line throughout the series.
 
 - `chapter`
 - `hero`
+- `side-by-side`
+- `vis-container`
+- `scrolly-bottom`
 - `scrolly-left`
 - `scrolly-overlay`
 - `scrolly-right`
+- `scrolly-top`
 - `full-width`
+
+## Thesis 里的 Layout 名称
+
+如果你更喜欢 thesis 里的那组 layout 名字，starter 现在已经先接入了第一批。
+
+最简单可用的写法是：
+
+```yaml
+layout: side-by-side
+layout: text-container
+layout: vis-container
+layout: text-over-vis
+chapter:
+  flow: horizontal
+chapter:
+  flow: vertical
+```
+
+对于带方向的名字，推荐用 object 形式：
+
+```yaml
+layout:
+  name: float-to-text
+  side: right
+```
+
+```yaml
+layout:
+  name: fixed-to-text
+  side: left
+```
+
+当前 runtime 映射关系是：
+
+- `side-by-side` -> 当前 starter 里的 strip preset
+- `text-container` -> `chapter`
+- `vis-container` -> `vis-container`
+- `text-over-vis` -> `scrolly-overlay`
+- `chapter.flow: horizontal` -> thesis 的 flow metadata
+- `chapter.flow: vertical` -> thesis 的 flow metadata
+- `float-to-text` + `side` -> `scrolly-left` / `scrolly-right`
+- `fixed-to-text` + `side` -> `scrolly-left` / `scrolly-right`
+
+这样我们就能一边保留你喜欢的 design-space vocabulary，一边继续复用现有 runtime preset，而不会再让 `horizontal / vertical` 假装自己是 layout preset。
+
+对于 horizontal chapter，请使用专门的 horizontal scrolly layout：
+
+```yaml
+chapter:
+  flow: horizontal
+---
+layout: scrolly-bottom
+```
+
+`scrolly-bottom` 和 `scrolly-top` 只应该出现在 `chapter.flow: horizontal` 里。
+
+### `chapter.flow`
+
+如果你想保留 thesis 里的方向语义，但又不想把它硬做成 layout preset，就用 `chapter.flow`。
+
+```yaml
+chapter:
+  flow: horizontal
+```
+
+当前 runtime 已经会用它把连续 section 组织成 horizontal chapter。这个 flow 也会继续向后延续到后面的 section，直到新的 section 再声明另一个 `chapter.flow`。
 
 ### `chapter`
 

@@ -16,6 +16,7 @@ export default defineConfig({
           { text: "Story Format", link: "/story-format" },
           { text: "Three-to-One Fidelity", link: "/three-to-one-fidelity" },
           { text: "Design Space", link: "/design-space" },
+          { text: "Layout Mapping", link: "/layout-mapping" },
           { text: "Syntax vNext", link: "/syntax-vnext" },
           { text: "Project Model", link: "/project-model" },
           {
@@ -32,6 +33,7 @@ export default defineConfig({
               { text: "Story Format", link: "/story-format" },
               { text: "Three-to-One Fidelity", link: "/three-to-one-fidelity" },
               { text: "Design Space", link: "/design-space" },
+              { text: "Layout Mapping", link: "/layout-mapping" },
               { text: "Syntax vNext", link: "/syntax-vnext" },
               { text: "Project Model", link: "/project-model" },
             ],
@@ -64,6 +66,7 @@ export default defineConfig({
           { text: "故事格式", link: "/zh/story-format" },
           { text: "Three-to-One 还原", link: "/zh/three-to-one-fidelity" },
           { text: "设计空间", link: "/zh/design-space" },
+          { text: "Layout 映射", link: "/zh/layout-mapping" },
           { text: "下一代语法", link: "/zh/syntax-vnext" },
           { text: "项目模型", link: "/zh/project-model" },
           {
@@ -80,6 +83,7 @@ export default defineConfig({
               { text: "故事格式", link: "/zh/story-format" },
               { text: "Three-to-One 还原", link: "/zh/three-to-one-fidelity" },
               { text: "设计空间", link: "/zh/design-space" },
+              { text: "Layout 映射", link: "/zh/layout-mapping" },
               { text: "下一代语法", link: "/zh/syntax-vnext" },
               { text: "项目模型", link: "/zh/project-model" },
             ],

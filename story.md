@@ -107,6 +107,82 @@ color: region
 The unit chart keeps row-level granularity and shows how a simple categorical palette can support a final section.
 
 ---
+id: chart-first-stage
+layout: vis-container
+chart: scatter
+data: housing
+x: year
+y: value
+color: region
+dek: "Vis-container treats the chart as the main stage and lets the copy live inside that same field."
+---
+
+## The chart can become the main container
+
+This section demos the new `vis-container` layout. Instead of placing text beside the visual, it lets the visual hold the stage and places the narrative as inset copy within it.
+
+---
+id: side-by-side-strip
+layout: side-by-side
+chart: bar
+data: housing
+x: region
+y: value
+dek: "Side-by-side arranges copy and chart along a single wide strip."
+---
+
+## The story can stretch sideways
+
+This section demos the new `side-by-side` layout. It is the runtime strip preset we use while keeping the thesis term `Horizontal` reserved for chapter-level flow direction.
+
+---
+id: chapter-flow-horizontal
+chapter:
+  flow: horizontal
+---
+
+## Flow direction can live at chapter level
+
+This section demos the new chapter-level flow syntax. `horizontal` is no longer a layout preset. It now lives under `chapter.flow`, so the thesis vocabulary stays semantic even before the runtime grows a full horizontal reading model.
+
+---
+id: chapter-flow-horizontal-second
+layout: scrolly-bottom
+chart: line
+data: housing
+x: year
+y: value
+series: region
+dek: "Horizontal chapters can still carry step-based visual updates."
+---
+
+## The next section joins the same horizontal chapter
+
+This panel belongs to the same horizontal chapter flow. It does not need to repeat `chapter.flow`, because the flow now carries forward until another section resets it.
+
+::step{focus="all"}
+All three series stay visible as the horizontal panel enters.
+::
+
+::step{focus="Inner"}
+The **Inner** line takes focus in the middle of the horizontal panel.
+::
+
+::step{focus="Outer,Middle"}
+The lower two lines become the focus before the chapter returns to vertical flow.
+::
+
+---
+id: chapter-flow-reset
+chapter:
+  flow: vertical
+---
+
+## The chapter can return to vertical flow
+
+This section resets the story back to vertical reading so the normal page rhythm resumes after the horizontal chapter sequence.
+
+---
 id: closing
 ---
 

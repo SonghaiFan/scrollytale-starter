@@ -318,11 +318,11 @@ export const BottomNav = defineComponent({
                           type: "button",
                           class: `app-mode-link is-settings-tool${isConfigOpen.value ? " is-active" : ""}`,
                           "aria-label": isConfigOpen.value
-                            ? "Hide Scrollama settings"
-                            : "Show Scrollama settings",
+                            ? "Hide scrolly settings"
+                            : "Show scrolly settings",
                           title: isConfigOpen.value
-                            ? "Hide Scrollama settings"
-                            : "Show Scrollama settings",
+                            ? "Hide scrolly settings"
+                            : "Show scrolly settings",
                           onClick: () => {
                             isConfigOpen.value = !isConfigOpen.value;
                           },

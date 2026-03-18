@@ -13,6 +13,12 @@
   max-width: 45ch;
 }
 
+.scrolly-intro {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
 .eyebrow-marker {
   display: inline-flex;
   align-items: center;
@@ -139,6 +145,27 @@
   font-size: clamp(1.25rem, 2vw, 2rem);
 }
 
+.scrollytale-debug-line {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 12;
+  height: 0;
+  border-top: 1px dashed var(--border);
+  pointer-events: none;
+}
+
+.scrollytale-debug-line-vertical {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 12;
+  width: 0;
+  border-left: 1px dashed var(--border);
+  pointer-events: none;
+}
+
 .sticky-figure {
   position: sticky;
   top: var(--scrollytale-figure-top, 1rem);
@@ -249,4 +276,141 @@
     gap: 28vh;
     padding-bottom: 8vh;
   }
+}
+
+.flow-group-horizontal .section-scrolly-bottom,
+.flow-group-horizontal .section-scrolly-top {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.flow-group-horizontal .section-scrolly-bottom {
+  grid-template-rows: var(--scrollytale-horizontal-figure-height, 70vh) var(--scrollytale-horizontal-text-height, 30vh);
+}
+
+.flow-group-horizontal .section-scrolly-top {
+  grid-template-rows: var(--scrollytale-horizontal-text-height, 30vh) var(--scrollytale-horizontal-figure-height, 70vh);
+}
+
+.flow-group-horizontal .section-scrolly-bottom .section-copy,
+.flow-group-horizontal .section-scrolly-top .section-copy {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .section-copy {
+  grid-row: 2;
+}
+
+.flow-group-horizontal .section-scrolly-top .section-copy {
+  grid-row: 1;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .section-figure,
+.flow-group-horizontal .section-scrolly-top .section-figure {
+  grid-column: 1;
+  min-height: var(--scrollytale-horizontal-figure-height, 70vh);
+}
+
+.flow-group-horizontal .section-scrolly-bottom .section-figure {
+  grid-row: 1;
+}
+
+.flow-group-horizontal .section-scrolly-top .section-figure {
+  grid-row: 2;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .sticky-figure,
+.flow-group-horizontal .section-scrolly-top .sticky-figure {
+  position: relative;
+  top: auto;
+  min-height: var(--scrollytale-horizontal-figure-height, 70vh);
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro {
+  gap: 1rem;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-strip,
+.flow-group-horizontal .section-scrolly-top .scrolly-strip {
+  display: flex;
+  gap: 1.25rem;
+  align-items: stretch;
+  padding: 1.25rem 2rem 2rem;
+  will-change: transform;
+  transition: transform 0.35s ease;
+}
+
+.flow-group-horizontal .section-scrolly-top .scrolly-strip {
+  padding: 2rem 2rem 1.25rem;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .steps,
+.flow-group-horizontal .section-scrolly-top .steps {
+  display: contents;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro-card,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro-card,
+.flow-group-horizontal .section-scrolly-bottom .step,
+.flow-group-horizontal .section-scrolly-top .step {
+  flex: 0 0 var(--scrollytale-horizontal-step-width, 18rem);
+  width: var(--scrollytale-horizontal-step-width, 18rem);
+  min-height: calc(var(--scrollytale-horizontal-text-height, 30vh) - 3.25rem);
+  margin: 0;
+  opacity: 0.24;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro-card,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro-card {
+  display: grid;
+  align-content: start;
+  padding: 0.25rem 0;
+  opacity: 0.24;
+  transition: opacity 0.8s ease;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro-card.is-active,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro-card.is-active {
+  opacity: 1;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .step:first-child,
+.flow-group-horizontal .section-scrolly-bottom .step:last-child,
+.flow-group-horizontal .section-scrolly-top .step:first-child,
+.flow-group-horizontal .section-scrolly-top .step:last-child {
+  margin: 0;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .step-content p,
+.flow-group-horizontal .section-scrolly-bottom .step-content li,
+.flow-group-horizontal .section-scrolly-top .step-content p,
+.flow-group-horizontal .section-scrolly-top .step-content li {
+  font-size: clamp(1rem, 1.2vw, 1.35rem);
+  line-height: 1.25;
+  padding: 0.25rem 0.25rem 0.25rem 0;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro-card h2,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro-card h2 {
+  font-size: clamp(2rem, 3vw, 3.4rem);
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  max-width: 8ch;
+  margin: 0;
+}
+
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro-card .dek,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro-card .dek,
+.flow-group-horizontal .section-scrolly-bottom .scrolly-intro-card .body-copy,
+.flow-group-horizontal .section-scrolly-top .scrolly-intro-card .body-copy {
+  font-size: 0.95rem;
 }

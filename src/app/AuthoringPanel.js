@@ -266,7 +266,7 @@ export const AuthoringPanel = defineComponent({
                         h(
                           "span",
                           { class: "authoring-section-meta" },
-                          `${section.layout} · ${section.vis.type}`
+                          `${section.layout} · ${section.vis.type} · flow:${section.chapter?.flow ?? "vertical"}`
                         ),
                       ]),
                     ]
