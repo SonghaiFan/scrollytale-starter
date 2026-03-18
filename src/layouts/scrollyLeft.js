@@ -1,12 +1,12 @@
-import { renderMarkerSpanForVisType } from "../app/navMarkers.js";
+import { getMarkerKindForVisType, renderMarkerSpanForVisType } from "../app/navMarkers.js";
 
 function renderStep(markdown, step, index, visType) {
   const content = typeof step === "string" ? step : step?.body ?? "";
+  const markerKind = getMarkerKindForVisType(visType);
 
   return `
-    <div class="step${index === 0 ? " is-active" : ""}" data-step-index="${index}">
+    <div class="step step-marker-${markerKind}${index === 0 ? " is-active" : ""}" data-step-index="${index}">
       <div class="step-inner">
-        ${renderMarkerSpanForVisType(visType, "step-marker")}
         <div class="step-content">${markdown.render(content)}</div>
       </div>
     </div>
