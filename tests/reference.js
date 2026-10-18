@@ -1,11 +1,17 @@
+import { chart as starterChart } from "../story.mdx";
 import { transition } from "visdelta";
 import {
   housingStates,
   barStates,
   pointStates,
   unitStates,
-} from "../src/story/housing.js";
+} from "./story-charts.js";
 const stories = {
+  starter: [
+    starterChart,
+    starterChart.highlight({ region: "North" }),
+    starterChart,
+  ],
   housing: housingStates,
   ranking: barStates,
   observations: pointStates,

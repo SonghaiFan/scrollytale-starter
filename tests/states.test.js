@@ -6,7 +6,7 @@ import {
   barStates,
   pointStates,
   unitStates,
-} from "../src/story/housing.js";
+} from "./story-charts.js";
 
 test("the shipped narratives change attention without silently filtering their records", () => {
   for (const states of [housingStates, barStates, pointStates, unitStates]) {

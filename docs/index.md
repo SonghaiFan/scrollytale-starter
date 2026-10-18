@@ -1,8 +1,24 @@
 # Scrollytale
 
-Scrollytale is an MDX application for scroll-driven VisDelta stories. Markdown carries the narrative; native JavaScript modules define chart states; React components own layouts and chart lifecycles.
+Write Markdown and put a native VisDelta chart on each Step.
 
-This is a greenfield design. The previous frontmatter/`::step` format and D3 chart renderers have been removed.
+```mdx
+import { bar } from 'visdelta'
+
+export const chart = bar([
+  { region: 'North', revenue: 18 },
+  { region: 'South', revenue: 12 },
+  { region: 'West', revenue: 9 },
+]).x('region').y('revenue')
+
+<Scrolly>
+  <Step chart={chart}>Compare everyone.</Step>
+  <Step chart={chart.highlight({ region: 'North' })}>Look north.</Step>
+  <Step chart={chart}>Return to everyone.</Step>
+</Scrolly>
+```
+
+Scrolly and Step are already available in story MDX. Each chart is complete and independent; returning to `chart` clears the highlight. No additional states list or technical id is required.
 
 ## Start
 
@@ -11,7 +27,7 @@ npm ci
 npm run dev
 ```
 
-Read at `/`. Write at `/authoring`. Edit `story.mdx` and import states from ordinary project modules. The shipped story uses fictional inline data and demonstrates Line, Bar, Point and Unit.
+Read at `/`, edit the starter at `/authoring`, or explore the optional four-chart story at `/examples/housing`.
 
 - [Authoring workflow](./authoring.md)
 - [Component API](./reference.md)

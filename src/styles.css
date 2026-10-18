@@ -11,6 +11,7 @@
   --vd-color-bg: var(--page);
   --vd-color-on-surface: var(--ink);
   --vd-color-muted: var(--muted);
+  --vd-color-mark-default: var(--ink);
   --vd-color-border: var(--line);
   --vd-color-outline: var(--muted);
   --vd-color-outline-variant: var(--line);
@@ -553,4 +554,21 @@ output span {
 
 .editor[hidden] {
   display: none;
+}
+
+/* Plain MDX is a complete entry point; editorial wrappers remain optional. */
+.mdx-document > h1 {
+  padding: 0 max(24px, 6%);
+  margin: 80px 0 24px;
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  max-width: 1150px;
+}
+.mdx-document > p {
+  max-width: 760px;
+  margin: 0 max(24px, 6%) 48px;
+  font-size: 18px;
+  color: var(--muted);
+}
+.loading-example {
+  padding: 48px;
 }

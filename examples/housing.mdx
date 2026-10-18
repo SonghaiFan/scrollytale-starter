@@ -1,0 +1,162 @@
+import { Hero, Chapter } from '../src/components/story.jsx'
+import { housingChart, barChart, pointChart, unitChart } from '../src/story/housing.js'
+
+
+<Hero eyebrow="Scrollytale / 01 · An illustrative story">
+
+# The space between
+
+Three regions. Four years. One persistent gap.
+A small story about seeing the same data from different places.
+
+</Hero>
+
+<Chapter id="context">
+
+## A shared scale, a different experience
+
+These **fictional housing index values** demonstrate a storytelling template.
+They are not market statistics. Each region has four observations, from 2019 to 2022.
+
+The text is Markdown. The charts are native VisDelta states.
+Scroll to move between them, or use the position control beneath each chart.
+
+<details>
+<summary>The author’s ingredients</summary>
+
+```js
+const all = line(rows)
+  .x('year')
+  .y('value', { domain: [0, 120] })
+  .breakdown('region')
+  .color('region')
+
+const highlighted = all.highlight({ region: 'Inner' })
+```
+
+</details>
+
+</Chapter>
+
+<Scrolly id="housing" title="The distance holds">
+  <Step chart={housingChart}>
+
+### Begin with the whole picture
+
+All three regions rise. A common vertical scale lets us compare the values without moving the goalposts.
+
+  </Step>
+  <Step chart={housingChart.highlight({ region: 'Inner' })}>
+
+### The inner region stays ahead
+
+Attention moves to **Inner**. The other observations stay in place; highlighting changes emphasis, not membership.
+
+  </Step>
+  <Step chart={housingChart.highlight({ region: ['Middle', 'Outer'] })}>
+
+### Look at the space below
+
+**Middle** and **Outer** rise together. The distance between them is smaller than the distance to Inner.
+
+  </Step>
+  <Step chart={housingChart}>
+
+### Return to the shared picture
+
+The emphasis clears. Scroll upward to retrace the same sequence in reverse.
+
+  </Step>
+</Scrolly>
+
+<Chapter id="perspective">
+
+## Change the question
+
+A line reveals movement. A bar compares a moment. Points return our attention to individual observations.
+Each section below owns its own sequence and lifecycle.
+
+</Chapter>
+
+<Scrolly id="ranking" title="One year, three regions" layout="right">
+  <Step chart={barChart}>
+
+### Compare 2022
+
+The final observation from each region, on the same scale.
+
+  </Step>
+  <Step chart={barChart.highlight({ region: 'Inner' })}>
+
+### Isolate the leader
+
+Inner records an illustrative value of 109, followed by Middle at 91 and Outer at 74.
+
+  </Step>
+  <Step chart={barChart}>
+
+### Keep the context
+
+All three remain visible together.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="observations" title="Every observation counts">
+  <Step chart={pointChart}>
+
+### Twelve individual records
+
+Each dot represents one region in one year.
+
+  </Step>
+  <Step chart={pointChart.highlight({ region: 'Outer' })}>
+
+### Follow the outer region
+
+Highlighting keeps the other records available for comparison.
+
+  </Step>
+  <Step chart={pointChart}>
+
+### See the complete set
+
+The original observations return to equal emphasis.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="households" title="A different unit of attention" layout="right">
+  <Step chart={unitChart}>
+
+### One circle, one fictional household
+
+This separate illustrative dataset contains 36 households, evenly divided among three regions.
+
+  </Step>
+  <Step chart={unitChart.highlight({ region: 'Middle' })}>
+
+### Twelve in the middle
+
+The Middle group receives emphasis. Every circle still represents one household.
+
+  </Step>
+  <Step chart={unitChart}>
+
+### Bring everyone back
+
+No records have been removed. Only our attention has changed.
+
+  </Step>
+</Scrolly>
+
+<Chapter id="closing">
+
+## Start with a story
+
+This advanced example lives in `examples/housing.mdx`. The simpler starter lives in `story.mdx`. Import your own data, then put a complete native chart on each Step.
+The application takes care of scroll progress, responsive layouts and chart cleanup.
+
+[Explore the MDX format](https://mdxjs.com/) · [Explore VisDelta](https://songhaifan.github.io/visdelta/)
+
+</Chapter>

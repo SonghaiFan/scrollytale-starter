@@ -1,163 +1,35 @@
-import { Hero, Chapter, Scrolly, Step } from './src/components/story.jsx'
-import { housingStates, barStates, pointStates, unitStates } from './src/story/housing.js'
+import { bar } from 'visdelta'
 
-export const meta = { title: 'The space between', description: 'An illustrative housing story, written in MDX and drawn by VisDelta.' }
+export const chart = bar([
+  { region: 'North', revenue: 18 },
+  { region: 'South', revenue: 12 },
+  { region: 'West', revenue: 9 },
+]).x('region').y('revenue')
 
-<Hero eyebrow="Scrollytale / 01 · An illustrative story">
+# Three regions, one picture
 
-# The space between
+Three fictional regions. Scroll to move attention between them.
 
-Three regions. Four years. One persistent gap.
-A small story about seeing the same data from different places.
+<Scrolly>
+  <Step chart={chart}>
 
-</Hero>
+## Start with everyone
 
-<Chapter id="context">
-
-## A shared scale, a different experience
-
-These **fictional housing index values** demonstrate a storytelling template.
-They are not market statistics. Each region has four observations, from 2019 to 2022.
-
-The text is Markdown. The charts are native VisDelta states.
-Scroll to move between them, or use the position control beneath each chart.
-
-<details>
-<summary>The author’s ingredients</summary>
-
-```js
-const all = line(rows)
-  .x('year')
-  .y('value', { domain: [0, 120] })
-  .breakdown('region')
-  .color('region')
-
-const states = [all, all.highlight({ region: 'Inner' }), all]
-```
-
-</details>
-
-</Chapter>
-
-<Scrolly id="housing" title="The distance holds">
-  <Step chart={housingStates[0]}>
-
-### Begin with the whole picture
-
-All three regions rise. A common vertical scale lets us compare the values without moving the goalposts.
+Compare all three regions on one chart.
 
   </Step>
-  <Step chart={housingStates[1]}>
+  <Step chart={chart.highlight({ region: 'North' })}>
 
-### The inner region stays ahead
+## Look north
 
-Attention moves to **Inner**. The other observations stay in place; highlighting changes emphasis, not membership.
-
-  </Step>
-  <Step chart={housingStates[2]}>
-
-### Look at the space below
-
-**Middle** and **Outer** rise together. The distance between them is smaller than the distance to Inner.
+North leads with 18. The other bars stay visible for context.
 
   </Step>
-  <Step chart={housingStates[3]}>
+  <Step chart={chart}>
 
-### Return to the shared picture
+## Return to everyone
 
-The emphasis clears. Scroll upward to retrace the same sequence in reverse.
+Use the original chart again to clear the highlight. Scroll back to retrace the story.
 
   </Step>
 </Scrolly>
-
-<Chapter id="perspective">
-
-## Change the question
-
-A line reveals movement. A bar compares a moment. Points return our attention to individual observations.
-Each section below owns its own sequence and lifecycle.
-
-</Chapter>
-
-<Scrolly id="ranking" title="One year, three regions" layout="right">
-  <Step chart={barStates[0]}>
-
-### Compare 2022
-
-The final observation from each region, on the same scale.
-
-  </Step>
-  <Step chart={barStates[1]}>
-
-### Isolate the leader
-
-Inner records an illustrative value of 109, followed by Middle at 91 and Outer at 74.
-
-  </Step>
-  <Step chart={barStates[2]}>
-
-### Keep the context
-
-All three remain visible together.
-
-  </Step>
-</Scrolly>
-
-<Scrolly id="observations" title="Every observation counts">
-  <Step chart={pointStates[0]}>
-
-### Twelve individual records
-
-Each dot represents one region in one year.
-
-  </Step>
-  <Step chart={pointStates[1]}>
-
-### Follow the outer region
-
-Highlighting keeps the other records available for comparison.
-
-  </Step>
-  <Step chart={pointStates[2]}>
-
-### See the complete set
-
-The original observations return to equal emphasis.
-
-  </Step>
-</Scrolly>
-
-<Scrolly id="households" title="A different unit of attention" layout="right">
-  <Step chart={unitStates[0]}>
-
-### One circle, one fictional household
-
-This separate illustrative dataset contains 36 households, evenly divided among three regions.
-
-  </Step>
-  <Step chart={unitStates[1]}>
-
-### Twelve in the middle
-
-The Middle group receives emphasis. Every circle still represents one household.
-
-  </Step>
-  <Step chart={unitStates[2]}>
-
-### Bring everyone back
-
-No records have been removed. Only our attention has changed.
-
-  </Step>
-</Scrolly>
-
-<Chapter id="closing">
-
-## Start with a story
-
-Edit `story.mdx`, import your own data and VisDelta states, and compose a narrative.
-The application takes care of scroll progress, responsive layouts and chart cleanup.
-
-[Explore the MDX format](https://mdxjs.com/) · [Explore VisDelta](https://songhaifan.github.io/visdelta/)
-
-</Chapter>

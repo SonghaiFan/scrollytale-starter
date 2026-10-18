@@ -1,7 +1,10 @@
 // Build an independent static-render consumer before the frozen browser run.
 import { build } from "vite";
+import mdx from "@mdx-js/rollup";
+import { storyMdxOptions } from "./mdx.js";
 await build({
   configFile: false,
+  plugins: [mdx(storyMdxOptions)],
   define: { "process.env.NODE_ENV": JSON.stringify("production") },
   build: {
     outDir: "dist/__verification",

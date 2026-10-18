@@ -1,5 +1,7 @@
 import React, {
   Component,
+  Suspense,
+  lazy,
   useCallback,
   useEffect,
   useRef,
@@ -8,6 +10,8 @@ import React, {
 import * as initialDocument from "../../story.mdx";
 import { Editor } from "./Editor.jsx";
 const Story = initialDocument.default;
+const HousingStory = lazy(() => import("../../examples/housing.mdx"));
+const advanced = location.pathname === "/examples/housing";
 
 class PreviewBoundary extends Component {
   state = { error: null };
@@ -54,11 +58,11 @@ export function App() {
   );
   const [theme, setTheme] = useState(readTheme);
   const [preview, setPreview] = useState({
-    Content: Story,
-    metadata: initialDocument.meta,
+    Content: advanced ? HousingStory : Story,
+    metadata: Reflect.get(initialDocument, "meta"),
     revision: 0,
   });
-  const previous = useRef(Story);
+  const previous = useRef(advanced ? HousingStory : Story);
   const [diskError, setDiskError] = useState("");
   const diskPending = useRef(false);
   const commit = useCallback((Content) => {
@@ -148,7 +152,7 @@ export function App() {
             <a
               className="mode-link"
               href={authoring ? "/" : "/authoring"}
-              onClick={toggleAuthoring}
+              onClick={advanced ? undefined : toggleAuthoring}
             >
               {authoring ? "Read story" : "Edit story"}
             </a>
@@ -175,16 +179,23 @@ export function App() {
               {diskError}
             </div>
           ) : null}
-          <PreviewBoundary key={preview.revision} previous={previous.current}>
-            <CommitPreview
-              Content={preview.Content}
-              metadata={preview.metadata}
-              onCommit={commit}
-            />
-          </PreviewBoundary>
+          <Suspense
+            fallback={<p className="loading-example">Loading example…</p>}
+          >
+            <PreviewBoundary key={preview.revision} previous={previous.current}>
+              <CommitPreview
+                Content={preview.Content}
+                metadata={preview.metadata}
+                onCommit={commit}
+              />
+            </PreviewBoundary>
+          </Suspense>
           <footer className="page-footer">
             <span>Scrollytale</span>
             <span>Written in MDX. Drawn by VisDelta.</span>
+            <a href={advanced ? "/" : "/examples/housing"}>
+              {advanced ? "Starter story" : "Four-chart example"}
+            </a>
             <a href="#story">Back to top ↑</a>
           </footer>
         </main>

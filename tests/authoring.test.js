@@ -18,7 +18,9 @@ test("the actual story compiles with the production MDX configuration", async ()
   );
   const result = String(await compile(source, storyMdxOptions));
   assert.match(result, /react\/jsx-runtime/);
-  assert.match(result, /housingStates/);
+  assert.match(result, /revenue/);
+  assert.match(result, /chart: chart/);
+  assert.doesNotMatch(source, /states=|id=|title=|import.*Scrolly/);
   assert.match(result, /Scrolly/);
   await assert.rejects(validateSource("<Scrolly>\n\nbroken"));
 });
@@ -78,4 +80,21 @@ test("story defaults use the official provider while docs stay independent and l
   );
   assert.match(overridden, /import \{Scrolly, Step\} from '\.\/custom\.jsx'/);
   assert.doesNotMatch(overridden, /const \{Scrolly, Step\}/);
+});
+
+test("the default starter is one native Bar with three independent Step charts", async () => {
+  const source = await fs.readFile(
+    new URL("../story.mdx", import.meta.url),
+    "utf8",
+  );
+  assert.equal((source.match(/<Step chart=/g) ?? []).length, 3);
+  assert.match(source, /bar\(\[/);
+  assert.match(source, /highlight\(\{ region: 'North' \}\)/);
+  assert.equal((source.match(/<Step chart=\{chart\}>/g) ?? []).length, 2);
+  const advanced = await fs.readFile(
+    new URL("../examples/housing.mdx", import.meta.url),
+    "utf8",
+  );
+  await compile(advanced, storyMdxOptions);
+  assert.doesNotMatch(advanced, /states=|States\[|const states/);
 });

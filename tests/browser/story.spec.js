@@ -9,7 +9,7 @@ test.beforeAll(async ({ request }) => {
 async function ready(page) {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("/examples/housing");
   await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
   await expect(
     page.locator(".chart-mount .vd-view > svg:not(.vd-legend-svg)"),
@@ -173,9 +173,9 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
   await page.goto("http://127.0.0.1:5183/authoring");
   const editor = page.getByRole("textbox", { name: "MDX source" });
   await expect(editor).toHaveValue(original);
-  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(1);
   const draft = original.replaceAll(
-    "The space between",
+    "Three regions, one picture",
     "The MDX editing loop",
   );
   try {
@@ -203,9 +203,7 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
       page.getByRole("heading", { name: "The MDX editing loop" }),
     ).toBeVisible();
     await expect(editor).toHaveValue(draft + "\n<Broken");
-    await editor.fill(
-      draft.replace("<Step chart={housingStates[0]}>", "<Step>"),
-    );
+    await editor.fill(draft.replace("<Step chart={chart}>", "<Step>"));
     await page.getByRole("button", { name: "Preview draft" }).click();
     await expect(page.locator(".preview-error")).toContainText(
       "Step 1 needs a native VisDelta chart declaration",
@@ -216,8 +214,8 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
     await editor.fill(draft);
     await page.getByRole("button", { name: "Preview draft" }).click();
     await expect(page.locator(".preview-error")).toHaveCount(0);
-    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
-    await expect(page.locator(".chart-mount")).toHaveCount(4);
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(1);
+    await expect(page.locator(".chart-mount")).toHaveCount(1);
     // A save must not erase changes made outside this editor.
     await fs.writeFile(authoringStory, original + "\n");
     await page.getByRole("button", { name: "Save file" }).click();
@@ -229,13 +227,13 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
     await fs.writeFile(authoringStory, original);
     await page.getByRole("button", { name: "Save file" }).click();
     await expect.poll(() => fs.readFile(authoringStory, "utf8")).toBe(draft);
-    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
-    await expect(page.locator(".chart-mount")).toHaveCount(4);
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(1);
+    await expect(page.locator(".chart-mount")).toHaveCount(1);
     await page.getByRole("link", { name: "Read story" }).click();
     await expect(page.locator(".editor")).toBeHidden();
     await page.getByRole("link", { name: "Edit story" }).click();
     await expect(editor).toHaveValue(draft);
-    await expect(page.locator(".chart-mount")).toHaveCount(4);
+    await expect(page.locator(".chart-mount")).toHaveCount(1);
   } finally {
     await fs.writeFile(authoringStory, original);
   }
@@ -249,12 +247,15 @@ test("external file changes refresh the reader while retaining a dirty editor dr
     await page.goto("http://127.0.0.1:5183/authoring");
     const editor = page.getByRole("textbox", { name: "MDX source" });
     await expect(editor).toHaveValue(original);
-    const draft = original.replaceAll("The space between", "My unsaved draft");
+    const draft = original.replaceAll(
+      "Three regions, one picture",
+      "My unsaved draft",
+    );
     await editor.fill(draft);
     await page.getByRole("link", { name: "Read story" }).click();
     await fs.writeFile(
       authoringStory,
-      original.replaceAll("The space between", "An external edit"),
+      original.replaceAll("Three regions, one picture", "An external edit"),
     );
     await expect(
       page.getByRole("heading", { name: "An external edit" }),
@@ -293,10 +294,12 @@ test("a stale preview response cannot replace newer text or its preview", async 
     await gate;
     await route.fulfill({ response });
   });
-  await editor.fill(source.replaceAll("The space between", "Stale preview"));
+  await editor.fill(
+    source.replaceAll("Three regions, one picture", "Stale preview"),
+  );
   await page.getByRole("button", { name: "Preview draft" }).click();
   await requested;
-  const latest = source.replaceAll("The space between", "Newer text");
+  const latest = source.replaceAll("Three regions, one picture", "Newer text");
   await editor.fill(latest);
   release();
   await expect(
@@ -304,7 +307,7 @@ test("a stale preview response cannot replace newer text or its preview", async 
   ).toBeEnabled();
   await expect(editor).toHaveValue(latest);
   await expect(
-    page.getByRole("heading", { name: "The space between" }),
+    page.getByRole("heading", { name: "Three regions, one picture" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Stale preview" }),
@@ -462,3 +465,60 @@ export const chart = bar([{ region: 'North', value: 18 }, { region: 'South', val
   await expect(page.locator(".preview-error")).toHaveCount(0);
   await expect(page.locator(".chart-mount")).toHaveCount(0);
 });
+
+for (const width of [1440, 390]) {
+  test(`default starter works without component imports or technical props at ${width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await page.goto("/");
+    await expect(
+      page.getByRole("heading", { name: "Three regions, one picture" }),
+    ).toBeVisible();
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(1);
+    await expect(page.locator(".story-step")).toHaveCount(3);
+    const id = await page.locator(".scrolly").getAttribute("id");
+    for (const position of [0, 1, 2, 1, 0]) {
+      await seek(page, id, position);
+      const actual = await frame(page, id);
+      const expected = await page
+        .locator(".chart-host")
+        .evaluate(async (host, index) => {
+          const { staticFrame } = await import("/__verification/reference.js");
+          const { width, height } = host.getBoundingClientRect();
+          return staticFrame("starter", index, width, height);
+        }, position);
+      expect(actual).toEqual(expected);
+    }
+    await seek(page, id, 1);
+    await expect(
+      page.locator('.story-step[aria-current="step"]'),
+    ).toContainText("Look north");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({ path: info.outputPath(`starter-${width}.png`) });
+    await page.getByRole("button", { name: "Toggle theme" }).click();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await expect
+      .poll(() =>
+        page
+          .locator(".vd-bar")
+          .first()
+          .evaluate((mark) => getComputedStyle(mark).fill),
+      )
+      .toBe(
+        await page
+          .locator("html")
+          .evaluate((root) => getComputedStyle(root).color),
+      );
+    await page.screenshot({
+      path: info.outputPath(`starter-dark-${width}.png`),
+    });
+    expect(errors).toEqual([]);
+  });
+}

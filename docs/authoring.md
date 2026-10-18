@@ -2,7 +2,7 @@
 
 ## Document and data
 
-Write `story.mdx` as a real MDX module. Import narrative components and native VisDelta state modules. The sample data lives in `src/story/housing.js`; use inline rows, imported modules or data sources supported by VisDelta. There is no separate source registry.
+Write `story.mdx` as a real MDX module. The default file contains three inline data rows, one native Bar declaration and three Steps. Scrolly and Step are provided by default. Put a complete chart on each Step; inline expressions such as `chart.highlight(...)` work without useMemo. Use imported data or chart modules when a story grows. The separate advanced example lives in `examples/housing.mdx`, backed by `src/story/housing.js`. There is no separate source registry.
 
 MDX is compiled with `@mdx-js/rollup` and the standard `remark-gfm` plugin for tables and other GFM syntax. `tooling/mdx.js` defines the shared base configuration plus the story provider defaults. Production, editor preview, save validation and compilation tests use the same story configuration; docs use the base without narrative runtime imports. The runtime uses React's automatic JSX runtime. An optional `export const meta = { title: 'My story' }` sets the browser document title after a successful render.
 
@@ -21,4 +21,4 @@ Saving validates MDX syntax, not every possible runtime expression or remote dat
 
 ## Production
 
-`npm run build` emits a static reader to `dist`. It includes the document and imported state modules; it contains no authoring server. Preview/save are intentionally unavailable in production. Deploy at the site root; subpath hosting is not currently configured.
+`npm run build` emits a static reader to `dist`. It includes the document and imported state modules; it contains no authoring server. Preview/save are intentionally unavailable in production. Deploy at the site root; subpath hosting is not currently configured. The `/examples/housing` reader route requires the host to serve `index.html` for that path.

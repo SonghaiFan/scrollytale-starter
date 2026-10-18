@@ -1,8 +1,8 @@
 # Scrollytale
 
-A greenfield MDX application for scroll-driven VisDelta stories. Write narrative in Markdown, import native chart states, and compose them with a small React component API. There is no YAML chart schema, legacy DSL or separate animation engine.
+Write Markdown. Put a native VisDelta `chart` on each `Step`. Scroll through the story.
 
-## Run
+## Start
 
 Requires Node 20.19+ or 22.12+.
 
@@ -11,10 +11,9 @@ npm ci
 npm run dev
 ```
 
-- Read: http://localhost:5173/
-- Write: http://localhost:5173/authoring
+Open http://localhost:5173/ to read, or http://localhost:5173/authoring to edit and preview `story.mdx`.
 
-`story.mdx` is the document. `src/story/housing.js` supplies the demo's native VisDelta states and fictional inline data. Replace those modules with your own data and states.
+The complete starter is a small Bar story:
 
 ```mdx
 import { bar } from 'visdelta'
@@ -25,35 +24,45 @@ export const chart = bar([
   { region: 'West', revenue: 9 },
 ]).x('region').y('revenue')
 
-# One picture, three steps
+# Three regions, one picture
 
 <Scrolly>
-  <Step chart={chart}>Start with every region.</Step>
+  <Step chart={chart}>Compare everyone.</Step>
   <Step chart={chart.highlight({ region: 'North' })}>Look north.</Step>
   <Step chart={chart}>Return to everyone.</Step>
 </Scrolly>
 ```
 
-`Scrolly` and `Step` are supplied automatically in story MDX. Every Step has a complete native `chart` declaration; steps do not inherit from one another. No states array, mandatory id or component import is needed. Ordinary MDX imports can override the defaults. A single Step renders a static chart. `layout` and `hold` are optional advanced controls.
+`Scrolly` and `Step` are supplied automatically. `chart` is a complete native VisDelta declaration. Each Step is independent; using `chart` again restores the original picture. Markdown, JSX, imports and expressions are standard MDX. Add blank lines around Markdown headings and paragraphs inside JSX.
 
-## Local authoring
+To make it yours, change the rows, choose `.x(...)` and `.y(...)`, then rewrite the three steps. No states array, mandatory id, component import or second chart language is needed. `layout` and `hold` are optional advanced controls.
 
-The editor compiles native MDX with the same configuration as production. It preserves drafts across mode changes and restores unsaved text from tab session storage when available. External MDX file edits update the development reader without erasing the editor draft. Preview imports are resolved relative to the project root. Syntax/import failures keep the last preview and preserve the draft; render failures show the previous document with an error. Preview does not save. Save validates MDX syntax and writes the whole `story.mdx` atomically after a content-hash conflict check. Reload disk is explicit and confirms replacement of unsaved text.
+## Edit
 
-This is a local, trusted-code authoring workflow. MDX imports and expressions execute project code. It is not a hosted editor for untrusted documents. Authoring endpoints and UI are development-only. Production is a static reader.
+**Preview draft** compiles without saving. **Save file** validates MDX syntax and writes the whole file after a disk-version check. Syntax/import errors keep the preview; render errors show the previous working document. Drafts survive reading/authoring navigation and restore from tab session storage when available. External `story.mdx` edits update the development reader without erasing a draft.
 
-## Verify and publish
+This is trusted local code authoring. MDX imports and expressions execute project code. The editor is development-only; production is a static reader. See [authoring](docs/authoring.md) for conflicts, reload and runtime errors.
+
+## Go further
+
+Open http://localhost:5173/examples/housing for the optional four-chart story, authored in [examples/housing.mdx](examples/housing.mdx) with native declarations from [src/story/housing.js](src/story/housing.js). It demonstrates Line, Bar, Point and Unit, editorial sections and left/right layouts. It is separate from the default starter and editor. Production hosting must serve the reader's index for this example route.
+
+- [Component API](docs/reference.md)
+- [Architecture and current boundaries](docs/architecture.md)
+- `npm run docs:dev` for the MDX documentation site
+
+VisDelta owns chart declarations, rendering and animation. Scrollytale owns MDX, narrative components, scroll progress and the editing workflow. No React, MDX or scroll API has been added to VisDelta.
+
+## Verify
 
 ```sh
 npm test
 npm run build
 npm run test:browser
-npm run docs:build
-npm run preview
 ```
 
-Browser tests first build an independent static-render consumer under `dist/__verification`, then use the frozen `dist` production output for reader checks and the development server for editor checks. They run serially. Chrome is discovered at its standard macOS path; set `CHROME_PATH` elsewhere, or install Playwright Chromium and leave the variable unset. Build before running browser tests; do not rebuild while they run. The verification-only bundle can be deleted before deployment; `npm run build` always emits a clean reader.
+Browser tests build an independent static-render consumer and the docs, then run serially against frozen outputs. Editor tests use a disposable project on port 5183, so saves and external-edit checks leave your working `story.mdx` and port 5173 untouched. Tests retain the four-chart regression coverage alongside the simple default story. Chrome is discovered at its standard macOS path; set `CHROME_PATH` elsewhere, or install Playwright Chromium. Do not rebuild during a browser run.
 
-The bundled demo covers Line, Bar, Point and Unit with genuine VisDelta sequences. Tests cover progress boundaries, reverse/jump/resize, pending initialization, cleanup and multiple instances; build success alone does not establish chart behavior.
+`npm run build` emits a clean reader to `dist`; browser-only helpers under `dist/__verification` are not part of a normal production build. `npm run docs:build` builds the separate documentation entry to `docs/dist`.
 
-See [component API](docs/reference.md), [authoring](docs/authoring.md), and [architecture and limitations](docs/architecture.md). VisDelta is pinned to the repository-vendored, unpublished `0.4.3-dev.scrollytale.1` integration package, which fixes a reproduced sequence font-scope issue. See [snapshot provenance](vendor/README.md) for its source commit and hash. No source aliases or temporary-path dependencies are used.
+VisDelta is pinned to the repository-vendored, unpublished `0.4.3-dev.scrollytale.1` integration package. [Snapshot provenance](vendor/README.md) records its source commit and hash. `npm ci` uses the installed package without a sibling checkout or source alias.
