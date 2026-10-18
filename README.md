@@ -62,4 +62,4 @@ Browser tests first build an independent static-render consumer under `dist/__ve
 
 The bundled demo covers Line, Bar, Point and Unit with genuine VisDelta sequences. Tests cover progress boundaries, reverse/jump/resize, pending initialization, cleanup and multiple instances; build success alone does not establish chart behavior.
 
-See [component API](docs/reference.md), [authoring](docs/authoring.md), and [architecture and limitations](docs/architecture.md). VisDelta is pinned to the installed npm package `0.4.2`; no source aliases are used.
+See [component API](docs/reference.md), [authoring](docs/authoring.md), and [architecture and limitations](docs/architecture.md). VisDelta is pinned to the repository-vendored, unpublished `0.4.3-dev.scrollytale.1` integration package, which fixes a reproduced sequence font-scope issue. See [snapshot provenance](vendor/README.md) for its source commit and hash. No source aliases or temporary-path dependencies are used.

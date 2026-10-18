@@ -16,7 +16,7 @@
   "dependencies": {
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "visdelta": "0.4.2"
+    "visdelta": "file:vendor/visdelta-0.4.3-dev.scrollytale.1.tgz"
   },
   "devDependencies": {
     "@mdx-js/mdx": "3.1.1",

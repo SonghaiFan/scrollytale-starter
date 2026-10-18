@@ -1,0 +1,11 @@
+{
+  "file": "visdelta-0.4.3-dev.scrollytale.1.tgz",
+  "version": "0.4.3-dev.scrollytale.1",
+  "sha256": "d90654f2c1f7577721dd2a42e44d482753bd98ab7922a626d1dd9763e3fc9739",
+  "sourceRepository": "https://github.com/SonghaiFan/visdelta",
+  "sourceCommit": "a99853a7a89ee6dd56926faea4384720b9cc6d3b",
+  "contentsSha256": "42c1e0e97d63ade4d84496b09632cfc98651ee4ca5e09b84650c3b6395791ad7",
+  "baseVersion": "0.4.2",
+  "published": false,
+  "private": true
+}

@@ -9,7 +9,7 @@
 
 The reader and documentation both use the shared MDX configuration. The docs are a separate React entry, built with `npm run docs:build` to `docs/dist`; its base path is `/scrollytale-starter/`.
 
-The reader imports the installed `visdelta@0.4.2` package and its required stylesheet. It does not import VisDelta source or maintain another animation engine.
+The reader imports the installed, unpublished `visdelta@0.4.3-dev.scrollytale.1` snapshot and its required stylesheet. The tarball is committed under `vendor/`, with source commit and SHA-256 recorded in `vendor/visdelta-snapshot.json`; `npm ci` reproduces the installation. It fixes runtime chart-root scope during sequence activation. It does not import VisDelta source or maintain another animation engine.
 
 ## Chart lifecycle
 
