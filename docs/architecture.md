@@ -7,7 +7,7 @@
 - Scrollytale: measured step anchors, hold policy, responsive narrative layouts and one scroll progress owner.
 - VisDelta: immutable chart state, identity, transition planning, geometry, axes and frame evaluation.
 
-The reader and documentation both use the shared MDX configuration. The docs are a separate React entry, built with `npm run docs:build` to `docs/dist`; its base path is `/scrollytale-starter/`.
+The reader and documentation share the base MDX configuration. Only the story configuration adds MDX provider defaults for Scrolly and Step; the documentation entry does not load that runtime. The docs are a separate React entry, built with `npm run docs:build` to `docs/dist`; its base path is `/scrollytale-starter/`.
 
 The reader imports the installed, unpublished `visdelta@0.4.3-dev.scrollytale.1` snapshot and its required stylesheet. The tarball is committed under `vendor/`, with source commit and SHA-256 recorded in `vendor/visdelta-snapshot.json`; `npm ci` reproduces the installation. It fixes runtime chart-root scope during sequence activation. It does not import VisDelta source or maintain another animation engine.
 
@@ -33,7 +33,7 @@ Node tests cover real MDX compilation, syntax/conflict file preservation, author
 - Trusted local authoring only. MDX is executable project code, not sanitized user content.
 - Window scrolling only. A content-height cross-origin iframe needs a separate host integration; the reader displays a notice rather than claiming to observe parent scroll.
 - `left` and `right` scrolly layouts plus editorial Hero/Chapter. Overlay, nested scrolling and automatic chart-type transitions are not provided.
-- Imported states must be stable and adjacent states must be supported by VisDelta. Chart initialization errors are visible in their section.
-- One direct Step per state; arbitrary wrappers around Step are unsupported.
+- Step charts are immutable native declarations; inline expressions are supported without useMemo. Adjacent declarations must be supported by VisDelta. Chart initialization errors are visible in their section.
+- One complete chart per direct Step; arbitrary wrappers around Step are unsupported.
 - The application does not recreate old square scatter/unit marks, implicit aggregation, index-derived attention or silent row truncation.
 - Draft text is kept in memory and restored from tab session storage when available. The editor installs a before-unload warning when dirty. Browser storage is optional, so saving remains the durable boundary.

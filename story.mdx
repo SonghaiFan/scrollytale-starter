@@ -39,29 +39,29 @@ const states = [all, all.highlight({ region: 'Inner' }), all]
 
 </Chapter>
 
-<Scrolly id="housing" title="The distance holds" states={housingStates}>
-  <Step>
+<Scrolly id="housing" title="The distance holds">
+  <Step chart={housingStates[0]}>
 
 ### Begin with the whole picture
 
 All three regions rise. A common vertical scale lets us compare the values without moving the goalposts.
 
   </Step>
-  <Step>
+  <Step chart={housingStates[1]}>
 
 ### The inner region stays ahead
 
 Attention moves to **Inner**. The other observations stay in place; highlighting changes emphasis, not membership.
 
   </Step>
-  <Step>
+  <Step chart={housingStates[2]}>
 
 ### Look at the space below
 
 **Middle** and **Outer** rise together. The distance between them is smaller than the distance to Inner.
 
   </Step>
-  <Step>
+  <Step chart={housingStates[3]}>
 
 ### Return to the shared picture
 
@@ -79,22 +79,22 @@ Each section below owns its own sequence and lifecycle.
 
 </Chapter>
 
-<Scrolly id="ranking" title="One year, three regions" states={barStates} layout="right">
-  <Step>
+<Scrolly id="ranking" title="One year, three regions" layout="right">
+  <Step chart={barStates[0]}>
 
 ### Compare 2022
 
 The final observation from each region, on the same scale.
 
   </Step>
-  <Step>
+  <Step chart={barStates[1]}>
 
 ### Isolate the leader
 
 Inner records an illustrative value of 109, followed by Middle at 91 and Outer at 74.
 
   </Step>
-  <Step>
+  <Step chart={barStates[2]}>
 
 ### Keep the context
 
@@ -103,22 +103,22 @@ All three remain visible together.
   </Step>
 </Scrolly>
 
-<Scrolly id="observations" title="Every observation counts" states={pointStates}>
-  <Step>
+<Scrolly id="observations" title="Every observation counts">
+  <Step chart={pointStates[0]}>
 
 ### Twelve individual records
 
 Each dot represents one region in one year.
 
   </Step>
-  <Step>
+  <Step chart={pointStates[1]}>
 
 ### Follow the outer region
 
 Highlighting keeps the other records available for comparison.
 
   </Step>
-  <Step>
+  <Step chart={pointStates[2]}>
 
 ### See the complete set
 
@@ -127,22 +127,22 @@ The original observations return to equal emphasis.
   </Step>
 </Scrolly>
 
-<Scrolly id="households" title="A different unit of attention" states={unitStates} layout="right">
-  <Step>
+<Scrolly id="households" title="A different unit of attention" layout="right">
+  <Step chart={unitStates[0]}>
 
 ### One circle, one fictional household
 
 This separate illustrative dataset contains 36 households, evenly divided among three regions.
 
   </Step>
-  <Step>
+  <Step chart={unitStates[1]}>
 
 ### Twelve in the middle
 
 The Middle group receives emphasis. Every circle still represents one household.
 
   </Step>
-  <Step>
+  <Step chart={unitStates[2]}>
 
 ### Bring everyone back
 

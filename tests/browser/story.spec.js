@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
 import fs from "node:fs/promises";
+let authoringStory;
+test.beforeAll(async ({ request }) => {
+  const response = await request.get("http://127.0.0.1:5183/__test__/location");
+  authoringStory = (await response.json()).storyPath;
+});
 
 async function ready(page) {
   const errors = [];
@@ -164,8 +169,8 @@ test("reduced motion snaps scroll to complete authored states", async ({
 test("MDX editor: compile/import/render failures, recovery, save conflict and cleanup", async ({
   page,
 }) => {
-  const original = await fs.readFile("story.mdx", "utf8");
-  await page.goto("http://127.0.0.1:5173/authoring");
+  const original = await fs.readFile(authoringStory, "utf8");
+  await page.goto("http://127.0.0.1:5183/authoring");
   const editor = page.getByRole("textbox", { name: "MDX source" });
   await expect(editor).toHaveValue(original);
   await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
@@ -179,7 +184,7 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
     await expect(
       page.getByRole("heading", { name: "The MDX editing loop" }),
     ).toBeVisible();
-    expect(await fs.readFile("story.mdx", "utf8")).toEqual(original);
+    expect(await fs.readFile(authoringStory, "utf8")).toEqual(original);
     await page.getByRole("link", { name: "Read story" }).click();
     await page.getByRole("link", { name: "Edit story" }).click();
     await expect(editor).toHaveValue(draft);
@@ -198,10 +203,12 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
       page.getByRole("heading", { name: "The MDX editing loop" }),
     ).toBeVisible();
     await expect(editor).toHaveValue(draft + "\n<Broken");
-    await editor.fill(draft.replace("states={housingStates}", "states={[]}"));
+    await editor.fill(
+      draft.replace("<Step chart={housingStates[0]}>", "<Step>"),
+    );
     await page.getByRole("button", { name: "Preview draft" }).click();
     await expect(page.locator(".preview-error")).toContainText(
-      "nonempty array",
+      "Step 1 needs a native VisDelta chart declaration",
     );
     await expect(
       page.getByRole("heading", { name: "The MDX editing loop" }),
@@ -212,16 +219,16 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
     await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
     await expect(page.locator(".chart-mount")).toHaveCount(4);
     // A save must not erase changes made outside this editor.
-    await fs.writeFile("story.mdx", original + "\n");
+    await fs.writeFile(authoringStory, original + "\n");
     await page.getByRole("button", { name: "Save file" }).click();
     await expect(page.locator(".editor [role=alert]")).toContainText(
       "changed on disk",
     );
     await expect(editor).toHaveValue(draft);
-    expect(await fs.readFile("story.mdx", "utf8")).toEqual(original + "\n");
-    await fs.writeFile("story.mdx", original);
+    expect(await fs.readFile(authoringStory, "utf8")).toEqual(original + "\n");
+    await fs.writeFile(authoringStory, original);
     await page.getByRole("button", { name: "Save file" }).click();
-    await expect.poll(() => fs.readFile("story.mdx", "utf8")).toBe(draft);
+    await expect.poll(() => fs.readFile(authoringStory, "utf8")).toBe(draft);
     await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(4);
     await expect(page.locator(".chart-mount")).toHaveCount(4);
     await page.getByRole("link", { name: "Read story" }).click();
@@ -230,23 +237,23 @@ test("MDX editor: compile/import/render failures, recovery, save conflict and cl
     await expect(editor).toHaveValue(draft);
     await expect(page.locator(".chart-mount")).toHaveCount(4);
   } finally {
-    await fs.writeFile("story.mdx", original);
+    await fs.writeFile(authoringStory, original);
   }
 });
 
 test("external file changes refresh the reader while retaining a dirty editor draft", async ({
   page,
 }) => {
-  const original = await fs.readFile("story.mdx", "utf8");
+  const original = await fs.readFile(authoringStory, "utf8");
   try {
-    await page.goto("http://127.0.0.1:5173/authoring");
+    await page.goto("http://127.0.0.1:5183/authoring");
     const editor = page.getByRole("textbox", { name: "MDX source" });
     await expect(editor).toHaveValue(original);
     const draft = original.replaceAll("The space between", "My unsaved draft");
     await editor.fill(draft);
     await page.getByRole("link", { name: "Read story" }).click();
     await fs.writeFile(
-      "story.mdx",
+      authoringStory,
       original.replaceAll("The space between", "An external edit"),
     );
     await expect(
@@ -261,16 +268,16 @@ test("external file changes refresh the reader while retaining a dirty editor dr
     await page.goForward();
     await expect(editor).toHaveValue(draft);
   } finally {
-    await fs.writeFile("story.mdx", original);
+    await fs.writeFile(authoringStory, original);
   }
 });
 
 test("a stale preview response cannot replace newer text or its preview", async ({
   page,
 }) => {
-  await page.goto("http://127.0.0.1:5173/authoring");
+  await page.goto("http://127.0.0.1:5183/authoring");
   const editor = page.getByRole("textbox", { name: "MDX source" });
-  const source = await fs.readFile("story.mdx", "utf8");
+  const source = await fs.readFile(authoringStory, "utf8");
   await expect(editor).toHaveValue(source);
   let release;
   const gate = new Promise((resolve) => {
@@ -345,3 +352,113 @@ for (const width of [1440, 390]) {
     ).toBeVisible();
   });
 }
+
+test("Step chart declarations settle through parent renders, theme and real chart changes", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.__sessions = { created: 0, destroyed: 0 };
+    const append = Element.prototype.append;
+    Element.prototype.append = function (...nodes) {
+      for (const node of nodes)
+        if (node instanceof Element && node.classList.contains("chart-mount"))
+          window.__sessions.created++;
+      return append.apply(this, nodes);
+    };
+    const remove = Element.prototype.remove;
+    Element.prototype.remove = function () {
+      if (this.classList.contains("chart-mount")) window.__sessions.destroyed++;
+      return remove.call(this);
+    };
+  });
+  await page.goto("/__verification/lifecycle.html");
+  await page.evaluate(async () => {
+    window.__disposeHarness = (
+      await import("/__verification/reference.js")
+    ).mountLifecycleHarness();
+  });
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+  const ids = await page
+    .locator(".scrolly")
+    .evaluateAll((nodes) => nodes.map((node) => node.id));
+  expect(new Set(ids).size).toBe(2);
+  expect(ids.every(Boolean)).toBe(true);
+  const initial = await page.evaluate(() => ({ ...window.__sessions }));
+  for (let i = 0; i < 8; i++)
+    await page.getByRole("button", { name: "Render parent" }).click();
+  await expect(page.getByText("Revision 8")).toBeVisible();
+  expect(await page.evaluate(() => window.__sessions)).toEqual(initial);
+  expect(
+    await page
+      .locator(".scrolly")
+      .evaluateAll((nodes) => nodes.map((node) => node.id)),
+  ).toEqual(ids);
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "dark";
+    window.dispatchEvent(new Event("scrollytale:theme"));
+  });
+  expect(await page.evaluate(() => window.__sessions)).toEqual(initial);
+  await seek(page, ids[0], 1);
+  expect(await page.evaluate(() => window.__sessions)).toEqual(initial);
+  for (const name of ["Change data", "Change field"]) {
+    const before = await page.evaluate(() => ({ ...window.__sessions }));
+    await page.getByRole("button", { name }).click();
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+    await expect
+      .poll(() => page.evaluate(() => window.__sessions.created))
+      .toBe(before.created + 2);
+    expect(await page.evaluate(() => window.__sessions.destroyed)).toBe(
+      before.destroyed + 2,
+    );
+  }
+  const settled = await page.evaluate(() => ({ ...window.__sessions }));
+  await page.waitForTimeout(400);
+  expect(await page.evaluate(() => window.__sessions)).toEqual(settled);
+  await page.evaluate(() => window.__disposeHarness());
+  await expect(page.locator(".chart-mount")).toHaveCount(0);
+  expect(await page.evaluate(() => window.__sessions.created)).toEqual(
+    await page.evaluate(() => window.__sessions.destroyed),
+  );
+});
+
+test("MDX defaults and explicit same-name imports render without competing syntax", async ({
+  page,
+}) => {
+  await page.goto("http://127.0.0.1:5183/authoring");
+  const editor = page.getByRole("textbox", { name: "MDX source" });
+  await expect(editor).toBeEnabled();
+  const source = `import { bar } from 'visdelta'
+export const chart = bar([{ region: 'North', value: 18 }, { region: 'South', value: 12 }]).x('region').y('value')
+
+<Scrolly>
+  <Step chart={chart}>All regions.</Step>
+  <Step chart={chart.highlight({ region: 'North' })}>North.</Step>
+  <Step chart={chart}>All again.</Step>
+</Scrolly>`;
+  await editor.fill(source);
+  await page.getByRole("button", { name: "Preview draft" }).click();
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(1);
+  await expect(page.locator(".story-step")).toHaveCount(3);
+  await expect(
+    page.getByRole("region", { name: "Chart story", exact: true }),
+  ).toBeVisible();
+  await editor.fill(
+    source.replace("chart={chart.highlight({ region: 'North' })}", ""),
+  );
+  await page.getByRole("button", { name: "Preview draft" }).click();
+  await expect(page.locator(".preview-error")).toContainText(
+    "Step 2 needs a native VisDelta chart declaration",
+  );
+  await editor.fill(source.replace("<Scrolly>", "<Scrolly states={[]}>"));
+  await page.getByRole("button", { name: "Preview draft" }).click();
+  await expect(page.locator(".preview-error")).toContainText(
+    "Scrolly no longer accepts states",
+  );
+  await editor.fill(
+    "import { Scrolly, Step } from './tests/custom-components.jsx'\n\n<Scrolly><Step>My own components</Step></Scrolly>",
+  );
+  await page.getByRole("button", { name: "Preview draft" }).click();
+  await expect(page.getByTestId("custom-step")).toHaveText("My own components");
+  await expect(page.locator(".preview-error")).toHaveCount(0);
+  await expect(page.locator(".chart-mount")).toHaveCount(0);
+});

@@ -4,7 +4,7 @@
 
 Write `story.mdx` as a real MDX module. Import narrative components and native VisDelta state modules. The sample data lives in `src/story/housing.js`; use inline rows, imported modules or data sources supported by VisDelta. There is no separate source registry.
 
-MDX is compiled with `@mdx-js/rollup` and the standard `remark-gfm` plugin for tables and other GFM syntax. `tooling/mdx.js` is the shared configuration for Vite, editor validation, save validation and compilation tests. The runtime uses React's automatic JSX runtime. An optional `export const meta = { title: 'My story' }` sets the browser document title after a successful render.
+MDX is compiled with `@mdx-js/rollup` and the standard `remark-gfm` plugin for tables and other GFM syntax. `tooling/mdx.js` defines the shared base configuration plus the story provider defaults. Production, editor preview, save validation and compilation tests use the same story configuration; docs use the base without narrative runtime imports. The runtime uses React's automatic JSX runtime. An optional `export const meta = { title: 'My story' }` sets the browser document title after a successful render.
 
 ## Editor loop
 

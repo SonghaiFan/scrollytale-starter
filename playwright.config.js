@@ -16,15 +16,19 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: [
-    { command: "npm run docs:preview -- --port 4174 --strictPort", url: "http://127.0.0.1:4174/scrollytale-starter/", reuseExistingServer: !process.env.CI },
+    {
+      command: "npm run docs:preview -- --port 4174 --strictPort",
+      url: "http://127.0.0.1:4174/scrollytale-starter/",
+      reuseExistingServer: !process.env.CI,
+    },
     {
       command: "npm run preview -- --port 4173 --strictPort",
       url: "http://127.0.0.1:4173",
       reuseExistingServer: !process.env.CI,
     },
     {
-      command: "npm run dev -- --port 5173 --strictPort",
-      url: "http://127.0.0.1:5173",
+      command: "node tooling/serve-authoring-test.js",
+      url: "http://127.0.0.1:5183",
       reuseExistingServer: !process.env.CI,
     },
   ],

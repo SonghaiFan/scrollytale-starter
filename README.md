@@ -17,30 +17,24 @@ npm run dev
 `story.mdx` is the document. `src/story/housing.js` supplies the demo's native VisDelta states and fictional inline data. Replace those modules with your own data and states.
 
 ```mdx
-import { Scrolly, Step } from './src/components/story.jsx'
-import { states } from './src/story/my-story.js'
+import { bar } from 'visdelta'
 
-# A story worth following
+export const chart = bar([
+  { region: 'North', revenue: 18 },
+  { region: 'South', revenue: 12 },
+  { region: 'West', revenue: 9 },
+]).x('region').y('revenue')
 
-<Scrolly id="example" title="A changing picture" states={states}>
-  <Step>
+# One picture, three steps
 
-## The first state
-
-Ordinary Markdown explains the chart.
-
-  </Step>
-  <Step>
-
-## The second state
-
-Scroll to see the change.
-
-  </Step>
+<Scrolly>
+  <Step chart={chart}>Start with every region.</Step>
+  <Step chart={chart.highlight({ region: 'North' })}>Look north.</Step>
+  <Step chart={chart}>Return to everyone.</Step>
 </Scrolly>
 ```
 
-Use exactly one direct `Step` per state. State order is explicit in the `states` array. Reuse a state to return to it. A one-state section renders a held static chart. Use `Hero` and `Chapter` for editorial sections; `Scrolly` supports left/right chart placement and stacks on narrow containers.
+`Scrolly` and `Step` are supplied automatically in story MDX. Every Step has a complete native `chart` declaration; steps do not inherit from one another. No states array, mandatory id or component import is needed. Ordinary MDX imports can override the defaults. A single Step renders a static chart. `layout` and `hold` are optional advanced controls.
 
 ## Local authoring
 

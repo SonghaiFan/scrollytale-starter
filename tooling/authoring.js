@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { compile } from "@mdx-js/mdx";
-import { mdxOptions } from "./mdx.js";
+import { storyMdxOptions } from "./mdx.js";
 
 export const versionOf = (source) =>
   createHash("sha256").update(source).digest("hex");
@@ -11,7 +11,7 @@ export async function validateSource(source) {
     throw new Error("The MDX document cannot be empty.");
   if (Buffer.byteLength(source) > 1024 * 1024)
     throw new Error("The document exceeds the 1 MB limit.");
-  await compile({ value: source, path: "story.mdx" }, mdxOptions);
+  await compile({ value: source, path: "story.mdx" }, storyMdxOptions);
 }
 export async function saveDocument(file, source, version) {
   await validateSource(source);

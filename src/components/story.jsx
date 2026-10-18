@@ -2,10 +2,12 @@ import React, {
   Children,
   isValidElement,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
 import { sequence, transition } from "visdelta";
+import { retainChartDeclarations } from "../runtime/chartDeclarations.js";
 import { createChartSession } from "../runtime/chartSession.js";
 import { positionForScroll, scrollForPosition } from "../runtime/progress.js";
 
@@ -29,47 +31,49 @@ export function Step({ children }) {
   return <>{children}</>;
 }
 
-function validateStory(states, steps, hold, layout) {
-  if (
-    !Array.isArray(states) ||
-    !states.length ||
-    states.some((state) => typeof state?.toSpec !== "function")
-  ) {
+export function Scrolly(props) {
+  const {
+    id: authoredId,
+    title,
+    layout = "left",
+    hold = 0.45,
+    children,
+  } = props;
+  const generatedId = useId();
+  const declarations = useRef(null);
+  if ("states" in props)
     throw new Error(
-      "Scrolly requires a nonempty array of native VisDelta states.",
+      "Scrolly no longer accepts states. Put a chart on each Step: <Step chart={chart}>…</Step>.",
     );
-  }
-  if (
-    steps.length !== states.length ||
-    steps.some((step) => !isValidElement(step) || step.type !== Step)
-  ) {
-    throw new Error(
-      "Scrolly requires one direct <Step> for each state, in the same order.",
-    );
-  }
+  const steps = Children.toArray(children);
+  if (!steps.length)
+    throw new Error("Scrolly needs at least one <Step chart={chart}>…</Step>.");
+  const charts = steps.map((step, index) => {
+    if (!isValidElement(step) || step.type !== Step)
+      throw new Error(
+        `Scrolly child ${index + 1} must be a direct <Step chart={chart}>…</Step>.`,
+      );
+    if (typeof step.props.chart?.toSpec !== "function")
+      throw new Error(
+        `Step ${index + 1} needs a native VisDelta chart declaration. For example: <Step chart={chart}>Your Markdown</Step>.`,
+      );
+    return step.props.chart;
+  });
   if (!Number.isFinite(hold) || hold < 0 || hold >= 1)
     throw new Error("Scrolly hold must be in [0, 1).");
   if (!["left", "right"].includes(layout))
     throw new Error("Scrolly layout must be left or right.");
-}
-
-export function Scrolly({
-  id,
-  title,
-  states,
-  layout = "left",
-  hold = 0.45,
-  children,
-}) {
-  const steps = Children.toArray(children);
-  validateStory(states, steps, hold, layout);
   if (
-    typeof id !== "string" ||
-    !id.trim() ||
-    typeof title !== "string" ||
-    !title.trim()
+    authoredId !== undefined &&
+    (typeof authoredId !== "string" || !authoredId.trim())
   )
-    throw new Error("Scrolly requires an id and a descriptive title.");
+    throw new Error("Scrolly id must be a nonempty string when provided.");
+  if (title !== undefined && (typeof title !== "string" || !title.trim()))
+    throw new Error("Scrolly title must be a nonempty string when provided.");
+  const id = authoredId ?? `scrolly-${generatedId.replace(/:/g, "")}`;
+  const label = title ?? "Chart story";
+  declarations.current = retainChartDeclarations(declarations.current, charts);
+  const states = declarations.current.charts;
   const root = useRef(null);
   const chartHost = useRef(null);
   const driver = useRef(null);
@@ -182,21 +186,22 @@ export function Scrolly({
       ref={root}
       id={id}
       className={`scrolly layout-${layout}`}
-      aria-label={title}
+      aria-label={label}
       data-position={position.toFixed(4)}
       data-status={status}
     >
-      <div className="scrolly-heading">
-        <p className="eyebrow">A story in {states.length} states</p>
-        <h2>{title}</h2>
-      </div>
+      {title ? (
+        <div className="scrolly-heading">
+          <h2>{title}</h2>
+        </div>
+      ) : null}
       <div className="scrolly-grid">
         <figure className="story-figure">
           <div
             ref={chartHost}
             className="chart-host"
             role="group"
-            aria-label={title}
+            aria-label={label}
           />
           <figcaption>
             <span className="chart-status" role="status">
@@ -221,7 +226,7 @@ export function Scrolly({
             <label>
               Position
               <input
-                aria-label={`${title} position`}
+                aria-label={`${label} position`}
                 type="range"
                 min="0"
                 max={states.length - 1}

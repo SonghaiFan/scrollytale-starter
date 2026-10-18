@@ -57,3 +57,5 @@ export async function staticFrame(id, index, width, height) {
     mount.remove();
   }
 }
+
+export { mountLifecycleHarness } from "./lifecycle-fixture.jsx";
