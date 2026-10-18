@@ -37,6 +37,9 @@ export function Scrolly(props) {
     title,
     layout = "left",
     hold = 0.45,
+    mode = "step",
+    duration = 800,
+    controls = false,
     children,
   } = props;
   const generatedId = useId();
@@ -59,6 +62,10 @@ export function Scrolly(props) {
       );
     return step.props.chart;
   });
+  if (!["step", "scroll"].includes(mode))
+    throw new Error("Scrolly mode must be step or scroll.");
+  if (!Number.isFinite(duration) || duration < 0)
+    throw new Error("Scrolly duration must be finite and nonnegative.");
   if (!Number.isFinite(hold) || hold < 0 || hold >= 1)
     throw new Error("Scrolly hold must be in [0, 1).");
   if (!["left", "right"].includes(layout))
@@ -88,6 +95,8 @@ export function Scrolly(props) {
     let anchors = [];
     let measureNeeded = true;
     let destroyed = false;
+    let targetIndex = -1;
+    let playbackFrame = 0;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const section = root.current;
     const host = chartHost.current;
@@ -123,19 +132,44 @@ export function Scrolly(props) {
       );
       measureNeeded = false;
     }
+    function reportPlayback() {
+      playbackFrame = 0;
+      if (destroyed) return;
+      const value = session.value;
+      setPosition(value);
+      if (Math.abs(value - targetIndex) > 0.00001)
+        playbackFrame = requestAnimationFrame(reportPlayback);
+    }
     function tick() {
       frame = 0;
       if (destroyed) return;
       if (measureNeeded) measure();
       const raw = positionForScroll(window.scrollY, anchors, hold);
       const value = reduced.matches ? Math.round(raw) : raw;
-      session.seek(value);
-      setPosition(value);
+
       let index = 0;
       anchors.forEach((anchor, i) => {
         if (window.scrollY >= anchor - 1) index = i;
       });
-      setActive(reduced.matches ? Math.round(raw) : index);
+      if (mode === "scroll") {
+        session.seek(value);
+        setPosition(value);
+        setActive(reduced.matches ? Math.round(raw) : index);
+      } else {
+        setActive(index);
+        if (index !== targetIndex || reduced.matches) {
+          const initial = targetIndex === -1;
+          targetIndex = index;
+          cancelAnimationFrame(playbackFrame);
+          if (initial || reduced.matches) {
+            session.seek(index);
+            setPosition(index);
+          } else {
+            session.playTo(index, duration);
+            playbackFrame = requestAnimationFrame(reportPlayback);
+          }
+        }
+      }
     }
     function schedule(measureAgain = false) {
       if (measureAgain === true) measureNeeded = true;
@@ -172,6 +206,7 @@ export function Scrolly(props) {
       destroyed = true;
       driver.current = null;
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(playbackFrame);
       observer.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", refresh);
@@ -179,7 +214,7 @@ export function Scrolly(props) {
       reduced.removeEventListener("change", onScroll);
       session.destroy();
     };
-  }, [states, hold, layout, id]);
+  }, [states, hold, layout, id, mode, duration]);
 
   return (
     <section
@@ -189,6 +224,7 @@ export function Scrolly(props) {
       aria-label={label}
       data-position={position.toFixed(4)}
       data-status={status}
+      data-mode={mode}
     >
       {title ? (
         <div className="scrolly-heading">
@@ -203,20 +239,20 @@ export function Scrolly(props) {
             role="group"
             aria-label={label}
           />
-          <figcaption>
+          {controls ? <figcaption>
             <span className="chart-status" role="status">
               {status}
             </span>
             <output>
               {position.toFixed(2)} <span>/ {states.length - 1}</span>
             </output>
-          </figcaption>
+          </figcaption> : null}
           {error ? (
             <pre className="error" role="alert">
               {error}
             </pre>
           ) : null}
-          <div className="chart-controls">
+          {controls ? <div className="chart-controls">
             <button
               onClick={() => driver.current?.go(0)}
               disabled={status !== "Ready"}
@@ -238,7 +274,7 @@ export function Scrolly(props) {
                 }
               />
             </label>
-          </div>
+          </div> : null}
           {embedded ? (
             <p className="embed-note">
               For a full-height embed, open this story in its own window to

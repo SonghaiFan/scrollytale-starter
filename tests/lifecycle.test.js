@@ -162,3 +162,29 @@ test("unmount before creation, stale rejection, single state and independent ins
   assert.equal(b.values.at(-1), 0.75);
   other.destroy();
 });
+
+test("step playback delegates to native play, retargets from its live frame and survives resize", async () => {
+  const c = controller();
+  c.value = 0;
+  c.plays = [];
+  c.play = function (options) { this.plays.push({ ...options }); };
+  const session = createChartSession({
+    host: element(), states: [{}, {}, {}], sequence: async () => c,
+  });
+  session.playTo(1, 300);
+  await session.ready;
+  assert.deepEqual(c.plays, [{ to: 1, duration: 300 }]);
+  c.value = 0.4;
+  assert.equal(session.value, 0.4);
+  session.playTo(0, 300);
+  assert.deepEqual(c.plays.at(-1), { to: 0, duration: 300 });
+  const seeks = c.values.length;
+  session.resize();
+  assert.equal(c.values.length, seeks, "resize must not seek and cancel native playback");
+  session.seek(2);
+  assert.equal(c.values.at(-1), 2);
+  assert.throws(() => session.playTo(1, -1));
+  session.destroy();
+  session.playTo(1);
+  assert.equal(c.plays.length, 2);
+});

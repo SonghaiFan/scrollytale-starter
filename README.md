@@ -35,7 +35,7 @@ export const chart = bar([
 
 `Scrolly` and `Step` are supplied automatically. `chart` is a complete native VisDelta declaration. Each Step is independent; using `chart` again restores the original picture. Markdown, JSX, imports and expressions are standard MDX. Add blank lines around Markdown headings and paragraphs inside JSX.
 
-To make it yours, change the rows, choose `.x(...)` and `.y(...)`, then rewrite the three steps. No states array, mandatory id, component import or second chart language is needed. `layout` and `hold` are optional advanced controls.
+To make it yours, change the rows, choose `.x(...)` and `.y(...)`, then rewrite the three steps. No states array, mandatory id, component import or second chart language is needed. Entering a Step plays to its chart by default. Use `<Scrolly mode="scroll">` to tie animation continuously to scrolling. Position sliders are hidden unless `controls` is supplied. `layout`, `duration` and scroll-mode `hold` are optional.
 
 ## Edit
 
@@ -45,7 +45,7 @@ This is trusted local code authoring. MDX imports and expressions execute projec
 
 ## Go further
 
-Open http://localhost:5173/examples/housing for the optional four-chart story, authored in [examples/housing.mdx](examples/housing.mdx) with native declarations from [src/story/housing.js](src/story/housing.js). It demonstrates Line, Bar, Point and Unit, editorial sections and left/right layouts. It is separate from the default starter and editor. Production hosting must serve the reader's index for this example route.
+Open http://localhost:5173/examples/housing for the optional four-chart story, authored in [examples/housing.mdx](examples/housing.mdx) with native declarations from [src/story/housing.js](src/story/housing.js). It demonstrates Line, Bar, Point and Unit, continuous scroll progress, editorial sections and left/right layouts. It is separate from the default starter and editor. Production hosting must serve the reader's index for this example route.
 
 - [Component API](docs/reference.md)
 - [Architecture and current boundaries](docs/architecture.md)

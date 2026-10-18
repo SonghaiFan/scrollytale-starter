@@ -49,11 +49,18 @@ Each Scrolly needs at least one direct Step, each with `chart`. Errors identify 
 | `id` | Generated automatically and stable within the mounted component. Optionally supply a unique nonempty string for a named link target. |
 | `title` | Optional visible heading and accessible chart label. Without it, the section is labelled “Chart story”. |
 | `layout` | `left` (default) or `right`, indicating chart placement on wide containers. Both stack chart before text on narrow containers. |
-| `hold` | Finite fraction in `[0,1)`, default `0.45`. Each interval holds its source chart for this fraction, then transitions to the next chart. |
+| `mode` | `step` (default) plays to a chart when its Step crosses the reading line. `scroll` continuously ties animation to scroll position. |
+| `duration` | Finite nonnegative milliseconds per native serial transition stage, default `800`. Applies to step playback. |
+| `controls` | Default `false`. Set to show optional position controls; usually useful for inspecting scroll mode. |
+| `hold` | Finite fraction in `[0,1)`, default `0.45`. In scroll mode, each interval holds its source chart for this fraction, then transitions to the next chart. |
 
 Inline expressions such as `chart.highlight(...)` do not require useMemo. Complete declaration content and plugin module identity determine whether a chart session is replaced; status updates, unchanged parent renders and theme changes do not recreate it. Real data or chart declaration changes do. Keep remote refresh policy and named source loading in your own modules; Scrollytale does not infer changing remote content from an unchanged URL.
 
-A single Step renders a static chart. The application maps scroll progress to `0..numberOfSteps-1`, with each authored Step at its integer boundary. The first and final charts hold outside the sequence. Reduced motion snaps to authored charts. Position controls move through the same window-scroll mapping; they do not start a second animation clock.
+A single Step renders a static chart. In default step mode, crossing a Step's reading line plays from the current frame to that Step's chart using native VisDelta playback. Scrolling back reverses toward the previous chart; jumping ahead targets the newly active Step. Loading the page at an existing scroll position shows that Step immediately. Reduced motion snaps to authored charts.
+
+For continuous scroll progress, write `<Scrolly mode="scroll">`. The application maps scrolling to `0..numberOfSteps-1`, with authored charts at integer boundaries. `hold` controls how much of each interval keeps its source chart before progressing. The first and final charts hold outside the sequence.
+
+Position sliders are optional inspection tools, enabled with `<Scrolly mode="scroll" controls>`. They move through the same scroll mapping. The starter demonstrates step playback; `/examples/housing` demonstrates continuous progress. Neither shows technical position controls by default.
 
 ## Editorial components
 

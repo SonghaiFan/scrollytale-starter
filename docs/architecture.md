@@ -4,7 +4,7 @@
 
 - MDX compiler: Markdown, JSX, expressions and imports; story-only default Scrolly/Step provider.
 - React: document composition, editor, theme and component lifecycle.
-- Scrollytale: measured step anchors, hold policy, responsive narrative layouts and one scroll progress owner.
+- Scrollytale: measured step anchors, hold policy, responsive narrative layouts and one playback owner per mode.
 - VisDelta: immutable chart state, identity, transition planning, geometry, axes and frame evaluation.
 
 The reader and documentation share the base MDX configuration. Only the story configuration adds MDX provider defaults for Scrolly and Step; the documentation entry does not load that runtime. The docs are a separate React entry, built with `npm run docs:build` to `docs/dist`; its base path is `/scrollytale-starter/`.
@@ -13,9 +13,9 @@ The reader imports the installed, unpublished `visdelta@0.4.3-dev.scrollytale.1`
 
 ## Chart lifecycle
 
-Each Step supplies a complete native chart. The component collects them in child order and retains equivalent declarations within its own mounted generation, comparing the complete spec and plugin identity. Immutable builder snapshots are cached by reference; new inline highlights with equivalent content reuse the session. Every effect generation owns a distinct child mount. Progress received before asynchronous initialization is buffered. When a replaced generation resolves, its controller is destroyed without seeking it. Mounted sessions use `resize()` and restore their current position. Cleanup removes listeners, observers, scheduled frames, the controller and its private mount. No chart registration occurs through an inline callback ref.
+Each Step supplies a complete native chart. The component collects them in child order and retains equivalent declarations within its own mounted generation, comparing the complete spec and plugin identity. Immutable builder snapshots are cached by reference; new inline highlights with equivalent content reuse the session. Every effect generation owns a distinct child mount. Progress received before asynchronous initialization is buffered. When a replaced generation resolves, its controller is destroyed without seeking it. Mounted sessions use `resize()`; seeking restores its position while native playback retains its current frame and clock. Cleanup removes listeners, observers, scheduled frames, the controller and its private mount. No chart registration occurs through an inline callback ref.
 
-Step positions are measured in document coordinates. Container, viewport, font or step-size changes remeasure them. Anchors are aligned to CSS pixels so browser scroll quantization still reaches exact authored boundaries. The forward and inverse mappings live in `src/runtime/progress.js`; sliders navigate through that same mapping. Theme tokens live on the document root, followed by chart resize. Multiple stories keep independent mounts and progress.
+Step positions are measured in document coordinates. Container, viewport, font or step-size changes remeasure them. Anchors are aligned to CSS pixels so browser scroll quantization still reaches exact authored boundaries. The forward and inverse mappings live in `src/runtime/progress.js`; optional sliders navigate through that same mapping. Default step mode calls native `play({to,duration})` only when the active Step changes; scroll mode calls `progress()`. The two modes never compete. React observes native playback values for diagnostics without driving its animation. Theme tokens live on the document root, followed by chart resize. Multiple stories keep independent mounts and progress.
 
 ## Verification
 

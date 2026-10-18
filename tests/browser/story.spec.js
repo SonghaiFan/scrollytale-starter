@@ -17,8 +17,29 @@ async function ready(page) {
   expect(errors).toEqual([]);
   return errors;
 }
-async function seek(page, id, value) {
+async function seek(page, id, value, expected = value) {
   const section = page.locator(`#${id}`);
+  if (await section.getAttribute("data-mode") === "step") {
+    await section.locator(".step-number").nth(Math.round(value)).click();
+    await expect.poll(async () => Number(await section.getAttribute("data-position"))).toBeCloseTo(value, 3);
+    return;
+  }
+  if (!await section.locator("input[type=range]").count()) {
+    await section.evaluate((section, value) => {
+      const activation = section.clientWidth < 700
+        ? Math.min(innerHeight * .8, section.querySelector(".story-figure").offsetHeight + 100)
+        : innerHeight * .55;
+      const anchors = [...section.querySelectorAll(".story-step")].map(step =>
+        Math.round(step.getBoundingClientRect().top + scrollY - activation));
+      const index = Math.floor(value);
+      const fraction = value - index;
+      const top = fraction === 0 ? anchors[index]
+        : anchors[index] + (anchors[index + 1] - anchors[index]) * (.45 + fraction * .55);
+      window.scrollTo({ top, behavior: "instant" });
+    }, value);
+    await expect.poll(async () => Number(await section.getAttribute("data-position"))).toBeCloseTo(expected, 1);
+    return;
+  }
   await section.locator("input[type=range]").evaluate((input, value) => {
     const setter = Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,
@@ -29,7 +50,7 @@ async function seek(page, id, value) {
   }, value);
   await expect
     .poll(async () => Number(await section.getAttribute("data-position")))
-    .toBeCloseTo(value, 1);
+    .toBeCloseTo(expected, 1);
 }
 async function frame(page, id) {
   return page.locator(`#${id} .chart-mount`).evaluate((mount) =>
@@ -156,13 +177,7 @@ test("reduced motion snaps scroll to complete authored states", async ({
   await ready(page);
   await seek(page, "housing", 1);
   const section = page.locator("#housing");
-  await section.locator("input").evaluate((input) => {
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      "value",
-    ).set.call(input, "1.3");
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  });
+  await seek(page, "housing", 1.3, 1);
   await expect(section).toHaveAttribute("data-position", "1.0000");
 });
 
@@ -479,6 +494,7 @@ for (const width of [1440, 390]) {
     ).toBeVisible();
     await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(1);
     await expect(page.locator(".story-step")).toHaveCount(3);
+    await expect(page.locator(".chart-controls, .story-figure output")).toHaveCount(0);
     const id = await page.locator(".scrolly").getAttribute("id");
     for (const position of [0, 1, 2, 1, 0]) {
       await seek(page, id, position);
@@ -522,3 +538,44 @@ for (const width of [1440, 390]) {
     expect(errors).toEqual([]);
   });
 }
+
+test("step entry plays on its own, reverses mid-flight and retains playback through resize/theme", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const section = page.locator(".scrolly");
+  await expect(section).toHaveAttribute("data-status", "Ready");
+  const id = await section.getAttribute("id");
+  await section.locator(".step-number").nth(1).click();
+  await expect.poll(async () => {
+    const value = Number(await section.getAttribute("data-position"));
+    return value > .05 && value < .95;
+  }).toBe(true);
+  await section.locator(".step-number").nth(0).click();
+  await expect.poll(async () => Number(await section.getAttribute("data-position"))).toBe(0);
+  await section.locator(".step-number").nth(1).click();
+  await expect.poll(async () => Number(await section.getAttribute("data-position")) > .05).toBe(true);
+  await page.evaluate(() => window.scrollBy({ top: 120, behavior: "instant" }));
+  await page.setViewportSize({ width: 1200, height: 900 });
+  await page.getByRole("button", { name: "Toggle theme" }).click();
+  await expect.poll(async () => Number(await section.getAttribute("data-position"))).toBe(1);
+  const expected = await section.locator(".chart-host").evaluate(async host => {
+    const { staticFrame } = await import("/__verification/reference.js");
+    const { width, height } = host.getBoundingClientRect();
+    return staticFrame("starter", 1, width, height);
+  });
+  expect(await frame(page, id)).toEqual(expected);
+  await section.locator(".step-number").nth(2).click();
+  await section.locator(".step-number").nth(0).click();
+  await expect.poll(async () => Number(await section.getAttribute("data-position"))).toBe(0);
+});
+
+test("step mode respects reduced motion without timed playback", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  const section = page.locator(".scrolly");
+  await expect(section).toHaveAttribute("data-status", "Ready");
+  await section.locator(".step-number").nth(1).click();
+  await expect(section).toHaveAttribute("data-position", "1.0000");
+  await section.locator(".step-number").nth(0).click();
+  await expect(section).toHaveAttribute("data-position", "0.0000");
+});

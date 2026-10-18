@@ -19,7 +19,7 @@ These **fictional housing index values** demonstrate a storytelling template.
 They are not market statistics. Each region has four observations, from 2019 to 2022.
 
 The text is Markdown. The charts are native VisDelta states.
-Scroll to move between them, or use the position control beneath each chart.
+This example uses continuous scroll progress. Scroll to move between the charts; the animation follows your scroll position.
 
 <details>
 <summary>The author’s ingredients</summary>
@@ -38,7 +38,7 @@ const highlighted = all.highlight({ region: 'Inner' })
 
 </Chapter>
 
-<Scrolly id="housing" title="The distance holds">
+<Scrolly mode="scroll" id="housing" title="The distance holds">
   <Step chart={housingChart}>
 
 ### Begin with the whole picture
@@ -78,7 +78,7 @@ Each section below owns its own sequence and lifecycle.
 
 </Chapter>
 
-<Scrolly id="ranking" title="One year, three regions" layout="right">
+<Scrolly mode="scroll" id="ranking" title="One year, three regions" layout="right">
   <Step chart={barChart}>
 
 ### Compare 2022
@@ -102,7 +102,7 @@ All three remain visible together.
   </Step>
 </Scrolly>
 
-<Scrolly id="observations" title="Every observation counts">
+<Scrolly mode="scroll" id="observations" title="Every observation counts">
   <Step chart={pointChart}>
 
 ### Twelve individual records
@@ -126,7 +126,7 @@ The original observations return to equal emphasis.
   </Step>
 </Scrolly>
 
-<Scrolly id="households" title="A different unit of attention" layout="right">
+<Scrolly mode="scroll" id="households" title="A different unit of attention" layout="right">
   <Step chart={unitChart}>
 
 ### One circle, one fictional household
