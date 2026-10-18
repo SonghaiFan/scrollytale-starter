@@ -43,6 +43,21 @@ To make it yours, change the rows, choose `.x(...)` and `.y(...)`, then rewrite 
 
 This is trusted local code authoring. MDX imports and expressions execute project code. The editor is development-only; production is a static reader. See [authoring](docs/authoring.md) for conflicts, reload and runtime errors.
 
+## Export one offline HTML file
+
+```sh
+npm run export:html
+# exports/story.html — the current saved story.mdx
+
+npm run export:html -- examples/modes.mdx --out exports/modes.html
+```
+
+Share the resulting `.html` alone. It opens directly with `file://`, with no server or internet connection. The reader, VisDelta, all JavaScript chunks and CSS are embedded. Step playback, scroll progress, chart styles, theme switching and resize remain interactive. Export does not rebuild or replace `dist/`, change the story, or include the editor.
+
+Data written in MDX or imported from local JSON/JavaScript modules is bundled. Imported media and CSS assets are inlined by Vite; Markdown images and literal JSX `src`/`poster` media paths are embedded too. Root-relative literal media paths resolve from `public/`. Use local media for offline export; remote media produces a build error instead of a broken exported image. Runtime HTTP data requests, embeds and external fonts are not downloaded or snapshotted: supply local data/assets before exporting. The standalone reader blocks external resource loading, while ordinary web links can still be opened deliberately. Only the selected document is exported; links to other project pages do not include those pages.
+
+The exporter reads the saved MDX file, so save editor drafts first. Generated files live in the ignored `exports/` folder. `npm run test:offline` verifies real `file://` reads with networking disabled, including imported JSON, images and both scroll modes.
+
 ## Go further
 
 Choose chart presentation directly in MDX: `<Scrolly chartStyle="paper">`. Presets are `d3`, `paper`, `dark`, and `editorial`; native `defineChartStyle(...)` modules are accepted too. See http://localhost:5173/examples/styles and the [component API](docs/reference.md).

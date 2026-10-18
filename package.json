@@ -11,7 +11,9 @@
     "test:browser": "node tooling/build-reference.js && npm run docs:build && playwright test",
     "docs:dev": "vite --config docs/vite.config.js",
     "docs:build": "vite build --config docs/vite.config.js",
-    "docs:preview": "vite preview --config docs/vite.config.js"
+    "docs:preview": "vite preview --config docs/vite.config.js",
+    "export:html": "node tooling/export-html.js",
+    "test:offline": "playwright test --config playwright.offline.config.js"
   },
   "dependencies": {
     "react": "18.3.1",

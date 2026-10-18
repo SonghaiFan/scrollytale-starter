@@ -28,6 +28,12 @@ npm run docs:build
 
 Node tests cover real MDX compilation, syntax/conflict file preservation, authored boundaries, holds, inverse mapping, invalid input, async generation cleanup, single-state rendering, independent instances and resize position retention. Browser tests exercise frozen production output and the development editor. Builds are compilation checks, not visual or motion proofs.
 
+## Standalone export
+
+`npm run export:html -- [document.mdx] [--out exports/story.html]` uses a separate Vite configuration with no authoring plugin. It compiles the same native MDX provider into an IIFE with dynamic imports inlined, embeds the extracted CSS and imported assets, and writes one HTML file. A small standalone reader replaces the app shell, excluding routing and the editor. A rehype pass embeds local Markdown and literal JSX media. It reads saved source and leaves the normal `dist/` build untouched.
+
+Inline and imported data are included. Runtime HTTP sources, remote embeds and fonts are not snapshotted; authors must supply local assets/data for offline use. A content security policy blocks external resource loading. Tests open actual `file://` outputs with networking disabled and check playback, progress, resize, theme, imported JSON/media and script-closing text.
+
 ## Current boundaries
 
 - Trusted local authoring only. MDX is executable project code, not sanitized user content.

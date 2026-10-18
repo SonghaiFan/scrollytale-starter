@@ -1,0 +1,33 @@
+import { bar } from 'visdelta'
+import rows from './rows.json'
+import icon from './icon.svg'
+
+export const chart = bar(rows).x('region').y('value')
+export const closingTag = '</script><span>still text</span>'
+
+# Offline assets
+
+<p data-testid="closing-tag">{closingTag}</p>
+
+<img src={icon} alt="Imported image" width="40" height="40" />
+
+![Markdown image](./icon.svg)
+
+<img src="./icon.svg" alt="Literal JSX image" width="40" height="40" />
+
+<Scrolly id="offline-paper" chartStyle="paper">
+  <Step chart={chart}>
+
+## Everyone
+
+Imported JSON supplies the values, 18 and 12.
+
+  </Step>
+  <Step chart={chart.highlight({ region: 'North' })}>
+
+## North
+
+The same chart, highlighted offline.
+
+  </Step>
+</Scrolly>

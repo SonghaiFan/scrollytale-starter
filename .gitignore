@@ -5,3 +5,5 @@ docs/dist
 
 test-results
 playwright-report
+
+exports/
