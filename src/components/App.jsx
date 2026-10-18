@@ -11,7 +11,10 @@ import * as initialDocument from "../../story.mdx";
 import { Editor } from "./Editor.jsx";
 const Story = initialDocument.default;
 const HousingStory = lazy(() => import("../../examples/housing.mdx"));
-const advanced = location.pathname === "/examples/housing";
+const ModesStory = lazy(() => import("../../examples/modes.mdx"));
+const advanced = location.pathname.startsWith("/examples/");
+const ReaderStory = location.pathname === "/examples/modes" ? ModesStory
+  : location.pathname === "/examples/housing" ? HousingStory : Story;
 
 class PreviewBoundary extends Component {
   state = { error: null };
@@ -58,11 +61,11 @@ export function App() {
   );
   const [theme, setTheme] = useState(readTheme);
   const [preview, setPreview] = useState({
-    Content: advanced ? HousingStory : Story,
+    Content: ReaderStory,
     metadata: Reflect.get(initialDocument, "meta"),
     revision: 0,
   });
-  const previous = useRef(advanced ? HousingStory : Story);
+  const previous = useRef(ReaderStory);
   const [diskError, setDiskError] = useState("");
   const diskPending = useRef(false);
   const commit = useCallback((Content) => {
@@ -147,6 +150,7 @@ export function App() {
           scrollytale<span>↘</span>
         </a>
         <div>
+          <a className="mode-link" href="/examples/modes" aria-label="Compare playback modes">Modes</a>
           <span className="nav-caption">MDX × VisDelta</span>
           {import.meta.env.DEV ? (
             <a
@@ -196,6 +200,7 @@ export function App() {
             <a href={advanced ? "/" : "/examples/housing"}>
               {advanced ? "Starter story" : "Four-chart example"}
             </a>
+            <a href="/examples/modes">Compare playback modes</a>
             <a href="#story">Back to top ↑</a>
           </footer>
         </main>

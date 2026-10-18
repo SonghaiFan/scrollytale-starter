@@ -1,0 +1,77 @@
+import { bar } from 'visdelta'
+
+export const chart = bar([
+  { region: 'North', revenue: 18 },
+  { region: 'South', revenue: 12 },
+  { region: 'West', revenue: 9 },
+]).x('region').y('revenue')
+
+# Two ways to tell the same story
+
+相同的数据、图表和三个步骤，只改变动画如何推进。
+
+[体验 Step 触发播放](#step-playback) · [体验 Scroll 进度驱动](#scroll-progress)
+
+## Step：进入后自动播放
+
+向下滚动，让下一段进入阅读区域，然后停住。图表会继续播放到该段的状态。向上滚动可以反向播放。
+
+`<Scrolly mode="step">`
+
+<Scrolly id="step-playback" title="Step 触发播放" mode="step">
+  <Step chart={chart}>
+
+### 看整体
+
+比较三个区域的收入。North 为 18，South 为 12，West 为 9。
+
+  </Step>
+  <Step chart={chart.highlight({ region: 'North' })}>
+
+### 关注 North
+
+滚动到这里后停住：高亮动画仍会继续，直到 North 成为焦点。
+
+  </Step>
+  <Step chart={chart}>
+
+### 回到整体
+
+清除高亮。试着在动画尚未结束时向上滚动，观察它转向前一段。
+
+  </Step>
+</Scrolly>
+
+[继续体验 Scroll 模式 ↓](#scroll-progress)
+
+## Scroll：滚动决定进度
+
+缓慢滚动到下一段，或在两段之间停住。图表动画会随滚动推进，停止滚动就停在当前帧；向上滚动则回退。
+
+`<Scrolly mode="scroll">`
+
+<Scrolly id="scroll-progress" title="Scroll 进度驱动" mode="scroll" hold={0}>
+  <Step chart={chart}>
+
+### 看整体
+
+比较相同的三个区域。这里关闭停留区间，让滚动与动画进度的关系更直接。
+
+  </Step>
+  <Step chart={chart.highlight({ region: 'North' })}>
+
+### 关注 North
+
+在上一段与这里之间缓慢滚动。停住时，高亮也停在当前进度。
+
+  </Step>
+  <Step chart={chart}>
+
+### 回到整体
+
+继续滚动，逐渐清除高亮；向上滚动可以逐帧回退。
+
+  </Step>
+</Scrolly>
+
+[再体验 Step 模式 ↑](#step-playback)

@@ -579,3 +579,38 @@ test("step mode respects reduced motion without timed playback", async ({ page }
   await section.locator(".step-number").nth(0).click();
   await expect(section).toHaveAttribute("data-position", "0.0000");
 });
+
+for (const width of [1440, 390]) {
+  test(`compare both playback modes on one page at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/examples/modes");
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+    await expect(page.locator(".chart-controls")).toHaveCount(0);
+    const step = page.locator("#step-playback");
+    const scroll = page.locator("#scroll-progress");
+    await expect(step).toHaveAttribute("data-mode", "step");
+    await expect(scroll).toHaveAttribute("data-mode", "scroll");
+    await step.locator(".step-number").nth(1).click();
+    await expect.poll(async () => Number(await step.getAttribute("data-position"))).toBe(1);
+    await scroll.evaluate(section => {
+      const activation = section.clientWidth < 700
+        ? Math.min(innerHeight * .8, section.querySelector(".story-figure").offsetHeight + 100)
+        : innerHeight * .55;
+      const anchors = [...section.querySelectorAll(".story-step")].map(element =>
+        Math.round(element.getBoundingClientRect().top + scrollY - activation));
+      window.scrollTo({ top: (anchors[0] + anchors[1]) / 2, behavior: "instant" });
+    });
+    await expect.poll(async () => Number(await scroll.getAttribute("data-position"))).toBeCloseTo(.5, 2);
+    const paused = await scroll.getAttribute("data-position");
+    await page.waitForTimeout(900);
+    await expect(scroll).toHaveAttribute("data-position", paused);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await scroll.locator(".step-number").nth(0).click();
+    await expect(scroll).toHaveAttribute("data-position", "0.0000");
+    await page.getByRole("link", { name: "再体验 Step 模式 ↑" }).click();
+    await expect(step).toBeInViewport();
+    await page.goto("http://127.0.0.1:5183/examples/modes");
+    await expect(page.getByRole("link", { name: "Compare playback modes", exact: true }).first()).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
