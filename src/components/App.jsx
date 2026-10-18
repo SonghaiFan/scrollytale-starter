@@ -12,8 +12,10 @@ import { Editor } from "./Editor.jsx";
 const Story = initialDocument.default;
 const HousingStory = lazy(() => import("../../examples/housing.mdx"));
 const ModesStory = lazy(() => import("../../examples/modes.mdx"));
+const VisDeltaStory = lazy(() => import("../../examples/visdelta.mdx"));
 const advanced = location.pathname.startsWith("/examples/");
-const ReaderStory = location.pathname === "/examples/modes" ? ModesStory
+const ReaderStory = location.pathname === "/examples/visdelta" ? VisDeltaStory
+  : location.pathname === "/examples/modes" ? ModesStory
   : location.pathname === "/examples/housing" ? HousingStory : Story;
 
 class PreviewBoundary extends Component {
@@ -201,6 +203,7 @@ export function App() {
               {advanced ? "Starter story" : "Four-chart example"}
             </a>
             <a href="/examples/modes">Compare playback modes</a>
+            <a href="/examples/visdelta">VisDelta homepage demos</a>
             <a href="#story">Back to top ↑</a>
           </footer>
         </main>

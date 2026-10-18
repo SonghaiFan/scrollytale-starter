@@ -1,0 +1,320 @@
+import { barBase, lineBase, areaBase, pointBase, unitBase, revenue, profit, ranked } from '../src/story/homepage.js'
+
+# Chart change, told as a story
+
+The VisDelta homepage demonstrations, retold in MDX. The same data and native chart declarations now advance as you read.
+These are illustrative example values, not a sourced statistical report.
+
+[Bar](#home-bar) · [Line](#home-line) · [Area](#home-area) · [Point](#home-point) · [Unit](#home-unit) · [Scroll story](#home-products)
+
+The five chart stories use **Step playback**: enter a new paragraph, then stop scrolling and watch the change finish. The final product story uses **Scroll progress**: stop scrolling to hold any frame.
+
+<details>
+<summary>The shared homepage data</summary>
+
+| Country | Sites in 2004 | Sites in 2022 |
+| --- | ---: | ---: |
+| Norway | 5 | 8 |
+| Denmark | 4 | 10 |
+| Sweden | 13 | 15 |
+
+</details>
+
+## Bar
+
+<Scrolly id="home-bar" title="Bar: code drives the chart">
+  <Step chart={barBase}>
+
+### Begin with the declaration
+
+The starting chart from the homepage. Each following step adds one native method.
+
+```js
+const chart = bar(rows).x("year").y("sites").breakdown("country")
+```
+
+  </Step>
+  <Step chart={barBase.color("country")}>
+
+### Distinguish the countries
+
+Color gives each country a consistent identity.
+
+```js
+.color("country")
+```
+
+  </Step>
+  <Step chart={barBase.color("country").layout("grouped")}>
+
+### Compare side by side
+
+Move from stacked totals to grouped bars.
+
+```js
+.layout("grouped")
+```
+
+  </Step>
+  <Step chart={barBase.color("country").layout("grouped").flip()}>
+
+### Turn the chart
+
+Exchange the horizontal and vertical directions.
+
+```js
+.flip()
+```
+
+  </Step>
+</Scrolly>
+
+## Line
+
+<Scrolly id="home-line" title="Line: code drives the chart">
+  <Step chart={lineBase}>
+
+### Begin with the declaration
+
+The starting chart from the homepage. Each following step adds one native method.
+
+```js
+const chart = line(rows).x("year").y("sites").breakdown("country")
+```
+
+  </Step>
+  <Step chart={lineBase.color("country")}>
+
+### Distinguish the countries
+
+Keep the same observations and give each series a color.
+
+```js
+.color("country")
+```
+
+  </Step>
+  <Step chart={lineBase.color("country").curve("curveBumpX")}>
+
+### Change the connecting curve
+
+The observations stay fixed while the connecting geometry changes.
+
+```js
+.curve("curveBumpX")
+```
+
+  </Step>
+  <Step chart={lineBase.color("country").curve("curveBumpX").flip()}>
+
+### Turn the chart
+
+The same series move into the other orientation.
+
+```js
+.flip()
+```
+
+  </Step>
+</Scrolly>
+
+## Area
+
+<Scrolly id="home-area" title="Area: code drives the chart">
+  <Step chart={areaBase}>
+
+### Begin with the declaration
+
+The starting chart from the homepage. Each following step adds one native method.
+
+```js
+const chart = area(rows).x("year").y("sites").breakdown("country")
+```
+
+  </Step>
+  <Step chart={areaBase.color("country")}>
+
+### Distinguish the layers
+
+Color reveals the three country layers.
+
+```js
+.color("country")
+```
+
+  </Step>
+  <Step chart={areaBase.color("country").layout("stream")}>
+
+### Find the flow
+
+Change the stacked baseline into a stream layout.
+
+```js
+.layout("stream")
+```
+
+  </Step>
+  <Step chart={areaBase.color("country").layout("stream").curve("curveBumpX")}>
+
+### Shape the flow
+
+Change the interpolation between observations.
+
+```js
+.curve("curveBumpX")
+```
+
+  </Step>
+</Scrolly>
+
+## Point
+
+<Scrolly id="home-point" title="Point: code drives the chart">
+  <Step chart={pointBase}>
+
+### Begin with the declaration
+
+The starting chart from the homepage. Each following step adds one native method.
+
+```js
+const chart = point(rows).x("sites").y("country").key(["year", "country"])
+```
+
+  </Step>
+  <Step chart={pointBase.color("country")}>
+
+### Distinguish the countries
+
+Each observation retains its year and country identity.
+
+```js
+.color("country")
+```
+
+  </Step>
+  <Step chart={pointBase.color("country").connector({ by: "country", orderBy: "year" })}>
+
+### Connect the years
+
+Connect each country’s observations in year order.
+
+```js
+.connector({ by: "country", orderBy: "year" })
+```
+
+  </Step>
+  <Step chart={pointBase.color("country").connector({ by: "country", orderBy: "year" }).flip()}>
+
+### Turn the comparison
+
+Exchange the axes without replacing the observations.
+
+```js
+.flip()
+```
+
+  </Step>
+</Scrolly>
+
+## Unit
+
+<Scrolly id="home-unit" title="Unit: code drives the chart">
+  <Step chart={unitBase}>
+
+### Begin with the declaration
+
+The starting chart from the homepage. Each following step adds one native method.
+
+```js
+const chart = unit(rows).x("year").key(["year", "country"]).value("sites", { unitValue: 2 })
+```
+
+  </Step>
+  <Step chart={unitBase.group("country")}>
+
+### Group by country
+
+Organize units by country within each year.
+
+```js
+.group("country")
+```
+
+  </Step>
+  <Step chart={unitBase.group("country").color("country")}>
+
+### Distinguish the groups
+
+Add color to the country groups.
+
+```js
+.color("country")
+```
+
+  </Step>
+  <Step chart={unitBase.group("country").color("country").layout("force")}>
+
+### Let the groups gather
+
+Change the arrangement to a force layout.
+
+```js
+.layout("force")
+```
+
+  </Step>
+</Scrolly>
+
+## Scroll is a timeline
+
+The homepage’s product story. Here your scroll position drives the frames directly; read upward to retrace them.
+
+<Scrolly id="home-products" title="Revenue, profit and attention" mode="scroll" hold={0}>
+  <Step chart={revenue}>
+
+### Revenue by product
+
+One state: data and mappings. Hardware has the highest revenue.
+
+```js
+const a = bar(products).x('product', { label: 'Product' })
+  .y('revenue', { label: 'Revenue ($M)' }).key('product')
+```
+
+  </Step>
+  <Step chart={profit}>
+
+### Show profit instead
+
+Change the measure. The bars, axis and title move together. Software now leads.
+
+```js
+const b = a.y('profit', { label: 'Profit ($M)' })
+```
+
+  </Step>
+  <Step chart={ranked}>
+
+### Rank it
+
+The same products move into descending profit order. No records change.
+
+```js
+const c = b.sort('profit', 'descending')
+```
+
+  </Step>
+  <Step chart={ranked.highlight({ product: ['Software', 'Cloud'] })}>
+
+### Point at two of them
+
+Highlight Software and Cloud. Nothing leaves the chart; only attention changes.
+
+```js
+const d = c.highlight({ product: ['Software', 'Cloud'] })
+```
+
+  </Step>
+</Scrolly>
+
+[Compare the two playback modes](/examples/modes) · [VisDelta homepage](https://songhaifan.github.io/visdelta/)

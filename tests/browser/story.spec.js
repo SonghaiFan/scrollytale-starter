@@ -614,3 +614,31 @@ for (const width of [1440, 390]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }
+
+for (const width of [1440, 390]) {
+  test(`VisDelta homepage demos render and play in MDX at ${width}px`, async ({ page }) => {
+    test.setTimeout(120000);
+    await page.setViewportSize({ width, height: 900 });
+    const errors = [];
+    page.on("pageerror", error => errors.push(error.message));
+    await page.goto("/examples/visdelta");
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(6, { timeout: 30000 });
+    await expect(page.locator(".chart-controls, .error")).toHaveCount(0);
+    for (const name of ["bar", "line", "area", "point", "unit"]) {
+      const section = page.locator(`#home-${name}`);
+      await expect(section.locator(".story-step")).toHaveCount(4);
+      for (const index of [1, 2, 3, 0]) {
+        await section.locator(".step-number").nth(index).click();
+        await expect.poll(async () => Number(await section.getAttribute("data-position")), { timeout: 20000 }).toBe(index);
+        await expect(section.locator(".chart-mount svg").first()).toBeVisible();
+      }
+    }
+    const scroll = page.locator("#home-products");
+    for (const index of [1, 2, 3, 0]) {
+      await scroll.locator(".step-number").nth(index).click();
+      await expect(scroll).toHaveAttribute("data-position", `${index}.0000`);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(errors).toEqual([]);
+  });
+}

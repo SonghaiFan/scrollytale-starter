@@ -45,6 +45,8 @@ This is trusted local code authoring. MDX imports and expressions execute projec
 
 ## Go further
 
+Open http://localhost:5173/examples/visdelta for the VisDelta homepage demos adapted into MDX: Bar, Line, Area, Point and Unit step stories, followed by the revenue-to-profit scroll story. Native declarations and illustrative rows match the homepage source.
+
 Open http://localhost:5173/examples/modes to compare step-triggered playback and continuous scroll progress on one page, using identical charts and steps. The navigation’s **Modes** link opens this example.
 
 Open http://localhost:5173/examples/housing for the optional four-chart story, authored in [examples/housing.mdx](examples/housing.mdx) with native declarations from [src/story/housing.js](src/story/housing.js). It demonstrates Line, Bar, Point and Unit, continuous scroll progress, editorial sections and left/right layouts. It is separate from the default starter and editor. Production hosting must serve the reader's index for this example route.
