@@ -1,0 +1,163 @@
+import { Hero, Chapter, Scrolly, Step } from './src/components/story.jsx'
+import { housingStates, barStates, pointStates, unitStates } from './src/story/housing.js'
+
+export const meta = { title: 'The space between', description: 'An illustrative housing story, written in MDX and drawn by VisDelta.' }
+
+<Hero eyebrow="Scrollytale / 01 · An illustrative story">
+
+# The space between
+
+Three regions. Four years. One persistent gap.
+A small story about seeing the same data from different places.
+
+</Hero>
+
+<Chapter id="context">
+
+## A shared scale, a different experience
+
+These **fictional housing index values** demonstrate a storytelling template.
+They are not market statistics. Each region has four observations, from 2019 to 2022.
+
+The text is Markdown. The charts are native VisDelta states.
+Scroll to move between them, or use the position control beneath each chart.
+
+<details>
+<summary>The author’s ingredients</summary>
+
+```js
+const all = line(rows)
+  .x('year')
+  .y('value', { domain: [0, 120] })
+  .breakdown('region')
+  .color('region')
+
+const states = [all, all.highlight({ region: 'Inner' }), all]
+```
+
+</details>
+
+</Chapter>
+
+<Scrolly id="housing" title="The distance holds" states={housingStates}>
+  <Step>
+
+### Begin with the whole picture
+
+All three regions rise. A common vertical scale lets us compare the values without moving the goalposts.
+
+  </Step>
+  <Step>
+
+### The inner region stays ahead
+
+Attention moves to **Inner**. The other observations stay in place; highlighting changes emphasis, not membership.
+
+  </Step>
+  <Step>
+
+### Look at the space below
+
+**Middle** and **Outer** rise together. The distance between them is smaller than the distance to Inner.
+
+  </Step>
+  <Step>
+
+### Return to the shared picture
+
+The emphasis clears. Scroll upward to retrace the same sequence in reverse.
+
+  </Step>
+</Scrolly>
+
+<Chapter id="perspective">
+
+## Change the question
+
+A line reveals movement. A bar compares a moment. Points return our attention to individual observations.
+Each section below owns its own sequence and lifecycle.
+
+</Chapter>
+
+<Scrolly id="ranking" title="One year, three regions" states={barStates} layout="right">
+  <Step>
+
+### Compare 2022
+
+The final observation from each region, on the same scale.
+
+  </Step>
+  <Step>
+
+### Isolate the leader
+
+Inner records an illustrative value of 109, followed by Middle at 91 and Outer at 74.
+
+  </Step>
+  <Step>
+
+### Keep the context
+
+All three remain visible together.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="observations" title="Every observation counts" states={pointStates}>
+  <Step>
+
+### Twelve individual records
+
+Each dot represents one region in one year.
+
+  </Step>
+  <Step>
+
+### Follow the outer region
+
+Highlighting keeps the other records available for comparison.
+
+  </Step>
+  <Step>
+
+### See the complete set
+
+The original observations return to equal emphasis.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="households" title="A different unit of attention" states={unitStates} layout="right">
+  <Step>
+
+### One circle, one fictional household
+
+This separate illustrative dataset contains 36 households, evenly divided among three regions.
+
+  </Step>
+  <Step>
+
+### Twelve in the middle
+
+The Middle group receives emphasis. Every circle still represents one household.
+
+  </Step>
+  <Step>
+
+### Bring everyone back
+
+No records have been removed. Only our attention has changed.
+
+  </Step>
+</Scrolly>
+
+<Chapter id="closing">
+
+## Start with a story
+
+Edit `story.mdx`, import your own data and VisDelta states, and compose a narrative.
+The application takes care of scroll progress, responsive layouts and chart cleanup.
+
+[Explore the MDX format](https://mdxjs.com/) · [Explore VisDelta](https://songhaifan.github.io/visdelta/)
+
+</Chapter>

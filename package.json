@@ -1,25 +1,28 @@
 {
   "name": "scrollytale-starter",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "preview": "vite preview",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.js",
+    "test:browser": "node tooling/build-reference.js && npm run docs:build && playwright test",
+    "docs:dev": "vite --config docs/vite.config.js",
+    "docs:build": "vite build --config docs/vite.config.js",
+    "docs:preview": "vite preview --config docs/vite.config.js"
   },
   "dependencies": {
-    "arquero": "^8.0.3",
-    "d3": "^7.9.0",
-    "js-yaml": "^4.1.0",
-    "markdown-it": "^14.1.0",
-    "scrollama": "^3.2.0"
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "visdelta": "0.4.2"
   },
   "devDependencies": {
-    "vite": "^7.1.4",
-    "vitepress": "^1.6.4"
+    "@mdx-js/mdx": "3.1.1",
+    "@mdx-js/rollup": "3.1.1",
+    "@playwright/test": "1.56.1",
+    "remark-gfm": "4.0.1",
+    "vite": "7.3.7"
   }
 }
