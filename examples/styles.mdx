@@ -1,0 +1,105 @@
+import { styleChart, neutralChart, spaciousStyle } from '../src/story/styles.js'
+
+# Chart styles, directly in MDX
+
+Choose a style for the entire chart story. The page theme and narrative layout stay independent; explicit chart colors stay blue and amber across presets.
+
+[Paper](#style-paper) · [Dark](#style-dark) · [Editorial](#style-editorial) · [D3](#style-d3) · [Custom](#style-custom)
+
+## Start with a preset
+
+```mdx
+<Scrolly chartStyle="paper">
+  <Step chart={chart}>The full picture.</Step>
+  <Step chart={chart.highlight({ region: 'North' })}>Look north.</Step>
+</Scrolly>
+```
+
+The names are `d3`, `paper`, `dark`, and `editorial`. Omit `chartStyle` to keep the page’s inherited theme. Presets supply chart structure and scoped CSS; no extra theme stylesheet is needed.
+
+<Scrolly id="style-paper" title="Paper" chartStyle="paper" mode="scroll">
+  <Step chart={styleChart}>
+
+### Print-oriented spacing
+
+Paper uses a light surface, serif typography, a right-side legend and horizontal grid. The authored blue and amber remain unchanged.
+
+  </Step>
+  <Step chart={styleChart.highlight({ region: 'North' })}>
+
+### Guide attention
+
+Scroll to highlight North, then scroll back. The presentation stays Paper throughout the transition.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="style-dark" title="Dark" chartStyle="dark">
+  <Step chart={styleChart}>
+
+### A dark chart on either page theme
+
+The chart has its own scoped presentation. Switch the page’s light/dark theme to compare.
+
+  </Step>
+  <Step chart={styleChart.highlight({ region: 'North' })}>
+
+### The same emphasis
+
+Entering this step plays the same native highlight transition using Dark’s spacing and typography.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="style-editorial" title="Editorial" chartStyle="editorial">
+  <Step chart={styleChart}>
+
+### Ink on paper
+
+A single Step is a static chart with the same style API. Its axes, legend and marks remain inside the chart container.
+
+  </Step>
+</Scrolly>
+
+<Scrolly id="style-d3" title="D3" chartStyle="d3">
+  <Step chart={neutralChart}>
+
+### Restrained defaults
+
+D3 supplies VisDelta’s default chart structure. Its CSS tokens continue to inherit the page theme.
+
+  </Step>
+</Scrolly>
+
+## Use a native custom module
+
+```mdx
+import { defineChartStyle } from 'visdelta/chart-style'
+
+export const spacious = defineChartStyle({
+  key: 'spacious',
+  tickSpacing: { x: 100, y: 65 },
+  legendPosition: 'right',
+  plot: {
+    margin: { top: 34, right: 24, bottom: 50, left: 60 },
+    grid: 'horizontal',
+  },
+  axisTitle: channel => channel?.label,
+})
+
+<Scrolly chartStyle={spacious}>
+  <Step chart={chart}>A custom presentation.</Step>
+</Scrolly>
+```
+
+Define the module once at module scope. Its rules control structure; a custom key does not generate a CSS palette or font. Those tokens inherit from the page unless you supply scoped CSS yourself. Styles belong to Scrolly, rather than individual Steps; they do not interpolate as chart-state changes.
+
+<Scrolly id="style-custom" title="Custom: spacious" chartStyle={spaciousStyle}>
+  <Step chart={styleChart}>
+
+### More room, the same data
+
+This native module chooses spacing, a right-side legend and plain axis titles. The blue and amber still come from the chart declaration.
+
+  </Step>
+</Scrolly>

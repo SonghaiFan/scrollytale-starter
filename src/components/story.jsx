@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { sequence, transition } from "visdelta";
+import { resolveChartStyle } from "../runtime/chartStyle.js";
 import { retainChartDeclarations } from "../runtime/chartDeclarations.js";
 import { createChartSession } from "../runtime/chartSession.js";
 import { positionForScroll, scrollForPosition } from "../runtime/progress.js";
@@ -40,8 +41,13 @@ export function Scrolly(props) {
     mode = "step",
     duration = 800,
     controls = false,
+    chartStyle,
     children,
   } = props;
+  const resolvedStyle = resolveChartStyle(chartStyle);
+  const styleRef = useRef(resolvedStyle);
+  styleRef.current = resolvedStyle;
+  const liveSession = useRef(null);
   const generatedId = useId();
   const declarations = useRef(null);
   if ("states" in props)
@@ -108,7 +114,10 @@ export function Scrolly(props) {
       states,
       sequence,
       transition,
+      chartStyle: styleRef.current,
+      onPreparing: () => setStatus("Preparing chart…"),
       onReady: () => {
+        setError("");
         setStatus("Ready");
         schedule(true);
       },
@@ -117,6 +126,7 @@ export function Scrolly(props) {
         setStatus("Chart could not render");
       },
     });
+    liveSession.current = session;
     function measure() {
       const activation =
         section.clientWidth < 700
@@ -205,6 +215,7 @@ export function Scrolly(props) {
     return () => {
       destroyed = true;
       driver.current = null;
+      liveSession.current = null;
       cancelAnimationFrame(frame);
       cancelAnimationFrame(playbackFrame);
       observer.disconnect();
@@ -215,6 +226,10 @@ export function Scrolly(props) {
       session.destroy();
     };
   }, [states, hold, layout, id, mode, duration]);
+
+  useEffect(() => {
+    liveSession.current?.setChartStyle(resolvedStyle);
+  }, [resolvedStyle]);
 
   return (
     <section
@@ -236,6 +251,7 @@ export function Scrolly(props) {
           <div
             ref={chartHost}
             className="chart-host"
+            aria-busy={status === "Preparing chart…"}
             role="group"
             aria-label={label}
           />

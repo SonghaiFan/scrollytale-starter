@@ -49,6 +49,7 @@ Each Scrolly needs at least one direct Step, each with `chart`. Errors identify 
 | `id` | Generated automatically and stable within the mounted component. Optionally supply a unique nonempty string for a named link target. |
 | `title` | Optional visible heading and accessible chart label. Without it, the section is labelled “Chart story”. |
 | `layout` | `left` (default) or `right`, indicating chart placement on wide containers. Both stack chart before text on narrow containers. |
+| `chartStyle` | Optional `d3`, `paper`, `dark`, or `editorial` preset name, or a native module from `defineChartStyle(...)` in `visdelta/chart-style`. Applies to the entire Scrolly, including a single Step. Omit to inherit the page theme. |
 | `mode` | `step` (default) plays to a chart when its Step crosses the reading line. `scroll` continuously ties animation to scroll position. |
 | `duration` | Finite nonnegative milliseconds per native serial transition stage, default `800`. Applies to step playback. |
 | `controls` | Default `false`. Set to show optional position controls; usually useful for inspecting scroll mode. |
@@ -87,3 +88,13 @@ Ordinary Markdown, links, images and imported components.
 ```
 
 The default template only needs Markdown, Scrolly and Step. Use native VisDelta methods directly: `highlight` changes emphasis, `where` changes membership, and `focus` changes the camera.
+
+## Chart presentation
+
+Use `<Scrolly chartStyle="paper">` for a preset, or import `defineChartStyle` from `visdelta/chart-style` and pass its resolved module as `chartStyle={myStyle}`. Define custom modules at module scope to keep their reference stable. Unknown names and incomplete values produce an actionable render error. Plain configuration objects are not accepted; use the native factory.
+
+Style controls chart structure (spacing, grids, axis titles and legend placement); built-in preset keys also activate scoped CSS from the existing VisDelta stylesheet. A custom key supplies no CSS palette or fonts automatically. D3 and custom modules inherit unspecified CSS tokens from the page. Explicit chart colors remain authored values. Page theme changes and resize remeasure the current chart.
+
+Changing a module prepares a replacement at the live timeline position and resumes the current step target before swapping visible charts. The previous chart remains visible if preparation fails. Geometry can differ between styles; this is a presentation replacement, not an animated chart-state operation. Reusing a preset or the same custom module does not replace the controller. There is no per-Step style interpolation or `style`/`theme` alias.
+
+See `/examples/styles` for all four presets and a native custom module.

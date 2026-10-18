@@ -45,6 +45,8 @@ This is trusted local code authoring. MDX imports and expressions execute projec
 
 ## Go further
 
+Choose chart presentation directly in MDX: `<Scrolly chartStyle="paper">`. Presets are `d3`, `paper`, `dark`, and `editorial`; native `defineChartStyle(...)` modules are accepted too. See http://localhost:5173/examples/styles and the [component API](docs/reference.md).
+
 Open http://localhost:5173/examples/visdelta for the VisDelta homepage demos adapted into MDX: Bar, Line, Area, Point and Unit step stories, followed by the revenue-to-profit scroll story. Native declarations and illustrative rows match the homepage source.
 
 Open http://localhost:5173/examples/modes to compare step-triggered playback and continuous scroll progress on one page, using identical charts and steps. The navigation’s **Modes** link opens this example.
@@ -69,4 +71,4 @@ Browser tests build an independent static-render consumer and the docs, then run
 
 `npm run build` emits a clean reader to `dist`; browser-only helpers under `dist/__verification` are not part of a normal production build. `npm run docs:build` builds the separate documentation entry to `docs/dist`.
 
-VisDelta is pinned to the repository-vendored, unpublished `0.4.3-dev.scrollytale.1` integration package. [Snapshot provenance](vendor/README.md) records its source commit and hash. `npm ci` uses the installed package without a sibling checkout or source alias.
+VisDelta is pinned to the repository-vendored, unpublished `0.4.3-dev.scrollytale.2` integration package. [Snapshot provenance](vendor/README.md) records its source commit and hash. `npm ci` uses the installed package without a sibling checkout or source alias.

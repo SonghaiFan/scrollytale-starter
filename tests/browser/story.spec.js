@@ -642,3 +642,172 @@ for (const width of [1440, 390]) {
     expect(errors).toEqual([]);
   });
 }
+
+async function expectStyleFrame(page, id, index, style, story = "styles") {
+  const section = page.locator(`#${id}`);
+  const expected = await section.locator(".chart-host").evaluate(async (host, { index, style, story }) => {
+    const { staticFrame } = await import("/__verification/reference.js");
+    const { width, height } = host.getBoundingClientRect();
+    return staticFrame(story, index, width, height, style);
+  }, { index, style, story });
+  expect(await frame(page, id)).toEqual(expected);
+}
+
+for (const width of [1440, 390]) {
+  test(`MDX chartStyle presets and custom module retain scoped presentation at ${width}px`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/examples/styles");
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(5);
+    const styles = ["paper", "dark", "editorial", "d3", "custom"];
+    for (const style of styles) {
+      const section = page.locator(`#style-${style}`);
+      await expect(section.locator(`.vd-style-${style === "custom" ? "spacious" : style}`)).toHaveCount(1);
+      await section.locator(".step-number").first().click();
+      await expectStyleFrame(page, `style-${style}`, 0, style, style === "d3" ? "neutralStyle" : "styles");
+      const geometry = await section.locator(".chart-host").evaluate(host => {
+        const box = host.getBoundingClientRect();
+        return [...host.querySelectorAll('svg, .vd-legend text')].filter(node => getComputedStyle(node).display !== 'none').every(node => {
+          const bounds = node.getBoundingClientRect();
+          return bounds.left >= box.left - 1 && bounds.right <= box.right + 1 && bounds.top >= box.top - 1 && bounds.bottom <= box.bottom + 1;
+        });
+      });
+      expect(geometry).toBe(true);
+      if (style !== "d3") {
+        const fills = await section.locator(".vd-bar").evaluateAll(nodes => [...new Set(nodes.map(node => getComputedStyle(node).fill))].sort());
+        expect(fills).toEqual(["rgb(217, 119, 6)", "rgb(37, 99, 235)"].sort());
+      }
+    }
+    const paper = page.locator("#style-paper");
+    const dark = page.locator("#style-dark");
+    await expect(paper.locator(".vd-figure")).toHaveCSS("background-color", "rgb(255, 253, 247)");
+    await expect(dark.locator(".vd-figure")).toHaveCSS("background-color", "rgb(17, 22, 28)");
+    await expect(paper.locator(".vd-transition-root")).toHaveCSS("font-family", /Georgia/);
+    await expect(dark.locator(".vd-transition-root")).toHaveCSS("font-family", /monospace/);
+    expect(await paper.locator(".vd-axis text").first().evaluate(node => getComputedStyle(node).fill)).toBe("rgb(116, 102, 83)");
+    for (const index of [1, 0]) {
+      await seek(page, "style-paper", index);
+      await expectStyleFrame(page, "style-paper", index, "paper");
+      await seek(page, "style-dark", index);
+      await expectStyleFrame(page, "style-dark", index, "dark");
+    }
+    await seek(page, "style-paper", 0);
+    await paper.locator(".story-figure").screenshot({ path: info.outputPath(`paper-${width}.png`) });
+    await page.getByRole("button", { name: "Toggle theme" }).click();
+    await expect(paper.locator(".vd-figure")).toHaveCSS("background-color", "rgb(255, 253, 247)");
+    await expect(dark.locator(".vd-figure")).toHaveCSS("background-color", "rgb(17, 22, 28)");
+    await page.setViewportSize({ width: width === 390 ? 560 : 1200, height: 850 });
+    await seek(page, "style-paper", 0);
+    await expectStyleFrame(page, "style-paper", 0, "paper");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await paper.locator(".story-figure").screenshot({ path: info.outputPath(`paper-resized-${width}.png`) });
+  });
+}
+
+test("style changes preserve live progress, keep stable modules, and settle after rapid replacement", async ({ page }) => {
+  await page.goto("/__verification/lifecycle.html");
+  await page.evaluate(async () => {
+    window.__disposeHarness = (await import("/__verification/reference.js")).mountLifecycleHarness();
+  });
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+  const section = page.locator(".scrolly").first();
+  await section.locator(".step-number").nth(1).click();
+  await expect(section).toHaveAttribute("data-position", "1.0000");
+  await page.evaluate(() => {
+    window.__positions = [];
+    window.__positionObserver = new MutationObserver(() => window.__positions.push(document.querySelector('.scrolly').dataset.position));
+    window.__positionObserver.observe(document.querySelector('.scrolly'), { attributes: true, attributeFilter: ['data-position'] });
+  });
+  await page.getByRole("button", { name: "Paper style", exact: true }).evaluate(button => button.click());
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+  await expect(section.locator(".vd-style-paper")).toHaveCount(1);
+  await expect(section).toHaveAttribute("data-position", "1.0000");
+  await page.evaluate(() => {
+    document.documentElement.dataset.theme = "dark";
+    window.dispatchEvent(new Event("scrollytale:theme"));
+  });
+  await expect(page.locator(".scrolly").nth(1).locator(".vd-bar").first()).toHaveCSS("fill", "rgb(33, 24, 15)");
+  const mount = await section.locator(".chart-mount").evaluate(node => { window.__styleMount = node; return node.dataset.position; });
+  expect(mount).toBe("1");
+  for (let i = 0; i < 3; i++) await page.getByRole("button", { name: "Render parent", exact: true }).evaluate(button => button.click());
+  expect(await section.locator(".chart-mount").evaluate(node => node === window.__styleMount)).toBe(true);
+  await page.getByRole("button", { name: "Custom style", exact: true }).evaluate(button => button.click());
+  await expect(section.locator(".vd-style-spacious")).toHaveCount(1);
+  await section.locator(".chart-mount").evaluate(node => { window.__styleMount = node; });
+  await page.getByRole("button", { name: "Render parent", exact: true }).evaluate(button => button.click());
+  expect(await section.locator(".chart-mount").evaluate(node => node === window.__styleMount)).toBe(true);
+  await page.evaluate(() => {
+    document.querySelectorAll('.fixture-controls button').forEach(button => {
+      if (['Paper style', 'Dark style'].includes(button.textContent)) button.click();
+    });
+  });
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+  await expect(page.locator('.scrolly .vd-style-dark')).toHaveCount(2);
+  await expect(page.locator('.chart-mount')).toHaveCount(2);
+  await page.getByRole("button", { name: "Broken style", exact: true }).evaluate(button => button.click());
+  await expect(page.locator('.scrolly[data-status="Chart could not render"]')).toHaveCount(2);
+  await expect(page.locator('.scrolly .vd-style-dark')).toHaveCount(2);
+  await expect(page.locator('.chart-mount')).toHaveCount(2);
+  await expect(page.locator('.error').first()).toContainText("Style preparation failed");
+  await page.getByRole("button", { name: "Paper style", exact: true }).evaluate(button => button.click());
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+  await expect(page.locator('.error')).toHaveCount(0);
+  expect(await page.evaluate(() => window.__positions.every(value => Number(value) === 1))).toBe(true);
+  await page.evaluate(() => { window.__positionObserver.disconnect(); window.__disposeHarness(); });
+  await expect(page.locator('.chart-mount')).toHaveCount(0);
+});
+
+test("invalid MDX chartStyle values report useful errors and preserve the working preview", async ({ page }) => {
+  await page.goto("http://127.0.0.1:5183/authoring");
+  const editor = page.getByRole("textbox", { name: "MDX source" });
+  const source = `import { bar } from 'visdelta'
+export const chart = bar([{region: 'North', value: 18}]).x('region').y('value')
+
+<Scrolly chartStyle="paper"><Step chart={chart}>Paper chart.</Step></Scrolly>`;
+  await editor.fill(source);
+  await page.getByRole("button", { name: "Preview draft" }).click();
+  await expect(page.locator('.vd-style-paper')).toHaveCount(1);
+  for (const style of ['"unknown"', '{null}', '{{key: "incomplete"}}']) {
+    await editor.fill(source.replace('"paper"', style));
+    await page.getByRole("button", { name: "Preview draft" }).click();
+    await expect(page.locator('.preview-error')).toContainText('chartStyle');
+    await expect(page.locator('.vd-style-paper')).toHaveCount(1);
+  }
+});
+
+test("changing style during forward and reverse playback keeps the current native target", async ({ page }) => {
+  await page.goto("/__verification/lifecycle.html");
+  await page.evaluate(async () => {
+    window.__disposeHarness = (await import("/__verification/reference.js")).mountLifecycleHarness();
+  });
+  await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+  const section = page.locator('.scrolly').first();
+  // Observe in-page frames so browser RPC latency cannot hide the intermediate frame.
+  async function switchDuringMotion(index, buttonText) {
+    return section.evaluate((section, { index, buttonText }) => new Promise((resolve, reject) => {
+      const started = performance.now();
+      const inspect = () => {
+        const value = Number(section.dataset.position);
+        if (value > .05 && value < .95) {
+          [...document.querySelectorAll('.fixture-controls button')].find(button => button.textContent === buttonText).click();
+          resolve(value);
+        } else if (performance.now() - started > 5000) reject(new Error('No intermediate native playback frame'));
+        else requestAnimationFrame(inspect);
+      };
+      section.querySelectorAll('.step-number')[index].click();
+      requestAnimationFrame(inspect);
+    }), { index, buttonText });
+  }
+  const forward = await switchDuringMotion(1, 'Paper style');
+  expect(forward).toBeGreaterThan(.05);
+  expect(forward).toBeLessThan(.95);
+  await expect(section.locator('.vd-style-paper:visible')).toHaveCount(1);
+  await expect(section).toHaveAttribute('data-position', '1.0000');
+  const reverse = await switchDuringMotion(0, 'Dark style');
+  expect(reverse).toBeGreaterThan(.05);
+  expect(reverse).toBeLessThan(.95);
+  await expect(section.locator('.vd-style-dark:visible')).toHaveCount(1);
+  await expect(section).toHaveAttribute('data-position', '0.0000');
+  await expect(page.locator('.chart-mount')).toHaveCount(2);
+  await expect(page.locator('.error')).toHaveCount(0);
+  await page.evaluate(() => window.__disposeHarness());
+});

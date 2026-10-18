@@ -1,11 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { chartStylePresets } from "visdelta/chart-style";
 import { createChartSession } from "../src/runtime/chartSession.js";
 
 function element() {
   return {
     children: [],
     dataset: {},
+    style: {},
     append(node) {
       this.children.push(node);
       node.parent = this;
@@ -187,4 +189,119 @@ test("step playback delegates to native play, retargets from its live frame and 
   session.destroy();
   session.playTo(1);
   assert.equal(c.plays.length, 2);
+});
+
+function liveController(value = 0) {
+  const c = controller();
+  c.value = value;
+  c.progress = function (next) { this.value = next; this.values.push(next); };
+  c.plays = [];
+  c.play = function (options) { this.plays.push({ ...options }); };
+  return c;
+}
+
+test("chartStyle replaces at the latest live frame and destination, keeping the old chart until takeover", async () => {
+  const initial = liveController(), next = liveController(), pending = deferred(), host = element();
+  const paper = { key: 'paper' }, dark = { key: 'dark' };
+  const options = [];
+  const session = createChartSession({ host, states: [{}, {}, {}], chartStyle: paper,
+    sequence: async (_, opts) => { options.push(opts); return options.length === 1 ? initial : pending.promise; },
+  });
+  await session.ready;
+  assert.equal(options[0].chartStyle, paper);
+  session.seek(1);
+  session.playTo(2, 450);
+  initial.value = 1.2;
+  const replacement = session.setChartStyle(dark);
+  await Promise.resolve();
+  assert.equal(initial.destroyed, 0);
+  assert.equal(host.children.length, 2);
+  assert.equal(host.children[1].style.visibility, 'hidden');
+  session.playTo(0, 450);
+  initial.value = 1.4;
+  pending.resolve(next);
+  await replacement;
+  assert.equal(options[1].chartStyle, dark);
+  assert.deepEqual(next.values, [1.4]);
+  assert.deepEqual(next.plays, [{ to: 0, duration: 450 }]);
+  assert.equal(initial.destroyed, 1);
+  assert.equal(host.children.length, 1);
+  assert.equal(host.children[0].style.visibility, '');
+  await session.setChartStyle(dark);
+  assert.equal(options.length, 2);
+  session.destroy();
+  assert.equal(next.destroyed, 1);
+});
+
+test("rapid style changes, failed compilation and unmount never replace or erase the live chart with stale work", async () => {
+  const host = element(), first = liveController(), stale = liveController(), fresh = liveController();
+  const a = deferred(), b = deferred(), failure = deferred(), unmount = deferred();
+  const preparations = [Promise.resolve(first), a.promise, b.promise, failure.promise, unmount.promise];
+  const errors = [];
+  const session = createChartSession({ host, states: [{}, {}], sequence: () => preparations.shift(), onError: error => errors.push(error.message) });
+  await session.ready;
+  session.seek(.6);
+  const oldTask = session.setChartStyle('a');
+  await Promise.resolve();
+  const newTask = session.setChartStyle('b');
+  await Promise.resolve();
+  a.resolve(stale);
+  await oldTask;
+  assert.equal(stale.destroyed, 1);
+  assert.equal(first.destroyed, 0);
+  session.seek(.8);
+  b.resolve(fresh);
+  await newTask;
+  assert.deepEqual(fresh.values, [.8]);
+  assert.equal(first.destroyed, 1);
+  const failedTask = session.setChartStyle('broken');
+  await Promise.resolve();
+  failure.reject(new Error('Cannot prepare style'));
+  await failedTask;
+  assert.equal(host.children.length, 1);
+  assert.equal(fresh.destroyed, 0);
+  assert.deepEqual(errors, ['Cannot prepare style']);
+  const lateTask = session.setChartStyle('late');
+  await Promise.resolve();
+  session.destroy();
+  const late = liveController();
+  unmount.resolve(late);
+  await lateTask;
+  assert.equal(late.destroyed, 1);
+  assert.equal(host.children.length, 0);
+});
+
+test("single-Step style replacement passes native options and retains authored position zero", async () => {
+  const controllers = [], options = [];
+  const session = createChartSession({ host: element(), states: [{}], chartStyle: chartStylePresets.paper,
+    transition: async (from, to, opts) => {
+      assert.equal(from, to);
+      options.push(opts);
+      const c = liveController(); controllers.push(c); return c;
+    },
+  });
+  await session.ready;
+  await session.setChartStyle(chartStylePresets.dark);
+  assert.deepEqual(options.map(opts => opts.chartStyle.key), ['paper', 'dark']);
+  assert.deepEqual(controllers.map(c => c.values), [[1], [1]]);
+  assert.equal(session.value, 0); // One authored state, despite native pair completion being 1.
+  session.resize();
+  assert.equal(controllers[1].values.at(-1), 1);
+  session.destroy();
+});
+
+test("a failed initial frame draw destroys the candidate and retains the previous chart", async () => {
+  const first = liveController(), broken = liveController(), host = element(), errors = [];
+  broken.progress = () => { throw new Error('Frame invalid'); };
+  let calls = 0;
+  const session = createChartSession({ host, states: [{}, {}], sequence: async () => ++calls === 1 ? first : broken,
+    onError: error => errors.push(error.message),
+  });
+  await session.ready;
+  await session.setChartStyle({ key: 'broken' });
+  assert.equal(broken.destroyed, 1);
+  assert.equal(first.destroyed, 0);
+  assert.equal(host.children.length, 1);
+  assert.deepEqual(errors, ['Frame invalid']);
+  session.destroy();
 });

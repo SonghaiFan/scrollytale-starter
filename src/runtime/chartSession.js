@@ -1,83 +1,106 @@
-// Every session owns a distinct DOM mount. Stale async work can never paint into its replacement.
-export function createChartSession({
-  host,
-  states,
-  sequence,
-  transition,
-  onReady,
-  onError,
-}) {
-  const mount = document.createElement("div");
-  mount.className = "chart-mount";
-  host.append(mount);
+// Each prepared controller owns a private mount; async replacements never paint into the live chart.
+export function createChartSession({ host, states, sequence, transition, chartStyle, onReady, onPreparing, onError }) {
   let disposed = false;
-  let controller;
+  let generation = 0;
+  let current;
+  let selectedStyle = chartStyle;
   let latestPosition = 0;
   let lastApplied;
-  let playing = false;
-  let pendingPlay;
+  let playback;
+  let pending;
+  const mounts = new Set();
+  const clamp = value => Math.max(0, Math.min(states.length - 1, value));
+  function remove(slot) {
+    if (slot.removed) return;
+    slot.removed = true;
+    slot.controller?.destroy();
+    slot.mount.remove();
+    mounts.delete(slot);
+  }
   function seek(value) {
-    if (!Number.isFinite(value))
-      throw new Error("Chart position must be finite.");
-    playing = false;
-    pendingPlay = undefined;
-    latestPosition = Math.max(0, Math.min(states.length - 1, value));
-    if (disposed || !controller || latestPosition === lastApplied) return;
-    controller.progress(states.length === 1 ? 1 : latestPosition);
+    if (!Number.isFinite(value)) throw new Error("Chart position must be finite.");
+    playback = undefined;
+    latestPosition = clamp(value);
+    if (disposed || !current || latestPosition === lastApplied) return;
+    current.controller.progress(states.length === 1 ? 1 : latestPosition);
     lastApplied = latestPosition;
-    mount.dataset.position = String(latestPosition);
+    current.mount.dataset.position = String(latestPosition);
   }
   function playTo(value, duration = 800) {
     if (!Number.isFinite(value) || !Number.isFinite(duration) || duration < 0)
       throw new Error("Playback destination and duration must be finite; duration must be nonnegative.");
     if (disposed) return;
-    const to = Math.max(0, Math.min(states.length - 1, value));
-    if (!controller) {
-      pendingPlay = { to, duration };
-      return;
-    }
     if (states.length === 1) return seek(0);
-    playing = true;
+    playback = { to: clamp(value), duration };
     lastApplied = undefined;
-    controller.play({ to, duration });
+    current?.controller.play(playback);
   }
-  const ready = Promise.resolve()
-    .then(async () => {
-      if (disposed) return;
-      const options = { target: mount, width: "auto", height: "auto" };
+  function prepare(style) {
+    const token = ++generation;
+    const mount = document.createElement("div");
+    mount.className = "chart-mount";
+    // Retain the visible chart while its successor is compiled at the same dimensions.
+    mount.style.visibility = "hidden";
+    mount.style.position = "absolute";
+    mount.style.inset = "0";
+    const slot = { mount, controller: undefined, removed: false };
+    mounts.add(slot);
+    host.append(mount);
+    onPreparing?.();
+    return Promise.resolve().then(async () => {
+      if (disposed || token !== generation) { remove(slot); return; }
+      const options = { target: mount, width: "auto", height: "auto", ...(style === undefined ? {} : { chartStyle: style }) };
       const next = await (states.length === 1
         ? transition(states[0], states[0], options)
         : sequence(states, options));
-      if (disposed) {
+      if (disposed || token !== generation) {
         next.destroy();
+        remove(slot);
         return;
       }
-      controller = next;
-      const queued = pendingPlay;
-      seek(latestPosition);
-      if (queued) playTo(queued.to, queued.duration);
+      slot.controller = next;
+      if (current) next.resize();
+      const value = states.length === 1 ? 0 : current?.controller.value ?? latestPosition;
+      next.progress(states.length === 1 ? 1 : value);
+      if (playback && value !== playback.to) next.play(playback);
+      const previous = current;
+      current = slot;
+      latestPosition = value;
+      lastApplied = playback ? undefined : value;
+      mount.dataset.position = String(value);
+      mount.style.visibility = "";
+      mount.style.position = "";
+      mount.style.inset = "";
+      if (previous) remove(previous);
       onReady?.();
-    })
-    .catch((error) => {
-      if (!disposed) onError?.(error);
+    }).catch(error => {
+      remove(slot);
+      if (!disposed && token === generation) onError?.(error);
     });
+  }
+  pending = prepare(chartStyle);
   return {
-    ready,
+    get ready() { return pending; },
     seek,
     playTo,
-    get value() { return controller?.value ?? latestPosition; },
+    get value() { return states.length === 1 ? 0 : current?.controller.value ?? latestPosition; },
+    setChartStyle(style) {
+      if (disposed || style === selectedStyle) return pending;
+      selectedStyle = style;
+      pending = prepare(style);
+      return pending;
+    },
     resize() {
-      if (disposed || !controller) return;
-      controller.resize();
-      if (playing) return;
+      if (disposed || !current) return;
+      current.controller.resize();
+      if (playback) return;
       lastApplied = undefined;
       seek(latestPosition);
     },
     destroy() {
       if (disposed) return;
       disposed = true;
-      controller?.destroy();
-      mount.remove();
+      for (const slot of [...mounts]) remove(slot);
     },
   };
 }

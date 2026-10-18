@@ -1,4 +1,6 @@
 import { chart as starterChart } from "../story.mdx";
+import { styleChart, neutralChart, spaciousStyle } from "../src/story/styles.js";
+import { resolveChartStyle } from "../src/runtime/chartStyle.js";
 import { transition } from "visdelta";
 import {
   housingStates,
@@ -7,6 +9,8 @@ import {
   unitStates,
 } from "./story-charts.js";
 const stories = {
+  styles: [styleChart, styleChart.highlight({ region: "North" })],
+  neutralStyle: [neutralChart],
   starter: [
     starterChart,
     starterChart.highlight({ region: "North" }),
@@ -17,7 +21,7 @@ const stories = {
   observations: pointStates,
   households: unitStates,
 };
-export async function staticFrame(id, index, width, height) {
+export async function staticFrame(id, index, width, height, chartStyle) {
   const mount = document.createElement("div");
   mount.style.cssText = `position:fixed;left:-20000px;top:0;width:${width}px;height:${height}px`;
   document.body.append(mount);
@@ -26,6 +30,7 @@ export async function staticFrame(id, index, width, height) {
     const state = stories[id][index];
     controller = await transition(state, state, {
       target: mount,
+      chartStyle: resolveChartStyle(chartStyle === "custom" ? spaciousStyle : chartStyle),
       width: "auto",
       height: "auto",
     });

@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
+import { defineChartStyle } from "visdelta/chart-style";
+import { spaciousStyle } from "../src/story/styles.js";
 import { bar } from "visdelta";
 import { Scrolly, Step } from "../src/components/story.jsx";
 
+const brokenStyle = defineChartStyle({ key: "broken", axisTitle() { throw new Error("Style preparation failed"); } });
+
 function Parent() {
+  const [chartStyle, setChartStyle] = useState(undefined);
   const [revision, setRevision] = useState(0);
   const [value, setValue] = useState(18);
   const [field, setField] = useState("value");
@@ -24,9 +29,14 @@ function Parent() {
         >
           Change field
         </button>
+        <button onClick={() => setChartStyle("paper")}>Paper style</button>
+        <button onClick={() => setChartStyle("dark")}>Dark style</button>
+        <button onClick={() => setChartStyle(spaciousStyle)}>Custom style</button>
+        <button onClick={() => setChartStyle(brokenStyle)}>Broken style</button>
+        <button onClick={() => setChartStyle(undefined)}>Inherited style</button>
         <span>Revision {revision}</span>
       </div>
-      <Scrolly>
+      <Scrolly chartStyle={chartStyle}>
         <Step chart={chart}>
           <h2>All regions</h2>
         </Step>
@@ -37,7 +47,7 @@ function Parent() {
           <h2>All again</h2>
         </Step>
       </Scrolly>
-      <Scrolly>
+      <Scrolly chartStyle={chartStyle}>
         <Step chart={chart}>
           <h2>A single chart</h2>
         </Step>

@@ -237,6 +237,7 @@ summary {
   padding-bottom: 12px;
 }
 .chart-host {
+  position: relative;
   height: clamp(270px, 53svh, 530px);
   width: 100%;
   min-width: 0;

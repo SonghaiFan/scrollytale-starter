@@ -13,8 +13,10 @@ const Story = initialDocument.default;
 const HousingStory = lazy(() => import("../../examples/housing.mdx"));
 const ModesStory = lazy(() => import("../../examples/modes.mdx"));
 const VisDeltaStory = lazy(() => import("../../examples/visdelta.mdx"));
+const StylesStory = lazy(() => import("../../examples/styles.mdx"));
 const advanced = location.pathname.startsWith("/examples/");
-const ReaderStory = location.pathname === "/examples/visdelta" ? VisDeltaStory
+const ReaderStory = location.pathname === "/examples/styles" ? StylesStory
+  : location.pathname === "/examples/visdelta" ? VisDeltaStory
   : location.pathname === "/examples/modes" ? ModesStory
   : location.pathname === "/examples/housing" ? HousingStory : Story;
 
@@ -204,6 +206,7 @@ export function App() {
             </a>
             <a href="/examples/modes">Compare playback modes</a>
             <a href="/examples/visdelta">VisDelta homepage demos</a>
+            <a href="/examples/styles">Chart styles</a>
             <a href="#story">Back to top ↑</a>
           </footer>
         </main>
