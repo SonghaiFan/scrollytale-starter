@@ -811,3 +811,32 @@ test("changing style during forward and reverse playback keeps the current nativ
   await expect(page.locator('.error')).toHaveCount(0);
   await page.evaluate(() => window.__disposeHarness());
 });
+
+for (const width of [1440, 390]) {
+  test(`plain MDX headings share a deliberate reading column at ${width}px`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height: 1000 });
+    for (const route of ['/examples/modes', '/examples/styles', '/examples/visdelta']) {
+      await page.goto(route);
+      await expect(page.locator('.mdx-document > h1')).toBeVisible();
+      const boxes = await page.locator('.mdx-document').evaluate(document => {
+        return [...document.querySelectorAll(':scope > h1, :scope > h2, :scope > h3, :scope > p, :scope > pre, :scope > details')].map(node => {
+          const rect = node.getBoundingClientRect();
+          return { left: rect.left, right: rect.right, width: rect.width };
+        });
+      });
+      expect(boxes.length).toBeGreaterThan(3);
+      for (const box of boxes) {
+        expect(box.left).toBeGreaterThanOrEqual(20);
+        expect(box.right).toBeLessThanOrEqual(width - 20);
+        expect(box.width).toBeLessThanOrEqual(760);
+        expect(box.left).toBeCloseTo(boxes[0].left, 0);
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+    await page.goto('/examples/modes');
+    await expect(page.locator('.scrolly[data-status="Ready"]')).toHaveCount(2);
+    await page.screenshot({ path: info.outputPath(`prose-${width}.png`) });
+    await page.getByRole('button', { name: 'Toggle theme' }).click();
+    await page.screenshot({ path: info.outputPath(`prose-dark-${width}.png`) });
+  });
+}

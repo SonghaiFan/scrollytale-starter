@@ -1,5 +1,5 @@
 :root {
-  font-family: Inter, Arial, sans-serif;
+  font-family: var(--vd-type-family, ui-sans-serif, system-ui, sans-serif);
   color-scheme: light;
   --page: #f8f8f4;
   --panel: #fff;
@@ -557,18 +557,124 @@ output span {
   display: none;
 }
 
-/* Plain MDX is a complete entry point; editorial wrappers remain optional. */
+/* Plain Markdown gets a reading column; Scrolly and editorial sections keep their own layouts.
+   Direct-child selectors keep document typography out of VisDelta's chart DOM. */
+.mdx-document {
+  --story-gutter: clamp(20px, 5vw, 72px);
+  --prose-width: 760px;
+  padding-top: 1px;
+  padding-bottom: 48px;
+}
+.mdx-document > :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, pre, table, details, hr, figure) {
+  width: min(calc(100% - 2 * var(--story-gutter)), var(--prose-width));
+  margin-inline: auto;
+}
+.mdx-document > :where(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 96px;
+  text-wrap: balance;
+}
 .mdx-document > h1 {
-  padding: 0 max(24px, 6%);
-  margin: 80px 0 24px;
-  font-size: clamp(2.6rem, 6vw, 5.5rem);
-  max-width: 1150px;
+  margin-block: clamp(56px, 8vw, 104px) 28px;
+  font-size: clamp(2.35rem, 5.5vw, 4.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+.mdx-document > h2 {
+  margin-block: 72px 20px;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 550;
+}
+.mdx-document > h3 {
+  margin-block: 40px 16px;
+  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+}
+.mdx-document > :where(h4, h5, h6) {
+  margin-block: 32px 12px;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+.mdx-document > :where(p, ul, ol, blockquote) {
+  margin-block: 0 24px;
+  font-size: 17px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
 }
 .mdx-document > p {
-  max-width: 760px;
-  margin: 0 max(24px, 6%) 48px;
-  font-size: 18px;
   color: var(--muted);
+}
+.mdx-document > h1 + p {
+  margin-bottom: 32px;
+  font-size: clamp(18px, 2vw, 21px);
+}
+.mdx-document > :where(ul, ol) {
+  padding-left: 24px;
+}
+.mdx-document > :where(ul, ol) li + li {
+  margin-top: 8px;
+}
+.mdx-document > :where(p, ul, ol, blockquote) code {
+  padding: 2px 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--ink);
+}
+.mdx-document > pre {
+  margin-block: 24px 40px;
+  padding: 20px 24px;
+  border-radius: 3px;
+  font-size: 13px;
+}
+.mdx-document > blockquote {
+  padding: 4px 20px;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+}
+.mdx-document > blockquote > :first-child {
+  margin-top: 0;
+}
+.mdx-document > blockquote > :last-child {
+  margin-bottom: 0;
+}
+.mdx-document > details {
+  margin-block: 32px 48px;
+  padding-block: 18px;
+}
+.mdx-document > table,
+.mdx-document > details table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin-block: 24px 40px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.mdx-document > table :where(th, td),
+.mdx-document > details table :where(th, td) {
+  padding: 12px 18px 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.mdx-document > table th,
+.mdx-document > details table th {
+  font-weight: 600;
+  color: var(--ink);
+}
+.mdx-document > hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin-block: 48px;
+}
+.mdx-document > :where(img, video),
+.mdx-document > p :where(img, video),
+.mdx-document > figure :where(img, video) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.mdx-document > :where(img, video) {
+  max-width: calc(100% - 2 * var(--story-gutter));
+  margin: 32px auto;
 }
 .loading-example {
   padding: 48px;
