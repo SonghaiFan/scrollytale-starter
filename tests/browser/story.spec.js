@@ -113,15 +113,13 @@ for (const width of [1440, 390]) {
       window.__observer = new MutationObserver((records) => {
         window.__mutations += records.length;
       });
-      document
-        .querySelectorAll(".chart-mount")
-        .forEach((mount) =>
-          window.__observer.observe(mount, {
-            subtree: true,
-            attributes: true,
-            childList: true,
-          }),
-        );
+      document.querySelectorAll(".chart-mount").forEach((mount) =>
+        window.__observer.observe(mount, {
+          subtree: true,
+          attributes: true,
+          childList: true,
+        }),
+      );
     });
     await page.waitForTimeout(500);
     expect(await page.evaluate(() => window.__mutations)).toBe(0);
@@ -304,24 +302,46 @@ test("a stale preview response cannot replace newer text or its preview", async 
   await expect(
     page.getByRole("heading", { name: "Stale preview" }),
   ).toHaveCount(0);
-  page.once("dialog", dialog => dialog.accept());
+  page.once("dialog", (dialog) => dialog.accept());
   await page.reload();
   await expect(editor).toHaveValue(latest);
-  await expect(page.locator(".editor-message")).toContainText("Restored your unsaved draft");
+  await expect(page.locator(".editor-message")).toContainText(
+    "Restored your unsaved draft",
+  );
 });
 
-
 for (const width of [1440, 390]) {
-  test(`MDX documentation fits and navigates at ${width}px`, async ({ page }, info) => {
+  test(`MDX documentation fits and navigates at ${width}px`, async ({
+    page,
+  }, info) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto('http://127.0.0.1:4174/scrollytale-starter/');
-    await expect(page.getByRole('heading', { name: 'Scrollytale', exact: true })).toBeVisible();
-    await page.getByRole('link', { name: 'Component API', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Component API', exact: true })).toBeVisible();
-    await expect(page.locator('table')).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.goto("http://127.0.0.1:4174/scrollytale-starter/");
+    await expect(
+      page.getByRole("heading", { name: "Scrollytale", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("navigation", { name: "Documentation" })
+      .getByRole("link", { name: "Component API", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Component API", exact: true }),
+    ).toBeVisible();
+    await expect(page.locator("table")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
     await page.screenshot({ path: info.outputPath(`docs-${width}.png`) });
-    await page.getByRole('link', { name: 'Architecture & verification', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'Architecture and verification', exact: true })).toBeVisible();
+    await page
+      .getByRole("navigation", { name: "Documentation" })
+      .getByRole("link", { name: "Architecture & verification", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", {
+        name: "Architecture and verification",
+        exact: true,
+      }),
+    ).toBeVisible();
   });
 }
